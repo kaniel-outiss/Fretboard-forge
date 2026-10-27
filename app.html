@@ -120,7 +120,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 <section class="tab on land" id="t-neck">
   <div class="side">
     <div class="row"><span class="lbl">Tonalité</span><select id="nKey"></select>
-      <span class="lbl">Vue</span><select id="nView"><option value="caged">CAGED</option><option value="scale">Gamme</option><option value="triad">Triades</option><option value="layers">Couches (Ellis)</option><option value="taylor">Hiérarchie (Taylor)</option><option value="jig">Tonalité (accords)</option><option value="mark">Repères C‑D‑E‑G‑A</option></select></div>
+      <span class="lbl">Vue</span><select id="nView"><option value="caged">CAGED</option><option value="scale">Gamme</option><option value="triad">Triades</option><option value="layers">Couches (Ellis)</option><option value="taylor">Hiérarchie (Taylor)</option><option value="jig">Tonalité (accords)</option><option value="mark">Repères C‑D‑E‑G‑A</option><option value="dict">📖 Dictionnaire d'accords</option></select></div>
     <div class="row" id="nSub"></div>
     <div class="row"><span class="lbl">Pastilles</span><button class="b" data-m="iv">Intervalles</button><button class="b" data-m="nt">Notes</button><button class="b" data-m="dg">Doigts</button>
       <button class="b" id="nMv">Mouvement</button><button class="b" id="nPlay">▶ Écouter</button></div>
@@ -338,7 +338,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.8 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.9 — Boss</div>
 </section>
 
 </main>
@@ -590,6 +590,17 @@ if(inC)h+=dot(s2,f,NC[(pc-cur.r+12)%12],nm(pc,N.key),{r:pc===cur.r?15:13,ring:pc
 else if(maj.includes(iv))h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="10" fill="#1c2033" stroke="${iv===0?'#fff':iv===9?'#a06bff':'#4a4f68'}" stroke-width="${iv===0||iv===9?2:1}"/><text x="${X(s2)}" y="${YN(f)+3.5}" text-anchor="middle" font-size="9" fill="#9a9fb8">${nm(pc,N.key)}</text></g>`}
 const rel=nm((k+9)%12,N.key)+'m',cap=['C','A','G','E','D'].map(x=>[x,(k-PC[x]+12)%12]).filter(([x,c])=>c>=1&&c<=7).map(([x,c])=>`formes de ${x} capo ${c}`).join(' · ');
 const g=PROGS[N.jg||0];info=`${N.key} majeur / ${rel} (relatif mineur, même notes). Romain majuscule = majeur, minuscule = mineur ; en italique, hors tonalité (♭VII « money chord »). Capo : ${cap||'—'}. Grille : ${g.n} → ${progNames(g).join(' – ')}`;
+}else if(N.view==='dict'){N.dt=N.dt||'maj';N.dv=N.dv||0;
+sub.innerHTML='<span class="lbl">Accord</span><select id="dtSel" style="max-width:150px">'+DICT.map(([id,lb])=>`<option value="${id}" ${N.dt===id?'selected':''}>${N.key}${lb}</option>`).join('')+'</select>'+(N.dvs=dictVoicings(k,N.dt)).map((v,i)=>`<button class="b ${N.dv===i?'on':''}" data-dv="${i}">${v.pos===0?'Ouv.':'Pos '+v.pos}</button>`).join('');
+sub.querySelector('#dtSel').onchange=e=>{N.dt=e.target.value;N.dv=0;drawNeck();const v=N.dvs[0];if(v)chord(v.ms)};
+sub.querySelectorAll('[data-dv]').forEach(b=>b.onclick=()=>{N.dv=+b.dataset.dv;drawNeck();chord(N.dvs[N.dv].ms)});
+const v=N.dvs[N.dv]||N.dvs[0];if(v){const lo=v.pos;
+if(v.bar)h+=`<rect x="${X(v.bar[0])-8}" y="${YN(lo)-9}" width="${X(v.bar[1])-X(v.bar[0])+16}" height="18" rx="9" fill="#ffd23f" opacity=".3"/>`;
+v.fr.forEach((f,s2)=>{if(f<0){h+=`<text x="${X(s2)}" y="${YN(0)+5}" text-anchor="middle" font-size="16" font-weight="700" fill="#ff3b5c">×</text>`;return}const pc=(TUNE[s2]+f)%12,iv=(pc-k+12)%12;
+h+=dot(s2,f,NC[iv],N.mode==='dg'?(f===0?'0':String(v.fi[s2])):N.mode==='nt'?nm(pc,N.key):IVN[iv],{r:f===0?11:15,ring:iv===0?'#fff':null})});
+const nts=v.fr.map((f,s2)=>f<0?'·':JN[(TUNE[s2]+f)%12]).join(' ');
+info=`${N.key}${DICT.find(x=>x[0]===N.dt)[1]} — ${DICT.find(x=>x[0]===N.dt)[3]} · voicing ${N.dv+1}/${N.dvs.length} · cordes 6→1 : ${nts} · doigts : ${v.fr.map((f,i)=>f<0?'x':f===0?'0':v.fi[i]).join(' ')}${v.bar?' (barré)':''}. Pastilles « Doigts » pour voir les doigtés.`}
+else info='Aucun voicing jouable trouvé pour cet accord.';
 }else if(N.view==='mark'){sub.innerHTML='';const M=[0,2,4,7,9];
 for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const pc=(TUNE[s2]+f)%12;if(M.includes(pc))h+=dot(s2,f,['#ff3b5c',0,'#ff9f1a',0,'#ffd23f',0,0,'#39ff88',0,'#2ee6ff'][pc],SHP[pc],{r:14});
 else h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="5" fill="#2a2f45"/></g>`}
@@ -605,6 +616,32 @@ document.getElementById('nLayRow').style.display=(N.view==='layers'||N.view==='t
 document.getElementById('nGo').textContent=N.play?'■ Stop':'🎯 Joue la couche';
 setSvg('nSvg',h);document.getElementById('nInfo').textContent=info}
 bindDots(document.getElementById('nSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('nSvg'),s);nNote(MIDI[s]+f,false)});
+/* ===== Dictionnaire d'accords (types de L'Encyclopédie des tableaux d'accords, Vogler) — voicings calculés ===== */
+const DICT=[['maj','','0,4,7','majeur'],['sus4','sus4','0,5,7','sus4'],['6','6','0,4,7,9;0,4,9','sixte'],['69','6/9','0,4,9,2;0,4,7,9,2','6/9'],['maj7','maj7','0,4,7,11;0,4,11','majeur 7'],['maj9','maj9','0,4,11,2;0,4,7,11,2','majeur 9'],['m11+','maj7♯11','0,4,11,6;0,4,7,11,6','♯11'],['maj13','maj13','0,4,11,9;0,4,11,2,9','majeur 13'],
+['min','m','0,3,7','mineur'],['m6','m6','0,3,7,9;0,3,9','mineur 6'],['m7','m7','0,3,7,10;0,3,10','mineur 7'],['m9','m9','0,3,10,2;0,3,7,10,2','mineur 9'],['m11','m11','0,3,10,5;0,3,7,10,5;0,3,10,2,5','mineur 11'],['m13','m13','0,3,10,9;0,3,10,2,9','mineur 13'],['mM7','m(maj7)','0,3,7,11;0,3,11','mineur/majeur 7'],
+['m7b5','ø7','0,3,6,10','demi-diminué'],['dim7','°7','0,3,6,9','diminué 7'],['dim','dim','0,3,6','diminué'],['aug','aug','0,4,8','augmenté'],
+['7','7','0,4,7,10;0,4,10','septième de dominante'],['7sus4','7sus4','0,5,7,10;0,5,10','7 sus4'],['7b5','7♭5','0,4,6,10','7 quinte bémol'],['7#5','7♯5','0,4,8,10','7 quinte augmentée'],['9','9','0,4,10,2;0,4,7,10,2','neuvième'],['9b5','9♭5','0,4,6,10,2','9 quinte bémol'],['9#5','9♯5','0,4,8,10,2','9 quinte augmentée'],['7b9','7♭9','0,4,10,1;0,4,7,10,1','7 neuvième bémol'],['7#9','7♯9','0,4,10,3','7 neuvième augmentée'],['11','11','0,7,10,5;0,10,2,5','onzième'],['13','13','0,4,10,9;0,4,10,2,9','treizième'],['13sus4','13sus4','0,5,10,9','13 sus4'],['5','5 (power)','0,7','power chord']];
+const DICTC={};
+function dictVoicings(r,id){const key=r+id;if(DICTC[key])return DICTC[key];const D=DICT.find(x=>x[0]===id),forms=D[2].split(';').map(f=>f.split(',').map(Number)),all=[...new Set(forms.flat())].map(x=>(r+x)%12),out=[];
+for(let lo=0;lo<=14;lo++){const opts=[];for(let s2=0;s2<6;s2++){const o=[-1];for(let f=(lo===0?0:lo);f<=lo+3&&f<=NF;f++)if(all.includes((TUNE[s2]+f)%12))o.push(f);opts.push(o)}
+const rec=(s2,cur)=>{if(s2===6){chk(cur);return}for(const f of opts[s2])rec(s2+1,cur.concat([f]))};
+const chk=fr=>{const pl=fr.map((f,i)=>f>=0?i:-1).filter(i=>i>=0);if(pl.length<Math.min(3,D[2].split(';')[0].split(',').length))return;
+const first=pl[0],last=pl[pl.length-1];if(fr.slice(first,last+1).filter(f=>f<0).length>1)return;
+const pcs=pl.map(i=>(TUNE[i]+fr[i])%12);if((pcs[0]-r+12)%12!==0)return;
+const ivs=new Set(pcs.map(p=>(p-r+12)%12));if(!forms.some(fm=>fm.every(x=>ivs.has(x))))return;
+const fz=pl.filter(i=>fr[i]>0).map(i=>fr[i]);if(!fz.length&&lo>0)return;const mn=fz.length?Math.min(...fz):0;if(lo>0&&mn!==lo)return;if(fz.length&&Math.max(...fz)-mn>3)return;
+// doigtés
+const fi=Array(6).fill(0),fretted=pl.filter(i=>fr[i]>0);const atMin=fretted.filter(i=>fr[i]===mn);let bar=null,used=1;
+atMin.forEach(i=>fi[i]=1);if(atMin.length>1){const a=atMin[0],b=atMin[atMin.length-1];if(fr.slice(a,b+1).some(f=>f>=0&&f<mn))return;bar=[a,b]}
+const rest=fretted.filter(i=>fr[i]>mn).sort((a,b)=>fr[a]-fr[b]||a-b);let nf=2;for(const i of rest){fi[i]=Math.max(nf,fr[i]-mn+1);nf=fi[i]+1;if(fi[i]>4)return}
+if(bar&&rest.some(i=>i<bar[0]))return;
+const sc=pl.length*3-(fz.length?Math.max(...fz)-mn:0)-(fr.slice(first,last+1).some(f=>f<0)?2:0)-(first>2?2:0);
+out.push({fr:fr.slice(),pos:lo===0?0:mn,fi,bar,sc,ms:pl.map(i=>MIDI[i]+fr[i])})};
+rec(0,[])}
+// meilleure par position, positions distinctes, jusqu'à 8
+const byPos={};out.forEach(v=>{const p=v.pos;if(!byPos[p]||v.sc>byPos[p].sc)byPos[p]=v});let L=Object.values(byPos).sort((a,b)=>a.pos-b.pos);
+const pick=[];L.forEach(v=>{if(!pick.some(x=>x.fr.join()===v.fr.join()||(x.pos>0&&Math.abs(x.pos-v.pos)<2&&x.sc>=v.sc)))pick.push(v)});
+return DICTC[key]=pick.slice(0,8)}
 /* ===== Fretboard Toolbox (Scott Sharp) : accords d'une tonalité, grilles, capo ===== */
 const QQ={M:[0,4,7],m:[0,3,7],d:[0,3,6],'7':[0,4,7,10],m7:[0,3,7,10]};
 const JIG=[{rn:'I',o:0,q:'M'},{rn:'ii',o:2,q:'m'},{rn:'iii',o:4,q:'m'},{rn:'IV',o:5,q:'M'},{rn:'V',o:7,q:'M'},{rn:'vi',o:9,q:'m'},{rn:'vii°',o:11,q:'d'},{rn:'♭VII',o:10,q:'M',out:1},{rn:'♭III',o:3,q:'M',out:1}];

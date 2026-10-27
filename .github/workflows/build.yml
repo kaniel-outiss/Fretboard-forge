@@ -45,8 +45,18 @@ jobs:
           JAVA
           sed -i 's/^          //' "$F"
       - run: npx cap sync android
+      - name: Numero de version croissant
+        run: |
+          V=$(node -p "require('./package.json').version")
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/; s/versionName \"[^\"]*\"/versionName \"$V\"/" android/app/build.gradle
+          grep -E "versionCode|versionName" android/app/build.gradle
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - run: cp android/app/build/outputs/apk/debug/app-debug.apk fretboard-forge.apk
+      - name: Signature fixe (cle du depot, identique a chaque version)
+        run: |
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          $BT/apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey fretboard-forge.apk
+          $BT/apksigner verify --print-certs fretboard-forge.apk | head -3
       - uses: actions/upload-artifact@v4
         with: {name: fretboard-forge.apk, path: fretboard-forge.apk}
       - uses: softprops/action-gh-release@v2

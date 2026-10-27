@@ -34,6 +34,8 @@ header h1 span{color:var(--acc);text-shadow:0 0 10px var(--acc)}
 .sgbar span{display:flex;flex-direction:column;line-height:1.1}.sgbar i{font-style:normal;font-size:9px;color:var(--mut)}
 .sgbar.cur{border-color:var(--acc);box-shadow:0 0 8px var(--acc);color:var(--acc)}
 #sgNow{font-size:15px}#sgNow span{color:var(--mut);font-size:12px}
+#blGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;width:100%}#blGrid span{background:var(--bg2);border:1px solid var(--line);border-radius:6px;text-align:center;font-size:12px;padding:3px 0;min-height:24px}#blGrid span.on{border-color:#ff7a1a;color:#ff7a1a;box-shadow:0 0 8px #ff7a1a}
+nav button{font-size:10px}
 .days{display:flex;gap:3px;justify-content:center}.days i{width:14px;height:14px;border-radius:3px;background:#161a2a}.days i.on{background:var(--ok);box-shadow:0 0 6px var(--ok)}.micn.hot{color:var(--ok);border-color:var(--ok);box-shadow:0 0 10px var(--ok)}
 #btnMic.live{border-color:var(--ko);color:var(--ko);box-shadow:0 0 10px var(--ko);animation:breathe 1.2s infinite}
 main{flex:1 1 auto;min-height:0;position:relative}
@@ -146,6 +148,21 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="fill"><svg class="neck" id="tSvg" viewBox="0 0 372 624"></svg></div>
 </section>
 
+<!-- ===== BLUES ===== -->
+<section class="tab land" id="t-bl">
+  <div class="side">
+    <div class="row"><span class="lbl">Module</span><button class="b on" data-bm="box">Boîtes</button><button class="b" data-bm="fda">F‑D‑A</button><button class="b" data-bm="jam">Jam 12 mesures</button><select id="blKey"></select></div>
+    <div class="row" id="blBoxRow"><span class="lbl">Boîte</span><button class="b on" data-bb="0">1</button><button class="b" data-bb="1">2</button><button class="b" data-bb="2">3</button><button class="b" data-bb="3">4</button><button class="b" id="blExt">+ notes en plus</button></div>
+    <div class="row" id="blFdaRow" style="display:none"><span class="lbl">Accord</span><button class="b" id="blF7">Version 7 (blues)</button></div>
+    <div class="row" id="blJamRow" style="display:none"><span class="lbl">Tempo</span><input type="range" id="blTempo" min="50" max="180" value="90" step="5" style="flex:1"><span id="blTempoV" style="font-size:12px;min-width:28px">90</span><div id="blGrid"></div></div>
+    <div class="frame" id="blFrame"><div class="big" id="blBig" style="font-size:22px">—</div><div class="info" id="blSub" style="text-align:center"></div>
+      <div class="stats"><span>Série <b id="blStreak" class="streak">0</b></span><span>Réussis <b id="blOk">0</b></span></div></div>
+    <div class="info" id="blInfo"></div>
+    <div class="row" style="justify-content:center"><button class="b" id="blPlay">▶ Écouter</button><button class="b go" id="blGo">🎯 Joue la boîte</button></div>
+  </div>
+  <div class="fill"><svg class="neck" id="bSvg" viewBox="0 0 372 624"></svg></div>
+</section>
+
 <!-- ===== JAZZ ===== -->
 <section class="tab land" id="t-jz">
   <div class="side" id="jS7">
@@ -246,7 +263,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v0.9 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v1.0 — Boss</div>
 </section>
 
 </main>
@@ -254,6 +271,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <button class="on" data-t="t-neck"><i>🎸</i>Manche</button>
   <button data-t="t-dr"><i>✏️</i>Dessine</button>
   <button data-t="t-tri"><i>⚡</i>Triades</button>
+  <button data-t="t-bl"><i>🔥</i>Blues</button>
   <button data-t="t-jz"><i>🎷</i>Jazz</button>
   <button data-t="t-sc"><i>🐉</i>Gammes</button>
   <button data-t="t-sg"><i>🎤</i>Scène</button>
@@ -346,7 +364,7 @@ function save(){localStorage.setItem('ff_state',JSON.stringify(ST))}
 ST.sess++;save();
 
 /* ================= ONGLETS ================= */
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));if(b.dataset.t==='t-pro')drawPro();if(b.dataset.t==='t-sc')drawSc();if(b.dataset.t==='t-tri')drawTri();if(b.dataset.t==='t-dr')drDraw();if(b.dataset.t==='t-jz')jzDraw();if(b.dataset.t==='t-sg')sceneOpen()});
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));if(b.dataset.t==='t-pro')drawPro();if(b.dataset.t==='t-sc')drawSc();if(b.dataset.t==='t-tri')drawTri();if(b.dataset.t==='t-dr')drDraw();if(b.dataset.t==='t-jz')jzDraw();if(b.dataset.t==='t-sg')sceneOpen();if(b.dataset.t==='t-bl')blDraw()});
 document.getElementById('btnSnd').onclick=e=>{sndOn=!sndOn;e.target.textContent=sndOn?'🔊':'🔇';ac()};
 
 /* ================= MANCHE ================= */
@@ -816,6 +834,68 @@ async function sceneOpen(){if(!STD){document.getElementById('sgList').innerHTML=
 const c={};STD.forEach(r=>c[r[3]]=(c[r[3]]||0)+1);document.getElementById('sgStyle').innerHTML='<option value="">Tous les styles</option><option value="__mel">♪ avec mélodie ('+STD.filter(r=>r[11]&&r[11].mel).length+')</option>'+Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<option value="${k}">${({ndp:'Notre-Dame de Paris',hymn:'cantiques',worship:'worship / gospel',film:'musiques de film'})[k]||k} (${n})</option>`).join('')}
 catch(e){document.getElementById('sgList').innerHTML='<div class="info">Impossible de décompresser les grilles : '+e.message+'</div>';return}}sgDraw()}
 
+/* ================= BLUES (Sokolow : boîtes 1-4, roadmap F-D-A ; jam 12 mesures) ================= */
+const BL={mode:'box',key:'G',box:0,ext:false,play:false,si:0,fda7:false,fi:0,run:false,bar:0,beat:0,timer:null,tempo:90,streak:0};
+/* boîtes relatives à la fondamentale sur la corde 6 (r6) — corde : 0 = Mi grave … 5 = Mi aigu ; ext = notes « en plus » (carrés de Sokolow) */
+const BOXES=[
+ {lb:'Boîte 1',how:'Repère : formation F au niveau de la tonique (Sokolow #8).',n:[[0,0],[0,3],[1,0],[1,2],[2,0],[2,2],[3,0],[3,2],[4,0],[4,3],[5,0],[5,3]],x:[[1,1],[3,3]]},
+ {lb:'Boîte 2',how:'Plus haut que la boîte 1, elle la chevauche sur les cordes 1 et 2.',n:[[3,4],[4,3],[4,5],[5,3],[5,5]],x:[]},
+ {lb:'Boîte 3',how:'Repère : tonique sur la corde 2 sous l\'index — la boîte « B.B. King », couleur plus majeure.',n:[[3,4],[3,7],[4,5],[4,8],[5,5],[5,7]],x:[[3,6],[4,7],[5,6]]},
+ {lb:'Boîte 4',how:'Repère : tonique sur la corde 3 sous le majeur.',n:[[3,7],[3,9],[4,8],[4,10],[5,7],[5,10]],x:[[5,9]]}];
+function blR6(){let r=(PC[BL.key]-4+12)%12;return r}
+function boxNotes(bi){const b=BOXES[bi],k=PC[BL.key],r6=blR6();let L=b.n.map(([s,o])=>({s,f:r6+o,x:false})).concat(BL.ext?b.x.map(([s,o])=>({s,f:r6+o,x:true})):[]);
+if(Math.max(...L.map(n=>n.f))>NF)L=L.map(n=>Object.assign(n,{f:n.f-12}));if(Math.min(...L.map(n=>n.f))<0)L=L.map(n=>Object.assign(n,{f:n.f+12}));
+return L.map(n=>Object.assign(n,{iv:(TUNE[n.s]+n.f-k+24)%12}))}
+const boxSeq=bi=>{const u=[...new Set(boxNotes(bi).map(n=>MIDI[n.s]+n.f))].sort((a,b)=>a-b);return u.concat(u.slice(0,-1).reverse())};
+/* roadmap F-D-A : trois formations d'accord majeur (ou 7) sur les cordes aiguës */
+const FDA={F:{strs:[2,3,4,5],iv:[0,4,7,0],iv7:[10,4,7,0]},D:{strs:[3,4,5],iv:[7,0,4],iv7:[7,10,4]},A:{strs:[2,3,4],iv:[7,0,4],iv7:[7,10,4]}};
+function fdaChain(root,seven){const o=[];Object.entries(FDA).forEach(([nm2,F])=>{const ivs=seven?F.iv7:F.iv;stackFrets(ivs.map(iv=>(root+iv)%12),F.strs).forEach(fr=>o.push({nm:nm2,fr,strs:F.strs,ivs}))});
+return o.sort((a,b)=>Math.min(...a.fr)-Math.min(...b.fr)||Math.max(...a.fr)-Math.max(...b.fr))}
+const BL12=[0,5,0,0,5,5,0,0,7,5,0,7];
+function blChordRoot(){return(PC[BL.key]+BL12[BL.bar])%12}
+function blDraw(){const k=PC[BL.key];let h=neckBase(),info='';
+document.querySelectorAll('[data-bm]').forEach(b=>b.classList.toggle('on',b.dataset.bm===BL.mode));
+document.getElementById('blBoxRow').style.display=BL.mode==='fda'?'none':'flex';document.getElementById('blFdaRow').style.display=BL.mode==='fda'?'flex':'none';document.getElementById('blJamRow').style.display=BL.mode==='jam'?'flex':'none';
+document.querySelectorAll('[data-bb]').forEach(b=>b.classList.toggle('on',+b.dataset.bb===BL.box));document.getElementById('blExt').classList.toggle('on',BL.ext);document.getElementById('blF7').classList.toggle('on',BL.fda7);
+const big=document.getElementById('blBig'),sub=document.getElementById('blSub');
+if(BL.mode==='box'){const L=boxNotes(BL.box),seq=boxSeq(BL.box),a=Math.min(...L.map(n=>n.f)),b=Math.max(...L.map(n=>n.f));
+h+=`<rect x="34" y="${YL(Math.max(0,a-1))}" width="296" height="${YL(b)-YL(Math.max(0,a-1))}" rx="10" fill="#ff7a1a" opacity=".05" stroke="#ff7a1a" stroke-opacity=".6" stroke-dasharray="4 4"/>`;
+L.forEach(n=>{const m=MIDI[n.s]+n.f,done=BL.play&&seq.slice(0,BL.si).includes(m),nx=BL.play&&seq[BL.si]===m;h+=n.x?`<g class="dot" data-s="${n.s}" data-f="${n.f}"><rect x="${X(n.s)-11}" y="${YN(n.f)-11}" width="22" height="22" rx="4" fill="#1c2033" stroke="#c8c8d0"/><text x="${X(n.s)}" y="${YN(n.f)+4}" text-anchor="middle" font-size="11" fill="#c8c8d0">${IVN[n.iv]}</text></g>`
+:dot(n.s,n.f,NC[n.iv],IVN[n.iv],{ring:n.iv===0?'#fff':null,op:BL.play&&!done&&!nx?.4:1,target:nx})});
+big.textContent=`${BL.key} — ${BOXES[BL.box].lb}`;sub.textContent=`cases ${a} à ${b} · pentatonique mineure${BL.ext?' + notes en plus (carrés)':''}`;
+info=BL.play?`Monte puis redescends la boîte (micro ou touche) — ${BL.si}/${seq.length}`:BOXES[BL.box].how+' Fondamentales cerclées de blanc.'}
+else if(BL.mode==='fda'){const ch=fdaChain(k,BL.fda7),cols={F:'#ff3b5c',D:'#39ff88',A:'#2ee6ff'};
+ch.forEach((c,i)=>{const a=Math.min(...c.fr),b=Math.max(...c.fr),cur=BL.play&&i===BL.fi;h+=`<rect x="${X(c.strs[0])-20}" y="${YL(Math.max(0,a-1))}" width="${X(c.strs[c.strs.length-1])-X(c.strs[0])+40}" height="${YL(b)-YL(Math.max(0,a-1))}" rx="8" fill="none" stroke="${cols[c.nm]}" stroke-width="${cur?3:1.5}" stroke-dasharray="${cur?'':'5 4'}" opacity="${BL.play&&!cur?.35:1}"/>`;
+h+=`<text x="${X(c.strs[0])-30}" y="${(YL(Math.max(0,a-1))+YL(b))/2+5}" text-anchor="middle" font-size="13" font-weight="600" fill="${cols[c.nm]}">${c.nm}</text>`;
+c.fr.forEach((f,j)=>{const done=cur&&BL.played.some(p=>p[0]===c.strs[j]&&p[1]===f);h+=dot(c.strs[j],f,NC[c.ivs[j]],IVN[c.ivs[j]],{op:BL.play&&!cur?.3:(cur&&!done?.55:1),target:cur&&!done})})});
+big.textContent=`${BL.key}${BL.fda7?'7':''} — roadmap F‑D‑A`;sub.textContent='F → saute 1 case → D → saute 1 → A → saute 2 → F…';
+info=BL.play?`Formation ${BL.fi+1}/${ch.length} (${ch[BL.fi]?ch[BL.fi].nm:''}) : pose ses notes pour monter.`:'Le même accord partout sur le manche avec trois formations. Version 7 : la forme blues (F7, D7, A7).'}
+else{const L=boxNotes(BL.box),cr=blChordRoot(),ct=[0,4,7,10];
+L.forEach(n=>{const iv=(TUNE[n.s]+n.f-cr+24)%12,isC=ct.includes(iv);h+=isC?dot(n.s,n.f,NC[iv],IVN[iv],{r:15}):`<g class="dot" data-s="${n.s}" data-f="${n.f}"><circle cx="${X(n.s)}" cy="${YN(n.f)}" r="10" fill="#1c2033" stroke="#7d83a0"/><text x="${X(n.s)}" y="${YN(n.f)+4}" text-anchor="middle" font-size="10" fill="#c8c8d0">${IVN[iv]}</text></g>`});
+const nm7=nm(cr,BL.key)+'7';big.textContent=`Mesure ${BL.bar+1}/12 — ${nm7} (${['I','','','','','IV','','V'][BL12[BL.bar]]||''})`;sub.textContent=`${BOXES[BL.box].lb} · notes de l'accord en couleur, le reste de la boîte en gris`;
+info='Reste dans la boîte, vise les notes colorées sur les temps forts : la boîte ne change pas, ce sont les cibles qui bougent avec l\'accord.';
+document.getElementById('blGrid').innerHTML=BL12.map((d,i)=>`<span class="${i===BL.bar?'on':''}">${['I7','','','','','IV7','','V7'][d]}</span>`).join('')}
+for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;
+setSvg('bSvg',h);document.getElementById('blInfo').textContent=info;
+document.getElementById('blGo').textContent=BL.mode==='jam'?(BL.run?'■ Stop':'▶ Jam 12 mesures'):(BL.play?'■ Stop':(BL.mode==='box'?'🎯 Joue la boîte':'🎯 Remonte le manche'));
+const sk=document.getElementById('blStreak');sk.textContent=BL.streak;sk.className='streak'+(BL.streak>=10?' gold':'');document.getElementById('blOk').textContent=ST.bl||0}
+BL.played=[];
+function blNote(m,fromMic){if(BL.mode==='box'&&BL.play){const seq=boxSeq(BL.box);if(m===seq[BL.si]){BL.si++;if(BL.si>=seq.length){BL.play=false;BL.si=0;ST.bl=(ST.bl||0)+1;BL.streak++;flash('ok','blFrame');vibrate(30);save()}blDraw()}else{flash('ko','blFrame');BL.streak=0;vibrate([60,40,60])}return}
+if(BL.mode==='fda'&&BL.play){const ch=fdaChain(PC[BL.key],BL.fda7),c=ch[BL.fi];if(!c)return;const want=c.fr.map((f,j)=>MIDI[c.strs[j]]+f),j=want.indexOf(m);
+if(j>=0){const p=[c.strs[j],c.fr[j]];if(!BL.played.some(q=>q[0]===p[0]&&q[1]===p[1]))BL.played.push(p);if(BL.played.length>=c.fr.length){BL.played=[];BL.fi++;chord(want,0,.8);if(fromMic)MIC.mute=performance.now()+600;if(BL.fi>=ch.length){BL.play=false;BL.fi=0;ST.bl=(ST.bl||0)+1;BL.streak++;flash('ok','blFrame');save()}}blDraw()}else{flash('ko','blFrame');vibrate([60,40,60])}return}
+if(BL.mode==='jam'){const iv=(m-blChordRoot()+120)%12;if([0,4,7,10].includes(iv))flash('ok','blFrame');}}
+function blStop(){BL.run=false;if(BL.timer)clearInterval(BL.timer);BL.timer=null}
+function blComp(){const r=blChordRoot(),bm=40+((r-4+12)%12);chord([bm,bm+7,bm+10,bm+16].map(x=>x<40?x+12:x),0,60/BL.tempo*1.4)}
+function blTick(){BL.beat++;if(BL.beat>=4){BL.beat=0;BL.bar=(BL.bar+1)%12;if(BL.bar===0){ST.bl=(ST.bl||0)+1;save()}}tone(BL.beat===0?96:91,0,.05,.08);if(BL.beat===0||BL.beat===2)blComp();if(BL.beat===0)blDraw()}
+document.querySelectorAll('[data-bm]').forEach(b=>b.onclick=()=>{blStop();BL.play=false;BL.si=0;BL.fi=0;BL.mode=b.dataset.bm;blDraw()});
+document.querySelectorAll('[data-bb]').forEach(b=>b.onclick=()=>{BL.box=+b.dataset.bb;BL.si=0;blDraw()});
+document.getElementById('blExt').onclick=()=>{BL.ext=!BL.ext;BL.si=0;blDraw()};document.getElementById('blF7').onclick=()=>{BL.fda7=!BL.fda7;BL.fi=0;blDraw()};
+const blKey=document.getElementById('blKey');blKey.innerHTML=KEYS.map(k=>`<option ${k==='G'?'selected':''}>${k}</option>`).join('');blKey.onchange=e=>{BL.key=e.target.value;BL.si=0;BL.fi=0;blDraw()};
+document.getElementById('blTempo').oninput=e=>{BL.tempo=+e.target.value;document.getElementById('blTempoV').textContent=BL.tempo;if(BL.run){blStop();BL.run=true;BL.timer=setInterval(blTick,60000/BL.tempo)}};
+document.getElementById('blGo').onclick=()=>{if(BL.mode==='jam'){if(BL.run)blStop();else{ac();BL.run=true;BL.bar=0;BL.beat=0;tone(96,0,.05,.08);blComp();BL.timer=setInterval(blTick,60000/BL.tempo)}}else{BL.play=!BL.play;BL.si=0;BL.fi=0;BL.played=[]}blDraw()};
+document.getElementById('blPlay').onclick=()=>{if(BL.mode==='box')boxSeq(BL.box).forEach((m,i)=>tone(m,i*.16));else if(BL.mode==='fda')fdaChain(PC[BL.key],BL.fda7).forEach((c,i)=>chord(c.fr.map((f,j)=>MIDI[c.strs[j]]+f),i*.55,.7));else blComp()};
+bindDots(document.getElementById('bSvg'),(s2,f)=>{tone(MIDI[s2]+f);vib(document.getElementById('bSvg'),s2);blNote(MIDI[s2]+f,false)});
+
 /* ================= MICRO ================= */
 const NOTE_FR=m=>SHP[m%12]+(Math.floor(m/12)-1);
 function acf(buf,sr){let n=buf.length,rms=0;for(let i=0;i<n;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/n);if(rms<0.012)return[-1,rms];
@@ -846,6 +926,7 @@ MIC.mute=performance.now()+400;hit(false);document.getElementById('tInfo').textC
 else if(tab==='t-dr'){drPlay(m,true)}
 else if(tab==='t-jz'){jzNote(m,true)}
 else if(tab==='t-sg'){sgMelNote(m)}
+else if(tab==='t-bl'){blNote(m,true)}
 else if(tab==='t-sc'&&S.drill&&S.tgt){const w=S.tgt[2];
 if(m===w){ST.sc.ok++;S.streak++;if(S.streak>ST.sc.max)ST.sc.max=S.streak;flash('ok','sFrame');vibrate(30);MIC.mute=performance.now()+500;save();setTimeout(()=>{newScT();drawSc()},350)}
 else if(m%12===w%12)flash('warn','sFrame');
@@ -885,7 +966,7 @@ const VIL=[
 {n:'⚡ Triades',v:()=>ST.tri.ok/150,go:()=>goTab('t-tri')},
 {n:'🖐️ CAGED',v:()=>((ST.dr.byKind.caged||{}).ok||0)/25,go:()=>{goTab('t-dr');clickSel('#t-dr [data-dk=caged]')}},
 {n:'🪜 Positions de gamme',v:()=>((ST.dr.byKind.sc||{}).ok||0)/25,go:()=>{goTab('t-dr');clickSel('#t-dr [data-dk=sc]')}},
-{n:'🔥 Blues',soon:1},
+{n:'🔥 Blues',v:()=>(ST.bl||0)/30,go:()=>goTab('t-bl')},
 {n:'🎷 Septièmes',v:()=>(ST.jz.ok-(ST.jz.iivi||0))/100,go:()=>{goTab('t-jz');if(J.mode==='h')clickSel('#jH [data-jm=s7]');clickSel('[data-jv=d4]')}},
 {n:'🔁 ii‑V‑I',v:()=>(ST.jz.iivi||0)/108,go:()=>{goTab('t-jz');if(J.mode==='h')clickSel('#jH [data-jm=s7]');clickSel('[data-jv=iiVI]')}},
 {n:'🐉 Bestiaire',v:()=>ST.sc.ok/120,go:()=>goTab('t-sc')},
@@ -907,7 +988,7 @@ document.getElementById('pReset').onclick=()=>{if(confirm('Effacer toute la prog
 
 /* ================= INIT ================= */
 drawNeck();newTarget(true);drawTri();drawSc();drNew();jzReset();
-let rz=null;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{drawNeck();drawTri();drawSc();drDraw();jzDraw();if(STD)sgDraw()},150)});
+let rz=null;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{blDraw();drawNeck();drawTri();drawSc();drDraw();jzDraw();if(STD)sgDraw()},150)});
 </script>
 </body>
 </html>

@@ -119,10 +119,11 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 <!-- ===== DESSINE ===== -->
 <section class="tab land" id="t-dr">
   <div class="side">
-    <div class="row"><span class="lbl">Exercice</span><button class="b on" data-dk="caged">CAGED</button><button class="b" data-dk="tri">Triade</button><button class="b" data-dk="sc">Gamme</button><button class="b" data-dk="iv">Intervalle</button></div>
+    <div class="row"><span class="lbl">Exercice</span><button class="b on" data-dk="caged">CAGED</button><button class="b" data-dk="tri">Triade</button><button class="b" data-dk="sc">Gamme</button><button class="b" data-dk="iv">Intervalle</button><button class="b" data-dk="rd">🎼 Lecture</button></div>
     <div class="row"><span class="lbl">Tonalité</span><select id="dKey"></select><div class="steps" id="dSteps"><span>✏️ Dessine</span><span>🗣️ Décris</span><span>🎸 Joue</span></div></div>
     <div class="frame" id="dFrame"><div class="big" id="dTitle">—</div><div class="info" id="dSub" style="text-align:center"></div>
       <div class="stats"><span>Série <b id="dStreak" class="streak">0</b></span><span>Dessins justes <b id="dOk">0</b></span><span>Intervalles <b id="dIv">0</b></span></div></div>
+    <div id="rdStaff" style="display:none"></div>
     <div class="info" id="dInfo"></div>
     <div class="row" id="dOpts" style="justify-content:center"></div>
     <div class="row" style="justify-content:center"><button class="b go" id="dAct">Valider ✓</button><button class="b" id="dClr">Effacer</button><button class="b" id="dNext">Nouveau ⟳</button></div>
@@ -264,7 +265,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v1.1 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v1.2 — Boss</div>
 </section>
 
 </main>
@@ -560,7 +561,7 @@ for(let s=0;s<6;s++)for(let f=a;f<=Math.min(NF,a+4);f++){const iv=(TUNE[s]+f-k+2
 const dKey=document.getElementById('dKey');dKey.innerHTML='<option value="*">Aléatoire</option>'+KEYS.map(k=>`<option>${k}</option>`).join('');
 dKey.onchange=e=>{D.rand=e.target.value==='*';if(!D.rand)D.key=e.target.value;drNew()};
 document.querySelectorAll('#t-dr [data-dk]').forEach(b=>b.onclick=()=>{D.kind=b.dataset.dk;document.querySelectorAll('#t-dr [data-dk]').forEach(x=>x.classList.toggle('on',x===b));drNew()});
-function drNew(){D.step=0;D.sel=[];D.res=null;D.counted=false;D.si=0;D.qi=0;D.qs=[];D.done=false;if(D.rand)D.key=rnd(KEYS);const k=PC[D.key];
+function drNew(){if(D.kind==='rd'){rdNew();return}document.getElementById('rdStaff').style.display='none';document.getElementById('dSteps').style.visibility='visible';D.step=0;D.sel=[];D.res=null;D.counted=false;D.si=0;D.qi=0;D.qs=[];D.done=false;if(D.rand)D.key=rnd(KEYS);const k=PC[D.key];
 if(D.kind==='iv'){drIv();return}
 if(D.kind==='caged'){const sh=rnd(ORD);D.tgt=shapeIn(sh,D.key).map(([s,f])=>[s,f]);D.title=`${D.key} — forme ${sh}`;D.sub=`Accord majeur, forme CAGED « ${sh} » (toutes les cordes jouées)`}
 else if(D.kind==='tri'){let v=null,q,ss;for(let t=0;t<20&&!v;t++){q=rnd(['maj','min']);ss=Math.floor(Math.random()*4);const vs=triadVoicings(D.key,q,ss);if(vs.length)v=rnd(vs)}
@@ -573,7 +574,7 @@ D.ivq=q;D.sel=[];D.res=null;D.title=IVLONG[q.n];D.sub=`au-dessus de la fondament
 function drQs(){const k=PC[D.key],pool=[...D.tgt].sort(()=>Math.random()-.5).slice(0,3);
 D.qs=pool.map(([s,f])=>{const iv=(TUNE[s]+f-k+24)%12,ans=IVN[iv],opts=new Set([ans]);const others=[...new Set(D.tgt.map(([s2,f2])=>IVN[(TUNE[s2]+f2-k+24)%12]))].concat(['R','3','5','b3','b7','2','4','6','7']);
 for(const o of others.sort(()=>Math.random()-.5)){if(opts.size>=4)break;opts.add(o)}return{s,f,ans,opts:[...opts].sort(()=>Math.random()-.5)}})}
-function drDraw(){const k=PC[D.key];let h=neckBase();
+function drDraw(){if(D.kind==='rd'){rdDraw();return}document.getElementById('rdStaff').style.display='none';document.getElementById('dSteps').style.visibility='visible';const k=PC[D.key];let h=neckBase();
 const st=document.querySelectorAll('#dSteps span');st.forEach((e,i)=>{e.className=D.kind==='iv'?(i===0?'on':''):(i<D.step||D.done&&i===2?'done':i===D.step?'on':'')});
 document.getElementById('dTitle').textContent=D.title||'—';document.getElementById('dSub').textContent=D.sub||'';
 const act=document.getElementById('dAct'),clr=document.getElementById('dClr'),opts=document.getElementById('dOpts'),info=document.getElementById('dInfo');opts.innerHTML='';
@@ -604,20 +605,20 @@ else{flash('ko','dFrame');btn.style.borderColor='var(--ko)';btn.style.color='var
 function drPlay(m,fromMic){if(D.step!==2||D.done||D.kind==='iv')return;
 if(m===D.seq[D.si]){D.si++;if(D.si>=D.seq.length){D.done=true;D.streak++;ST.dr.played++;flash('ok','dFrame');vibrate(30);save();if(fromMic)MIC.mute=performance.now()+600}drDraw()}
 else{flash('ko','dFrame');vibrate([60,40,60])}}
-bindDots(document.getElementById('dSvg'),(s,f)=>{const m=MIDI[s]+f;tone(m);vib(document.getElementById('dSvg'),s);
+bindDots(document.getElementById('dSvg'),(s,f)=>{const m=MIDI[s]+f;tone(m);vib(document.getElementById('dSvg'),s);if(D.kind==='rd'){rdNote(m,false);return}
 if(D.kind==='iv'){if(D.res)return;const val=ivValid(D.ivq),ok=has(val,s,f);D.sel=[[s,f]];D.res=true;const q=D.ivq;
 if(ok){ST.dr.iv++;D.streak++;flash('ok','dFrame');vibrate(30);const df=f-q.f,cross=q.s<=3&&s>=4;D.resTxt=`Juste ✓ — ${s-q.s} corde(s) plus haut, ${df>=0?'+':''}${df} case(s)${cross?' (passage de la corde de Si : +1 case)':''}. Autres formes en cyan.`}
 else{ST.dr.ivko++;D.streak=0;flash('ko','dFrame');vibrate([60,40,60]);const pc=(TUNE[s]+f-TUNE[q.s]-q.f+48)%12;D.resTxt=`Tu as posé : ${IVLONG[pc]||'unisson'}. La bonne réponse est en cyan.`}
 save();drDraw();return}
 if(D.step===0){if(D.res)return;const i=D.sel.findIndex(x=>x[0]===s&&x[1]===f);if(i>=0)D.sel.splice(i,1);else D.sel.push([s,f]);drDraw()}
 else if(D.step===2)drPlay(m,false)});
-document.getElementById('dAct').onclick=()=>{
+document.getElementById('dAct').onclick=()=>{if(D.kind==='rd'){RD.seq.slice(RD.i).forEach((n,i)=>tone(n.m,i*.4,.5));return}
 if(D.step===0){if(D.res&&!D.res.ok){D.sel=[];D.res=null;drDraw();return}
 const good=D.sel.filter(([s,f])=>has(D.tgt,s,f)).length,bad=D.sel.length-good,miss=D.tgt.length-good,ok=!bad&&!miss;D.res={ok,good,bad,miss};
 ST.dr.byKind[D.kind]=ST.dr.byKind[D.kind]||{ok:0,ko:0};if(!D.counted){D.counted=true;if(ok){ST.dr.ok++;ST.dr.byKind[D.kind].ok++}else{ST.dr.ko++;ST.dr.byKind[D.kind].ko++;D.streak=0}save()}
 if(ok){flash('ok','dFrame');vibrate(30);drDraw();setTimeout(()=>{D.step=1;drQs();drDraw()},700)}else{flash('ko','dFrame');vibrate([60,40,60]);drDraw()}}
 else if(D.step===2){D.seq.forEach((m,i)=>tone(m,i*.28))}};
-document.getElementById('dClr').onclick=()=>{if(D.step!==0)return;if(D.res&&!D.res.ok){D.step=1;drQs();drDraw();return}D.sel=[];drDraw()};
+document.getElementById('dClr').onclick=()=>{if(D.kind==='rd'){RD.song=-1;rdNew();return}if(D.step!==0)return;if(D.res&&!D.res.ok){D.step=1;drQs();drDraw();return}D.sel=[];drDraw()};
 document.getElementById('dNext').onclick=()=>drNew();
 
 /* ================= JAZZ : SEPTIÈMES + HENDERSON ================= */
@@ -921,6 +922,55 @@ document.getElementById('blGo').onclick=()=>{if(BL.mode==='jam'||BL.mode==='boog
 document.getElementById('blPlay').onclick=()=>{if(BL.mode==='dbl'){turnSeq().forEach((st,i)=>chord(st.fr.map((f,j)=>MIDI[st.strs[j]]+f),i*.5,.7));return}if(BL.mode==='boogie'){const bp=boogiePos();[...new Set(pentaMaj(bp.root,bp.str,bp.f).map(n=>MIDI[n.s]+n.f))].sort((a,b)=>a-b).forEach((m,i)=>tone(m,i*.16));return}if(BL.mode==='box')boxSeq(BL.box).forEach((m,i)=>tone(m,i*.16));else if(BL.mode==='fda')fdaChain(PC[BL.key],BL.fda7).forEach((c,i)=>chord(c.fr.map((f,j)=>MIDI[c.strs[j]]+f),i*.55,.7));else blComp()};
 bindDots(document.getElementById('bSvg'),(s2,f)=>{tone(MIDI[s2]+f);vib(document.getElementById('bSvg'),s2);blNote(MIDI[s2]+f,false)});
 
+/* ================= LECTURE (Leavitt : lire, pas de béquilles durables) ================= */
+ST.rd=ST.rd||{ok:0,ko:0,m:{}};
+const RD_LV=[
+ {lb:'Pos. I · cordes 1‑3',f:(s2,f)=>s2>=3&&f<=3,nat:true},
+ {lb:'Pos. I · 6 cordes',f:(s2,f)=>f<=3,nat:true},
+ {lb:'Pos. II',f:(s2,f)=>f>=2&&f<=5,nat:true},
+ {lb:'Pos. V',f:(s2,f)=>f>=5&&f<=8,nat:true},
+ {lb:'Pos. I + altérations',f:(s2,f)=>f<=4,nat:false},
+ {lb:'Manche 0‑12',f:(s2,f)=>f<=12,nat:true},
+ {lb:'♪ Mélodies',mel:true}];
+const RD={lv:0,seq:[],i:0,res:[],song:-1,streak:0};
+const NATP=[0,2,4,5,7,9,11];
+function rdPool(){const L=RD_LV[RD.lv],o=[];for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){if(!L.f(s2,f))continue;const m=MIDI[s2]+f;if(L.nat&&!NATP.includes(m%12))continue;o.push({m,s:s2,f})}return o}
+async function rdNew(){RD.i=0;RD.res=[];
+if(RD_LV[RD.lv].mel){if(!STD){document.getElementById('dInfo').textContent='Chargement des mélodies…';await stdLoad()}const ms=STD.map((r,i)=>[r,i]).filter(([r])=>r[11]&&r[11].mel);
+if(RD.song<0||!STD[RD.song]||!(STD[RD.song][11]&&STD[RD.song][11].mel))RD.song=rnd(ms)[1];const bars=stdBars(STD[RD.song]);RD.seq=[];
+bars.forEach(b=>(b.mel||[]).forEach((x,j)=>{if(x.m==null||(j>0&&b.mel[j-1].tie&&b.mel[j-1].m===x.m))return;let t=x.m-12;if(t<40)t+=12;RD.seq.push({m:t,w:t+12})}));RD.title=STD[RD.song][1]}
+else{const P=rdPool();RD.seq=[];let last=null;for(let k=0;k<16;k++){let c;do{c=rnd(P)}while(last&&c.m===last.m&&P.length>1);last=c;RD.seq.push({m:c.m,w:c.m+12,pos:[c.s,c.f]})}RD.title=RD_LV[RD.lv].lb}
+drDraw()}
+const LET=['C','C','D','D','E','F','F','G','G','A','A','B'],ACC=[0,1,0,1,0,0,1,0,1,0,1,0],LIX={C:0,D:1,E:2,F:3,G:4,A:5,B:6};
+function rdStaff(){const W=620,lg=12,bot=92,x0=100,dx=64,i0=Math.max(0,RD.i-2),vis=RD.seq.slice(i0,i0+8);let h=`<svg viewBox="0 0 ${W} 150" width="100%" style="max-height:150px">`;
+for(let k=0;k<5;k++)h+=`<line x1="10" x2="${W-10}" y1="${bot-k*lg}" y2="${bot-k*lg}" stroke="#5c6180" stroke-width="1.2"/>`;
+h+=`<text x="16" y="${bot+6}" font-size="62" fill="#2ee6ff" style="font-family:serif" filter="url(#glow)">𝄞</text><text x="38" y="${bot+30}" font-size="10" fill="#7d83a0">8</text>`;
+vis.forEach((n,k)=>{const idx=i0+k,w=n.w,step=(Math.floor(w/12)-1)*7+LIX[LET[w%12]],y=bot-(step-30)*lg/2,x=x0+k*dx,cur=idx===RD.i,r=RD.res[idx],col=cur?'#2ee6ff':r===true?'#39ff88':r===false?'#ff3b5c':'#c8c8d0';
+for(let st=28;st>=step;st-=2)if(st<30)h+=`<line x1="${x-14}" x2="${x+14}" y1="${bot-(st-30)*lg/2}" y2="${bot-(st-30)*lg/2}" stroke="#5c6180"/>`;
+for(let st=40;st<=step;st+=2)h+=`<line x1="${x-14}" x2="${x+14}" y1="${bot-(st-30)*lg/2}" y2="${bot-(st-30)*lg/2}" stroke="#5c6180"/>`;
+if(ACC[w%12])h+=`<text x="${x-22}" y="${y+5}" font-size="16" fill="${col}">♯</text>`;
+h+=`<ellipse cx="${x}" cy="${y}" rx="8" ry="6" transform="rotate(-20 ${x} ${y})" fill="${col}" ${cur?'filter="url(#glow)"':''}/>`;
+if(cur)h+=`<rect x="${x-20}" y="6" width="40" height="138" rx="8" fill="none" stroke="#2ee6ff" stroke-opacity=".4"/>`});
+return h+'</svg>'}
+function rdLevelOf(m){const c=ST.rd.m[m]||0;return c<3?0:c<6?1:2}
+function rdDraw(){document.getElementById('rdStaff').style.display='';document.getElementById('dSteps').style.visibility='hidden';
+const cur=RD.seq[RD.i],cl=cur?rdLevelOf(cur.m):2;document.getElementById('dTitle').textContent=RD.title||'—';
+document.getElementById('dSub').textContent=cur?(cl===0?`${SHP[cur.m%12]} — ${['','béquille : nom + case'][1]}`:cl===1?`${SHP[cur.m%12]} — béquille : nom seul`:'sans béquille : lis !'):'Lecture terminée ✓';
+document.getElementById('rdStaff').innerHTML=rdStaff();
+const op=document.getElementById('dOpts');op.innerHTML=RD_LV.map((l,i)=>`<button class="b ${RD.lv===i?'on':''}" data-rl="${i}" style="font-size:11px;padding:3px 7px">${l.lb}</button>`).join('');
+op.querySelectorAll('[data-rl]').forEach(b=>b.onclick=()=>{RD.lv=+b.dataset.rl;RD.song=-1;rdNew()});
+document.getElementById('dAct').style.visibility='visible';document.getElementById('dAct').textContent='▶ Écouter';document.getElementById('dClr').style.visibility=RD_LV[RD.lv].mel?'visible':'hidden';document.getElementById('dClr').textContent='Autre mélodie';
+let h=neckBase();if(cur&&cl===0){const ps=cur.pos?[cur.pos]:posOf(cur.m).sort((a,b)=>a[1]-b[1]).slice(0,1);ps.forEach(([s2,f])=>h+=dot(s2,f,'#2ee6ff',SHP[cur.m%12],{target:true}))}
+for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;
+setSvg('dSvg',h);const ok=RD.res.filter(x=>x===true).length,n=RD.res.length;
+document.getElementById('dInfo').textContent=cur?`Note ${RD.i+1}/${RD.seq.length} · juste ${ok}/${n||0} — joue la note écrite (la guitare sonne une octave plus bas que l'écrit). Les béquilles disparaissent note par note.`:`Terminé : ${ok}/${n} justes. Nouveau ⟳ pour une autre série.`;
+const sk=document.getElementById('dStreak');sk.textContent=RD.streak;sk.className='streak'+(RD.streak>=20?' viol':RD.streak>=10?' gold':'');document.getElementById('dOk').textContent=ST.dr.ok;document.getElementById('dIv').textContent=ST.dr.iv}
+function rdNote(m,fromMic){const cur=RD.seq[RD.i];if(!cur)return;
+if(m===cur.m){if(RD.res[RD.i]==null)RD.res[RD.i]=true;ST.rd.ok++;ST.rd.m[m]=(ST.rd.m[m]||0)+1;RD.streak++;flash('ok','dFrame');RD.i++;if(fromMic)MIC.mute=performance.now()+250;
+if(RD.i>=RD.seq.length){vibrate([30,40,30])}save();drDraw();return}
+if(m%12===cur.m%12){flash('warn','dFrame');document.getElementById('dInfo').textContent='Bonne note, mauvaise octave : relis la hauteur sur la portée.';return}
+RD.res[RD.i]=false;ST.rd.ko++;ST.rd.m[cur.m]=0;RD.streak=0;flash('ko','dFrame');vibrate([60,40,60]);save();drDraw()}
+
 /* ================= MICRO ================= */
 const NOTE_FR=m=>SHP[m%12]+(Math.floor(m/12)-1);
 function acf(buf,sr){let n=buf.length,rms=0;for(let i=0;i<n;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/n);if(rms<0.012)return[-1,rms];
@@ -948,7 +998,7 @@ else if(tab==='t-tri'&&T.mode==='drill'&&T.target){const t=T.target,strs=SSETS[T
 if(i>=0){vib(document.getElementById('tSvg'),strs[i]);const p=[strs[i],t.frets[i]];if(!T.played.some(q=>q[0]===p[0]&&q[1]===p[1]))T.played.push(p);if(T.played.length===3){MIC.mute=performance.now()+700;hit(true)}else drawTri();return}
 if(want.some(w=>w%12===m%12)){flash('warn','tFrame');document.getElementById('tInfo').textContent=`Presque : ${NOTE_FR(m)} — bonne note, mauvaise octave.`;return}
 MIC.mute=performance.now()+400;hit(false);document.getElementById('tInfo').textContent=`Entendu ${NOTE_FR(m)} — hors accord.`}
-else if(tab==='t-dr'){drPlay(m,true)}
+else if(tab==='t-dr'){if(D.kind==='rd')rdNote(m,true);else drPlay(m,true)}
 else if(tab==='t-jz'){jzNote(m,true)}
 else if(tab==='t-sg'){sgMelNote(m)}
 else if(tab==='t-bl'){blNote(m,true)}
@@ -987,6 +1037,7 @@ function sessNext(){vibrate([40,30,40]);SE.i++;if(SE.i>=SE.list.length){sessEnd(
 function sessEnd(done){stopTri();clearInterval(SE.timer);SE.on=false;if(done){ST.days[today()]=true;save();goTab('t-pro')}sessTick();sessDraw()}
 document.getElementById('sessGo').onclick=()=>{if(SE.on){sessEnd(false);return}SE.list=buildSession();SE.i=0;SE.on=true;SE.timer=setInterval(sessTick,1000);sessBlock()};
 const VIL=[
+{n:'🎼 Lecture',v:()=>(ST.rd?ST.rd.ok:0)/400,go:()=>{goTab('t-dr');clickSel('#t-dr [data-dk=rd]')}},
 {n:'🎯 Manche & intervalles',v:()=>ST.dr.iv/60,go:()=>{goTab('t-dr');clickSel('#t-dr [data-dk=iv]')}},
 {n:'⚡ Triades',v:()=>ST.tri.ok/150,go:()=>goTab('t-tri')},
 {n:'🖐️ CAGED',v:()=>((ST.dr.byKind.caged||{}).ok||0)/25,go:()=>{goTab('t-dr');clickSel('#t-dr [data-dk=caged]')}},

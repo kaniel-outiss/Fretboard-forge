@@ -84,6 +84,12 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 .vib{animation:vib .35s linear}
 @keyframes vib{0%{transform:translateX(0)}25%{transform:translateX(1.5px)}50%{transform:translateX(-1.5px)}75%{transform:translateX(1px)}100%{transform:translateX(0)}}
 .cof{display:flex;justify-content:center;flex:0 0 auto}
+#t-tri .side.g2{display:grid;grid-template-columns:1fr;gap:6px 10px;align-items:start}
+.g2 .gL,.g2 .gR{display:flex;flex-direction:column;gap:5px;min-width:0}
+.g2 .frame{padding:3px 8px}.g2 .big{font-size:16px!important}.g2 .stats b{font-size:13px}
+.g2 .gInfo{display:none}.g2 button.b{white-space:nowrap}
+.modbar{display:flex;gap:4px;flex-wrap:nowrap;overflow-x:auto;flex:0 0 auto;scrollbar-width:none}.modbar::-webkit-scrollbar{display:none}
+.modbar button.b{min-height:24px;padding:2px 9px;font-size:11.5px;white-space:nowrap}
 .steps{display:flex;gap:4px;margin-left:auto}.steps span{font-size:11px;padding:3px 8px;border-radius:10px;border:1px solid var(--line);color:var(--mut);opacity:.5}
 .steps span.on{opacity:1;color:var(--acc);border-color:var(--acc);box-shadow:0 0 8px var(--acc)}.steps span.done{opacity:1;color:var(--ok);border-color:var(--ok)}
 #dTitle{font-size:22px}#dOpts button{min-width:64px}
@@ -92,9 +98,12 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 @media (orientation:landscape){
   .tab.land .side{display:flex;flex-direction:column;gap:6px}
   .tab.land .fill{align-items:center}
-  #t-tri.land .side{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 12px;align-items:center}
-  #t-tri.land .side .row:nth-child(1){grid-column:1}#t-tri.land .side .cof{grid-row:1/4;grid-column:2}#t-tri.land .side .frame{grid-row:1/4;grid-column:3}
-  #t-tri.land .side .info{grid-column:1/4}
+  #t-tri.land .side.g3{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 12px;align-items:center}
+  #t-tri.land .side.g3 .row:nth-child(1){grid-column:1}#t-tri.land .side.g3 .cof{grid-row:1/4;grid-column:2}#t-tri.land .side.g3 .frame{grid-row:1/4;grid-column:3}
+  #t-tri.land .side.g3 .info{grid-column:1/4}
+  #t-tri.land .side.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,34%)}
+  .g2 .gInfo{display:none}
+  .side select,.side button.b{min-height:26px;padding:3px 8px;font-size:11.5px}
 }
 </style>
 </head>
@@ -138,8 +147,8 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 
 <!-- ===== TRIADES ===== -->
 <section class="tab land" id="t-tri">
-  <div class="side" id="triSide">
-    <div class="row"><span class="lbl">Module</span><button class="b on" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button><button class="b" data-dm="nm">🧭 Nommer</button><button class="b" data-dm="da">🧱 Doubles & arpèges</button></div>
+  <div class="modbar"><button class="b on" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button><button class="b" data-dm="nm">🧭 Nommer</button><button class="b" data-dm="da">🧱 Doubles & arpèges</button></div>
+  <div class="side g3" id="triSide">
     <div class="row"><span class="lbl">Cordes</span><button class="b on" data-ss="0">1-2-3</button><button class="b" data-ss="1">2-3-4</button><button class="b" data-ss="2">3-4-5</button><button class="b" data-ss="3">4-5-6</button></div>
     <div class="row"><span class="lbl">Qualité</span><button class="b on" data-q="maj">Maj</button><button class="b" data-q="min">Min</button><button class="b" data-q="dim">Dim</button><button class="b" data-q="aug">Aug</button></div>
     <div class="row"><span class="lbl">Tempo</span><input type="range" id="tTempo" min="40" max="160" value="70" step="5" style="flex:1"><span id="tTempoV" style="font-size:12px;min-width:30px">70</span>
@@ -152,8 +161,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="row" style="justify-content:center"><button class="b go" id="tGo">▶ Lancer le cercle</button><button class="b" id="tHint">💡 Indice</button></div>
     <div class="info" id="tInfo">Cycle des quartes, renversement le plus proche. Touche les 3 notes sur le manche.</div>
   </div>
-  <div class="side" id="tkSide" style="display:none">
-    <div class="row"><span class="lbl">Module</span><button class="b" data-dm="tri">Triades</button><button class="b on" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button><button class="b" data-dm="nm">🧭 Nommer</button><button class="b" data-dm="da">🧱 Doubles & arpèges</button></div>
+  <div class="side g3" id="tkSide" style="display:none">
     <div class="row"><button class="b on" data-tx="find">Trouve la note</button><button class="b" data-tx="spider">Araignée</button><button class="b" data-tx="harm">Harmonisée</button><button class="b" data-tx="one">Une corde</button><button class="b" data-tx="arp">Arpèges 6 c.</button><button class="b" data-tx="grp">Groupes de 3</button><button class="b" data-tx="sweep">Sweep</button><button class="b" data-tx="bend">Bends</button></div>
     <div class="row"><span id="tkOpt" style="display:flex;gap:6px;flex-wrap:wrap"></span><span id="tkKeyW"><select id="tkKey"></select></span></div>
     <div class="row"><span class="lbl">Tempo</span><input type="range" id="tkTempo" min="40" max="200" value="60" step="5" style="flex:1"><span id="tkTempoV" style="font-size:12px;min-width:28px">60</span><button class="b" id="tkMet">▶ Métronome</button></div>
@@ -163,8 +171,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="info" id="tkInfo"></div>
     <div class="row" style="justify-content:center"><button class="b" id="tkPlay">▶ Écouter</button><button class="b go" id="tkGo">⟳ Recommencer / Nouveau</button></div>
   </div>
-  <div class="side" id="earSide" style="display:none">
-    <div class="row"><span class="lbl">Module</span><button class="b" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b on" data-dm="ear">👂 Oreille</button><button class="b" data-dm="nm">🧭 Nommer</button><button class="b" data-dm="da">🧱 Doubles & arpèges</button></div>
+  <div class="side g3" id="earSide" style="display:none">
     <div class="row"><button class="b on" data-ex="iv">Intervalles</button><button class="b" data-ex="ch">Qualités</button><button class="b" data-ex="dg">Degrés</button><button class="b" data-ex="pg">Progressions</button><button class="b" data-ex="ec">Écho</button>
       <span class="lbl" style="min-width:0">Niveau</span><button class="b on" data-el="0">1</button><button class="b" data-el="1">2</button></div>
     <div class="frame" id="erFrame"><div class="big" id="erBig" style="font-size:22px">—</div><div class="info" id="erSub" style="text-align:center"></div>
@@ -173,23 +180,25 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="info" id="erInfo"></div>
     <div class="row" style="justify-content:center"><button class="b go" id="erPlay">▶ Réécouter</button><button class="b" id="erNext">⟳ Suivant</button></div>
   </div>
-  <div class="side" id="nmSide" style="display:none">
-    <div class="row"><span class="lbl">Module</span><button class="b" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button><button class="b on" data-dm="nm">🧭 Nommer</button><button class="b" data-dm="da">🧱 Doubles & arpèges</button></div>
-    <div class="row"><button class="b on" data-nx="ch">Accord : forme + position → nom</button><button class="b" data-nx="sc">Gamme : forme + position → nom</button><button class="b" data-nx="pos">Nom + forme → position</button></div>
-    <div class="frame" id="nmFrame"><div class="big" id="nmBig" style="font-size:22px">—</div><div class="info" id="nmSub" style="text-align:center"></div>
-      <div class="stats"><span>Série <b id="nmStreak" class="streak">0</b></span><span>Justes <b id="nmOk">0</b></span></div></div>
-    <div class="row" id="nmOpts" style="justify-content:center"></div>
-    <div class="info" id="nmInfo"></div>
-    <div class="row" style="justify-content:center"><button class="b" id="nmPlay">▶ Écouter</button><button class="b go" id="nmNext">⟳ Suivant</button></div>
+  <div class="side g2" id="nmSide" style="display:none">
+    <div class="gL">
+      <div class="row"><select id="nmEx"><option value="ch">Accord : forme + position → nom</option><option value="sc">Gamme : forme + position → nom</option><option value="pos">Nom + forme → position</option></select></div>
+      <div class="row" id="nmOpts"></div>
+    </div>
+    <div class="gR">
+      <div class="frame" id="nmFrame"><div class="big" id="nmBig">—</div><div class="info" id="nmSub" style="text-align:center"></div>
+        <div class="stats"><span>Série <b id="nmStreak" class="streak">0</b></span><span>Justes <b id="nmOk">0</b></span><button class="b" id="nmPlay">▶</button><button class="b go" id="nmNext">⟳ Suivant</button></div></div>
+      <div class="info" id="nmInfo" style="font-size:11px"></div>
+    </div>
   </div>
-  <div class="side" id="daSide" style="display:none">
-    <div class="row"><span class="lbl">Module</span><button class="b" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button><button class="b" data-dm="nm">🧭 Nommer</button><button class="b on" data-dm="da">🧱 Doubles & arpèges</button></div>
-    <div class="row"><button class="b on" data-dam="sc">Gamme harmonisée</button><button class="b" data-dam="pg">Sur une grille</button><span class="lbl" style="min-width:0;margin-left:6px">Tempo</span><input type="range" id="daTempo" min="40" max="200" value="70" step="5" style="width:110px"><span id="daTempoV" style="font-size:12px;min-width:26px">70</span></div>
-    <div id="daCtl" style="display:flex;flex-direction:column;gap:6px"></div>
-    <div class="frame" id="daFrame"><div class="big" id="daBig" style="font-size:20px">—</div><div class="info" id="daSub" style="text-align:center"></div>
-      <div class="stats"><span>Série <b id="daStreak" class="streak">0</b></span><span>Lignes finies <b id="daOk">0</b></span></div></div>
-    <div class="info" id="daInfo"></div>
-    <div class="row" style="justify-content:center"><button class="b" id="daPlay">▶ Écouter</button><button class="b go" id="daGo">⟳ Recommencer</button></div>
+  <div class="side g2" id="daSide" style="display:none">
+    <div class="gL"><div id="daCtl" style="display:flex;flex-direction:column;gap:5px"></div>
+      <div class="row" style="flex-wrap:nowrap"><button class="b" id="daPlay">▶ Écouter</button><button class="b go" id="daGo">⟳ Recommencer</button><span class="lbl" style="min-width:0">Tempo</span><input type="range" id="daTempo" min="40" max="200" value="70" step="5" style="width:110px"><span id="daTempoV" style="font-size:11px;min-width:24px">70</span></div></div>
+    <div class="gR">
+      <div class="frame" id="daFrame"><div class="big" id="daBig">—</div><div class="info" id="daSub" style="text-align:center;font-size:11px"></div>
+        <div class="stats" style="font-size:11px"><span>Série <b id="daStreak" class="streak">0</b></span><span>Lignes <b id="daOk">0</b></span></div></div>
+      <div class="info gInfo" id="daInfo" style="font-size:11px"></div>
+    </div>
   </div>
   <div class="fill"><svg class="neck" id="tSvg" viewBox="0 0 372 624"></svg></div>
 </section>
@@ -327,7 +336,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.3 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.4 — Boss</div>
 </section>
 
 </main>
@@ -1335,7 +1344,7 @@ function nmAns(v){const q=NMQ.q;if(!q||NMQ.res)return;const ok=v===q.ans;NMQ.res
 if(ok){ST.fl.ok++;NMQ.streak++;flash('ok','nmFrame');vibrate(30)}else{ST.fl.ko++;NMQ.streak=0;flash('ko','nmFrame');vibrate([60,40,60])}save();nmDraw();nmPlay()}
 function nmPlay(){const q=NMQ.q;if(!q)return;const ms=[...new Set(q.notes.map(([s2,f])=>MIDI[s2]+f))].sort((a,b)=>a-b);if(q.kind==='ch')chord(q.notes.map(([s2,f])=>MIDI[s2]+f));else demoRun('tSvg',ms.map(m=>{const n=q.notes.find(([s2,f])=>MIDI[s2]+f===m);return{s:n[0],f:n[1],m}}),.16)}
 function nmDraw(){const q=NMQ.q,big=document.getElementById('nmBig'),sub=document.getElementById('nmSub'),op=document.getElementById('nmOpts'),info=document.getElementById('nmInfo');
-document.querySelectorAll('[data-nx]').forEach(b=>b.classList.toggle('on',b.dataset.nx===NMQ.ex));document.getElementById('nmStreak').textContent=NMQ.streak;document.getElementById('nmOk').textContent=(ST.fl||{ok:0}).ok;
+document.getElementById('nmEx').value=NMQ.ex;document.getElementById('nmStreak').textContent=NMQ.streak;document.getElementById('nmOk').textContent=(ST.fl||{ok:0}).ok;
 let h=neckBase();if(q){const pz=q.p===0?'position ouverte':q.p+'e position',what=q.kind==='sc'?'Forme de gamme':'Forme';
 if(NMQ.ex==='pos'){big.textContent=`Fais un ${q.key}${q.kind==='sc'?' (gamme)':''} avec la forme ${q.form} : quelle position ?`;sub.textContent='Compte à partir de la lettre de la forme, case par case.'}
 else{big.textContent=`${what} ${q.form} · ${pz} → quel ${q.kind==='sc'?'gamme':'accord'} ?`;sub.textContent=`Compte depuis « ${q.form} » : une case = un demi-ton (pas de ♯ entre B‑C et E‑F).`}
@@ -1348,7 +1357,7 @@ const nm2=q.kind==='sc'?'gamme de '+q.key:'accord de '+q.key;
 info.textContent=rv?(NMQ.res.ok?'✓ ':'✗ ')+`Forme ${q.form}, ${pz} = ${nm2}. ${q.form} + ${q.p%12} demi-ton${q.p%12>1?'s':''} = ${q.key}.`+(q.kind==='sc'?' Les formes de gamme prolongent la forme d’accord du même nom.':''):'Fretboard Logic : distingue la forme (ce que tu vois et doigtes) du nom (ce que tu entends).'}
 for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;
 setSvg('tSvg',h)}
-document.querySelectorAll('[data-nx]').forEach(b=>b.onclick=()=>{NMQ.ex=b.dataset.nx;nmNew()});
+document.getElementById('nmEx').onchange=e=>{NMQ.ex=e.target.value;nmNew()};
 document.getElementById('nmNext').onclick=nmNew;document.getElementById('nmPlay').onclick=nmPlay;
 /* ===== 🧱 Doubles & arpèges : gammes harmonisées (doubles/triples) + arpèges/triades sur grilles ===== */
 const DA={mode:'sc',sc:0,key:'C',st:'t3',set:2,inv:0,src:'tb:3',pst:'cont',zone:5,tempo:70,ev:[],i:0,got:[],streak:0,title:'',std:null,stdName:''};
@@ -1412,26 +1421,23 @@ let DAT=null;function daStop(){DEMO++;if(DAT){clearTimeout(DAT);DAT=null}}
 function daPlay(){daStop();const tk=DEMO,dt=60/DA.tempo;DA.ev.forEach((e,i)=>setTimeout(()=>{if(tk!==DEMO)return;DA.i=i;DA.got=[];daDraw();if(e.notes.length>1)chord(e.notes.map(x=>x.m),0,dt*1.6);else tone(e.notes[0].m,0,dt*.95,.24)},i*dt*1000));DAT=setTimeout(()=>{if(tk!==DEMO)return;DA.i=0;daDraw()},DA.ev.length*dt*1000+400)}
 /* --- interface --- */
 function daCtl(){const box=document.getElementById('daCtl');let h='';
-const keySel=`<select id="daKey">${KEYS.map(x=>`<option ${x===DA.key?'selected':''}>${x}</option>`).join('')}</select>`;
-if(DA.mode==='sc'){h+=`<div class="row"><span class="lbl">Gamme</span><select id="daSc" style="max-width:190px">${SCALES.map((s,i)=>s[2].length>=6?`<option value="${i}" ${DA.sc===i?'selected':''}>${s[0]}</option>`:'').join('')}</select>${keySel}</div>`;
-h+=`<div class="row"><span class="lbl">Structure</span>${Object.keys(DA_ST).map(x=>`<button class="b ${DA.st===x?'on':''}" data-dst="${x}">${DA_ST[x][0]}</button>`).join('')}</div>`;
-h+=`<div class="row"><span class="lbl">Cordes</span>${daSets().map((st,i)=>`<button class="b ${DA.set===i?'on':''}" data-dset="${i}">${daSetLab(st)}</button>`).join('')}${DA_ST[DA.st][1]?'':`<span class="lbl" style="min-width:0;margin-left:6px">Renv.</span>${['Fond.','1er','2e'].map((x,i)=>`<button class="b ${DA.inv===i?'on':''}" data-dinv="${i}">${x}</button>`).join('')}`}</div>`}
+const sel=(id,opts,cur,w)=>`<select id="${id}" ${w?`style="max-width:${w}px"`:''}>${opts.map(([v,t])=>`<option value="${v}" ${String(v)===String(cur)?'selected':''}>${t}</option>`).join('')}</select>`;
+const keySel=sel('daKey',KEYS.map(x=>[x,x]),DA.key);
+const modeSel=sel('daMode',[['sc','Gamme harmonisée'],['pg','Sur une grille']],DA.mode);
+if(DA.mode==='sc'){h+=`<div class="row">${modeSel}${sel('daSc',SCALES.map((x,i)=>[i,x[0]]).filter(([i])=>SCALES[i][2].length>=6),DA.sc,170)}${keySel}</div>`;
+h+=`<div class="row">${sel('daSt',Object.keys(DA_ST).map(x=>[x,DA_ST[x][0]]),DA.st)}${sel('daSet',daSets().map((st,i)=>[i,'Cordes '+daSetLab(st)]),DA.set)}${DA_ST[DA.st][1]?'':sel('daInv',[[0,'Fondamentale'],[1,'1er renversement'],[2,'2e renversement']],DA.inv)}</div>`}
 else{const og=`<optgroup label="Toolbox (Sharp)">${PROGS.map((g,i)=>`<option value="tb:${i}">${g.g} · ${g.n}</option>`).join('')}</optgroup><optgroup label="Gospel">${Object.keys(GOSP_PROGS).map(x=>`<option value="gp:${x}">${GOSP_PROGS[x].lb}</option>`).join('')}</optgroup>${DA.std?`<optgroup label="Standard"><option value="std:0">${DA.stdName}</option></optgroup>`:''}`;
-h+=`<div class="row"><span class="lbl">Grille</span><select id="daSrc" style="max-width:220px">${og}</select>${DA.src.startsWith('std')?'':keySel}</div>`;
-h+=`<div class="row"><span class="lbl">Standard</span><input id="daQ" placeholder="titre (ex. autumn)" style="width:130px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:4px 6px"><button class="b" id="daQGo">Charger</button><button class="b" id="daRnd">🎲 Au hasard</button></div>`;
-h+=`<div class="row"><span class="lbl">Jeu</span><select id="daPst" style="max-width:240px">${Object.keys(DA_PST).map(x=>`<option value="${x}" ${DA.pst===x?'selected':''}>${DA_PST[x]}</option>`).join('')}</select></div>`;
-h+=`<div class="row"><span class="lbl">Zone</span><input type="range" id="daZone" min="2" max="15" value="${DA.zone}" style="flex:1"><span style="font-size:12px;min-width:46px">case ${DA.zone}</span>${DA.pst==='tri'?`<span class="lbl" style="min-width:0">Cordes</span>${SSETS.map((st,i)=>`<button class="b ${DA.set===i?'on':''}" data-dset="${i}">${daSetLab(st)}</button>`).join('')}`:''}</div>`}
+h+=`<div class="row">${modeSel}<select id="daSrc" style="max-width:210px">${og}</select>${DA.src.startsWith('std')?'':keySel}</div>`;
+h+=`<div class="row">${sel('daPst',Object.keys(DA_PST).map(x=>[x,DA_PST[x]]),DA.pst,230)}${DA.pst==='tri'?sel('daSet',SSETS.map((st,i)=>[i,'Cordes '+daSetLab(st)]),DA.set):''}<span class="lbl" style="min-width:0">Zone</span><input type="range" id="daZone" min="2" max="15" value="${DA.zone}" style="width:90px"><span style="font-size:11px">c.${DA.zone}</span></div>`;
+h+=`<div class="row"><input id="daQ" placeholder="Standard : titre…" style="width:130px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:3px 6px;font-size:11.5px"><button class="b" id="daQGo">Charger</button><button class="b" id="daRnd">🎲 Au hasard</button></div>`}
 box.innerHTML=h;
-const g=id=>box.querySelector(id);if(g('#daKey'))g('#daKey').onchange=e=>{DA.key=e.target.value;daBuild()};
-if(g('#daSc'))g('#daSc').onchange=e=>{DA.sc=+e.target.value;daBuild()};
-box.querySelectorAll('[data-dst]').forEach(b=>b.onclick=()=>{DA.st=b.dataset.dst;daCtl();daBuild()});
-box.querySelectorAll('[data-dset]').forEach(b=>b.onclick=()=>{DA.set=+b.dataset.dset;daCtl();daBuild()});
-box.querySelectorAll('[data-dinv]').forEach(b=>b.onclick=()=>{DA.inv=+b.dataset.dinv;daCtl();daBuild()});
-if(g('#daSrc')){g('#daSrc').value=DA.src;g('#daSrc').onchange=e=>{DA.src=e.target.value;daCtl();daBuild()}}
-if(g('#daPst'))g('#daPst').onchange=e=>{DA.pst=e.target.value;if(DA.pst==='tri'&&DA.set>3)DA.set=2;daCtl();daBuild()};
-if(g('#daZone'))g('#daZone').oninput=e=>{DA.zone=+e.target.value;e.target.nextElementSibling.textContent='case '+DA.zone;daBuild()};
-if(g('#daQGo'))g('#daQGo').onclick=()=>daStd(g('#daQ').value.trim());if(g('#daRnd'))g('#daRnd').onclick=()=>daStd('');
-document.querySelectorAll('[data-dam]').forEach(b=>b.classList.toggle('on',b.dataset.dam===DA.mode))}
+const g=id=>box.querySelector(id),on=(id,fn)=>{const el=g(id);if(el)el.onchange=e=>fn(e.target.value)};
+on('#daMode',v=>{DA.mode=v;daStop();daCtl();daBuild()});on('#daKey',v=>{DA.key=v;daBuild()});on('#daSc',v=>{DA.sc=+v;daBuild()});
+on('#daSt',v=>{DA.st=v;daCtl();daBuild()});on('#daSet',v=>{DA.set=+v;daBuild()});on('#daInv',v=>{DA.inv=+v;daBuild()});
+if(g('#daSrc')){g('#daSrc').value=DA.src;on('#daSrc',v=>{DA.src=v;daCtl();daBuild()})}
+on('#daPst',v=>{DA.pst=v;if(DA.pst==='tri'&&DA.set>3)DA.set=2;daCtl();daBuild()});
+if(g('#daZone'))g('#daZone').oninput=e=>{DA.zone=+e.target.value;e.target.nextElementSibling.textContent='c.'+DA.zone;daBuild()};
+if(g('#daQGo'))g('#daQGo').onclick=()=>daStd(g('#daQ').value.trim());if(g('#daRnd'))g('#daRnd').onclick=()=>daStd('')}
 function daDraw(){const e=DA.ev[DA.i],big=document.getElementById('daBig'),sub=document.getElementById('daSub');
 document.getElementById('daStreak').textContent=DA.streak;document.getElementById('daOk').textContent=ST.da||0;
 let h=neckBase();const k=PC[DA.key];
@@ -1449,10 +1455,9 @@ for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" d
 setSvg('tSvg',h);
 if(!DA.ev.length){big.textContent=DA.title||'—';sub.textContent=DA.mode==='pg'?'Choisis une grille (ou un standard).':'';return}
 const nxt=DA.ev.slice(DA.i+1).find(x=>x.ci!==e.ci&&x.ch);
-big.textContent=DA.mode==='pg'&&e.ch?(e.tag+(nxt&&nxt.ch?'  →  '+daName(nxt.ch):'')):`${e.tag} — ${e.notes.map(x=>IVN[(x.m-k+120)%12]).join(' + ')}`;
+big.textContent=DA.mode==='pg'&&e.ch?(e.tag+(nxt&&nxt.ch?' → '+daName(nxt.ch):'')):`${e.tag} · ${e.notes.map(x=>IVN[(x.m-k+120)%12]).join(' + ')}`;
 sub.textContent=`${DA.title} · ${DA.i+1}/${DA.ev.length}`;
-document.getElementById('daInfo').textContent=DA.mode==='sc'?'Joue chaque forme (touche toutes ses notes, ou au micro une seule suffit). Les ombres montrent toute la gamme harmonisée sur ces cordes : vois la forme glisser.':'Reste dans la zone : les petites pastilles sont les notes de l\'accord en cours, les pointillés jaunes la forme suivante. Le jeu « continu » enchaîne chaque accord par la note la plus proche.'}
-document.querySelectorAll('[data-dam]').forEach(b=>b.onclick=()=>{DA.mode=b.dataset.dam;daStop();daCtl();daBuild()});
+document.getElementById('daFrame').title=DA.mode==='sc'?'Joue chaque forme (touche toutes ses notes, ou au micro une seule suffit). Les ombres montrent toute la gamme harmonisée sur ces cordes : vois la forme glisser.':'Reste dans la zone : les petites pastilles sont les notes de l\'accord en cours, les pointillés jaunes la forme suivante. Le jeu « continu » enchaîne chaque accord par la note la plus proche.'}
 document.getElementById('daPlay').onclick=()=>{if(DAT){daStop();DA.i=0;daDraw();return}ac();daPlay()};
 document.getElementById('daGo').onclick=()=>{daStop();DA.streak=DA.streak;daBuild()};
 document.getElementById('daTempo').oninput=e=>{DA.tempo=+e.target.value;document.getElementById('daTempoV').textContent=DA.tempo};

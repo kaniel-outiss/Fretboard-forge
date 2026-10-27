@@ -151,9 +151,10 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 <!-- ===== BLUES ===== -->
 <section class="tab land" id="t-bl">
   <div class="side">
-    <div class="row"><span class="lbl">Module</span><button class="b on" data-bm="box">Boîtes</button><button class="b" data-bm="fda">F‑D‑A</button><button class="b" data-bm="jam">Jam 12 mesures</button><select id="blKey"></select></div>
+    <div class="row"><span class="lbl">Module</span><button class="b on" data-bm="box">Boîtes</button><button class="b" data-bm="fda">F‑D‑A</button><button class="b" data-bm="dbl">Doubles notes</button><button class="b" data-bm="jam">Jam 12 mesures</button><button class="b" data-bm="boogie">Boogie</button><select id="blKey"></select></div>
     <div class="row" id="blBoxRow"><span class="lbl">Boîte</span><button class="b on" data-bb="0">1</button><button class="b" data-bb="1">2</button><button class="b" data-bb="2">3</button><button class="b" data-bb="3">4</button><button class="b" id="blExt">+ notes en plus</button></div>
     <div class="row" id="blFdaRow" style="display:none"><span class="lbl">Accord</span><button class="b" id="blF7">Version 7 (blues)</button></div>
+    <div class="row" id="blDblRow" style="display:none"><span class="lbl">Base</span><button class="b on" data-bd="0">I</button><button class="b" data-bd="5">IV</button><button class="b" data-bd="7">V</button><button class="b" id="blBlue">+ notes bleues</button></div>
     <div class="row" id="blJamRow" style="display:none"><span class="lbl">Tempo</span><input type="range" id="blTempo" min="50" max="180" value="90" step="5" style="flex:1"><span id="blTempoV" style="font-size:12px;min-width:28px">90</span><div id="blGrid"></div></div>
     <div class="frame" id="blFrame"><div class="big" id="blBig" style="font-size:22px">—</div><div class="info" id="blSub" style="text-align:center"></div>
       <div class="stats"><span>Série <b id="blStreak" class="streak">0</b></span><span>Réussis <b id="blOk">0</b></span></div></div>
@@ -263,7 +264,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v1.0 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v1.1 — Boss</div>
 </section>
 
 </main>
@@ -852,10 +853,19 @@ const FDA={F:{strs:[2,3,4,5],iv:[0,4,7,0],iv7:[10,4,7,0]},D:{strs:[3,4,5],iv:[7,
 function fdaChain(root,seven){const o=[];Object.entries(FDA).forEach(([nm2,F])=>{const ivs=seven?F.iv7:F.iv;stackFrets(ivs.map(iv=>(root+iv)%12),F.strs).forEach(fr=>o.push({nm:nm2,fr,strs:F.strs,ivs}))});
 return o.sort((a,b)=>Math.min(...a.fr)-Math.min(...b.fr)||Math.max(...a.fr)-Math.max(...b.fr))}
 const BL12=[0,5,0,0,5,5,0,0,7,5,0,7];
+BL.dg=0;BL.blue=false;
+/* #10 : doubles notes cordes 1 et 3 depuis la formation F (en la : 3/4, 5/6, 7/7, 9/9, 12/12) */
+function dblPairs(rpc){let r1=(rpc-4+12)%12;if(r1<2)r1+=12;return[[r1-2,r1-1,'9'],[r1,r1+1,''],[r1+2,r1+2,''],[r1+4,r1+4,''],[r1+7,r1+7,'7']].filter(p=>p[1]<=NF)}
+function turnSeq(){const k=PC[BL.key];let r1=(k-4+12)%12;if(r1<2)r1+=12;const st=[[r1+4,r1+4],[r1+3,r1+3],[r1+2,r1+2],[r1,r1+1]].map(([a,b])=>({strs:[5,3],fr:[a,b]}));
+const v=fdaChain((k+7)%12,true).filter(c=>c.nm!=='F').reduce((a,b)=>Math.abs(avg(a.fr)-r1)<=Math.abs(avg(b.fr)-r1)?a:b);st.push({strs:v.strs,fr:v.fr,v7:true});return st}
+/* #11 : penta majeure, fondamentale corde 6 (I) ou corde 5 (IV même case, V deux cases plus haut) */
+function pentaMaj(rootPc,str,fret){const o=str===0?[[0,0],[0,2],[0,4],[1,2],[1,4],[2,2]]:[[1,0],[1,2],[1,4],[2,2],[2,4],[3,2]],bl=str===0?[[0,3],[2,0]]:[[1,3],[3,0]];
+return o.map(([s2,d])=>({s:s2,f:fret+d,x:false})).concat(BL.blue?bl.map(([s2,d])=>({s:s2,f:fret+d,x:true})):[]).map(n=>Object.assign(n,{iv:(TUNE[n.s]+n.f-rootPc+24)%12}))}
+function boogiePos(){const k=PC[BL.key];let r=(k-4+12)%12;if(r===0)r=12;if(r>12)r-=12;const d=BL12[BL.bar];return d===0?{str:0,f:r,root:k}:d===5?{str:1,f:r,root:(k+5)%12}:{str:1,f:r+2,root:(k+7)%12}}
 function blChordRoot(){return(PC[BL.key]+BL12[BL.bar])%12}
 function blDraw(){const k=PC[BL.key];let h=neckBase(),info='';
 document.querySelectorAll('[data-bm]').forEach(b=>b.classList.toggle('on',b.dataset.bm===BL.mode));
-document.getElementById('blBoxRow').style.display=BL.mode==='fda'?'none':'flex';document.getElementById('blFdaRow').style.display=BL.mode==='fda'?'flex':'none';document.getElementById('blJamRow').style.display=BL.mode==='jam'?'flex':'none';
+document.getElementById('blBoxRow').style.display=BL.mode==='fda'?'none':'flex';document.getElementById('blFdaRow').style.display=BL.mode==='fda'?'flex':'none';document.getElementById('blJamRow').style.display=(BL.mode==='jam'||BL.mode==='boogie')?'flex':'none';document.getElementById('blDblRow').style.display=(BL.mode==='dbl'||BL.mode==='boogie')?'flex':'none';document.querySelectorAll('[data-bd]').forEach(b=>{b.classList.toggle('on',+b.dataset.bd===BL.dg);b.style.display=BL.mode==='dbl'?'':'none'});document.getElementById('blBlue').classList.toggle('on',BL.blue);document.getElementById('blBoxRow').style.display=(BL.mode==='box'||BL.mode==='jam')?'flex':'none';
 document.querySelectorAll('[data-bb]').forEach(b=>b.classList.toggle('on',+b.dataset.bb===BL.box));document.getElementById('blExt').classList.toggle('on',BL.ext);document.getElementById('blF7').classList.toggle('on',BL.fda7);
 const big=document.getElementById('blBig'),sub=document.getElementById('blSub');
 if(BL.mode==='box'){const L=boxNotes(BL.box),seq=boxSeq(BL.box),a=Math.min(...L.map(n=>n.f)),b=Math.max(...L.map(n=>n.f));
@@ -870,6 +880,18 @@ h+=`<text x="${X(c.strs[0])-30}" y="${(YL(Math.max(0,a-1))+YL(b))/2+5}" text-anc
 c.fr.forEach((f,j)=>{const done=cur&&BL.played.some(p=>p[0]===c.strs[j]&&p[1]===f);h+=dot(c.strs[j],f,NC[c.ivs[j]],IVN[c.ivs[j]],{op:BL.play&&!cur?.3:(cur&&!done?.55:1),target:cur&&!done})})});
 big.textContent=`${BL.key}${BL.fda7?'7':''} — roadmap F‑D‑A`;sub.textContent='F → saute 1 case → D → saute 1 → A → saute 2 → F…';
 info=BL.play?`Formation ${BL.fi+1}/${ch.length} (${ch[BL.fi]?ch[BL.fi].nm:''}) : pose ses notes pour monter.`:'Le même accord partout sur le manche avec trois formations. Version 7 : la forme blues (F7, D7, A7).'}
+else if(BL.mode==='dbl'){const rp=(PC[BL.key]+BL.dg)%12,P=dblPairs(rp),T=BL.play?turnSeq():null,cur=T?T[BL.si]:null;
+if(!BL.play){P.forEach(([a,b,lb])=>{h+=`<line x1="${X(5)}" y1="${YN(a)}" x2="${X(3)}" y2="${YN(b)}" stroke="#ffb020" stroke-width="2" opacity=".5"/>`;[[5,a],[3,b]].forEach(([s2,f])=>{const iv=(TUNE[s2]+f-rp+24)%12;h+=dot(s2,f,NC[iv],IVN[iv])})});
+const F=fdaChain(rp,false).find(c=>c.nm==='F'&&Math.abs(c.fr[3]-P[1][0])<=0);if(F)F.fr.forEach((f,j)=>h+=`<circle cx="${X(F.strs[j])}" cy="${YN(f)}" r="19" fill="none" stroke="#fff" stroke-opacity=".5" stroke-dasharray="3 3"/>`);
+info='Doubles notes cordes 1 et 3 autour de la formation F (cercles pointillés) : c\'est le « sac à licks » de Sokolow, à rejouer sur chaque accord (I, IV, V).'}
+else{T.forEach((st,i)=>st.fr.forEach((f,j)=>{const s2=st.strs[j],iv=(TUNE[s2]+f-(st.v7?(PC[BL.key]+7)%12:PC[BL.key])+24)%12,done=i<BL.si,isC=i===BL.si,pl=isC&&BL.played.some(q=>q[0]===s2&&q[1]===f);h+=dot(s2,f,NC[iv],IVN[iv],{op:done||pl?1:isC?.55:.2,target:isC&&!pl})}));
+info=`Turnaround : descends les doubles notes puis pose le V7 — étape ${BL.si+1}/${T.length}`}
+big.textContent=`${nm(rp,BL.key)} — doubles notes (#10)`;sub.textContent=BL.play?'Turnaround → V7':'base : formation F · paires 9 · I · I · I · 7'}
+else if(BL.mode==='boogie'){const bp=boogiePos(),L=pentaMaj(bp.root,bp.str,bp.f);
+L.forEach(n=>{h+=n.x?`<g class="dot" data-s="${n.s}" data-f="${n.f}"><circle cx="${X(n.s)}" cy="${YN(n.f)}" r="12" fill="#05060b" stroke="#2ee6ff" stroke-width="2"/><text x="${X(n.s)}" y="${YN(n.f)+4}" text-anchor="middle" font-size="10" fill="#2ee6ff">${IVN[n.iv]}</text></g>`:dot(n.s,n.f,NC[n.iv],IVN[n.iv],{ring:n.iv===0?'#fff':null})});
+const nm7=nm(bp.root,BL.key)+'7';big.textContent=`Mesure ${BL.bar+1}/12 — ${nm7}`;sub.textContent=`penta majeure de ${nm(bp.root,BL.key)}, fondamentale corde ${bp.str===0?6:5}${BL.blue?' + notes bleues (creuses)':''}`;
+info='Une gamme par accord : I fondamentale corde 6 ; IV même case, fondamentale corde 5 ; V deux cases plus haut. Rejoue le même riff sur chaque accord.';
+document.getElementById('blGrid').innerHTML=BL12.map((d,i)=>`<span class="${i===BL.bar?'on':''}">${['I7','','','','','IV7','','V7'][d]}</span>`).join('')}
 else{const L=boxNotes(BL.box),cr=blChordRoot(),ct=[0,4,7,10];
 L.forEach(n=>{const iv=(TUNE[n.s]+n.f-cr+24)%12,isC=ct.includes(iv);h+=isC?dot(n.s,n.f,NC[iv],IVN[iv],{r:15}):`<g class="dot" data-s="${n.s}" data-f="${n.f}"><circle cx="${X(n.s)}" cy="${YN(n.f)}" r="10" fill="#1c2033" stroke="#7d83a0"/><text x="${X(n.s)}" y="${YN(n.f)+4}" text-anchor="middle" font-size="10" fill="#c8c8d0">${IVN[iv]}</text></g>`});
 const nm7=nm(cr,BL.key)+'7';big.textContent=`Mesure ${BL.bar+1}/12 — ${nm7} (${['I','','','','','IV','','V'][BL12[BL.bar]]||''})`;sub.textContent=`${BOXES[BL.box].lb} · notes de l'accord en couleur, le reste de la boîte en gris`;
@@ -877,23 +899,26 @@ info='Reste dans la boîte, vise les notes colorées sur les temps forts : la bo
 document.getElementById('blGrid').innerHTML=BL12.map((d,i)=>`<span class="${i===BL.bar?'on':''}">${['I7','','','','','IV7','','V7'][d]}</span>`).join('')}
 for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;
 setSvg('bSvg',h);document.getElementById('blInfo').textContent=info;
-document.getElementById('blGo').textContent=BL.mode==='jam'?(BL.run?'■ Stop':'▶ Jam 12 mesures'):(BL.play?'■ Stop':(BL.mode==='box'?'🎯 Joue la boîte':'🎯 Remonte le manche'));
+document.getElementById('blGo').textContent=(BL.mode==='jam'||BL.mode==='boogie')?(BL.run?'■ Stop':'▶ Jam 12 mesures'):(BL.play?'■ Stop':({box:'🎯 Joue la boîte',fda:'🎯 Remonte le manche',dbl:'🎯 Turnaround'})[BL.mode]);
 const sk=document.getElementById('blStreak');sk.textContent=BL.streak;sk.className='streak'+(BL.streak>=10?' gold':'');document.getElementById('blOk').textContent=ST.bl||0}
 BL.played=[];
 function blNote(m,fromMic){if(BL.mode==='box'&&BL.play){const seq=boxSeq(BL.box);if(m===seq[BL.si]){BL.si++;if(BL.si>=seq.length){BL.play=false;BL.si=0;ST.bl=(ST.bl||0)+1;BL.streak++;flash('ok','blFrame');vibrate(30);save()}blDraw()}else{flash('ko','blFrame');BL.streak=0;vibrate([60,40,60])}return}
 if(BL.mode==='fda'&&BL.play){const ch=fdaChain(PC[BL.key],BL.fda7),c=ch[BL.fi];if(!c)return;const want=c.fr.map((f,j)=>MIDI[c.strs[j]]+f),j=want.indexOf(m);
 if(j>=0){const p=[c.strs[j],c.fr[j]];if(!BL.played.some(q=>q[0]===p[0]&&q[1]===p[1]))BL.played.push(p);if(BL.played.length>=c.fr.length){BL.played=[];BL.fi++;chord(want,0,.8);if(fromMic)MIC.mute=performance.now()+600;if(BL.fi>=ch.length){BL.play=false;BL.fi=0;ST.bl=(ST.bl||0)+1;BL.streak++;flash('ok','blFrame');save()}}blDraw()}else{flash('ko','blFrame');vibrate([60,40,60])}return}
+if(BL.mode==='dbl'&&BL.play){const T=turnSeq(),st=T[BL.si];if(!st)return;const want=st.fr.map((f,j)=>MIDI[st.strs[j]]+f),j=want.indexOf(m);
+if(j>=0){const p=[st.strs[j],st.fr[j]];if(!BL.played.some(q=>q[0]===p[0]&&q[1]===p[1]))BL.played.push(p);if(BL.played.length>=st.fr.length){BL.played=[];BL.si++;chord(want,0,.8);if(fromMic)MIC.mute=performance.now()+600;if(BL.si>=T.length){BL.play=false;BL.si=0;ST.bl=(ST.bl||0)+1;BL.streak++;flash('ok','blFrame');save()}}blDraw()}else{flash('ko','blFrame');vibrate([60,40,60])}return}
 if(BL.mode==='jam'){const iv=(m-blChordRoot()+120)%12;if([0,4,7,10].includes(iv))flash('ok','blFrame');}}
 function blStop(){BL.run=false;if(BL.timer)clearInterval(BL.timer);BL.timer=null}
 function blComp(){const r=blChordRoot(),bm=40+((r-4+12)%12);chord([bm,bm+7,bm+10,bm+16].map(x=>x<40?x+12:x),0,60/BL.tempo*1.4)}
 function blTick(){BL.beat++;if(BL.beat>=4){BL.beat=0;BL.bar=(BL.bar+1)%12;if(BL.bar===0){ST.bl=(ST.bl||0)+1;save()}}tone(BL.beat===0?96:91,0,.05,.08);if(BL.beat===0||BL.beat===2)blComp();if(BL.beat===0)blDraw()}
 document.querySelectorAll('[data-bm]').forEach(b=>b.onclick=()=>{blStop();BL.play=false;BL.si=0;BL.fi=0;BL.mode=b.dataset.bm;blDraw()});
 document.querySelectorAll('[data-bb]').forEach(b=>b.onclick=()=>{BL.box=+b.dataset.bb;BL.si=0;blDraw()});
+document.querySelectorAll('[data-bd]').forEach(b=>b.onclick=()=>{BL.dg=+b.dataset.bd;blDraw()});document.getElementById('blBlue').onclick=()=>{BL.blue=!BL.blue;blDraw()};
 document.getElementById('blExt').onclick=()=>{BL.ext=!BL.ext;BL.si=0;blDraw()};document.getElementById('blF7').onclick=()=>{BL.fda7=!BL.fda7;BL.fi=0;blDraw()};
 const blKey=document.getElementById('blKey');blKey.innerHTML=KEYS.map(k=>`<option ${k==='G'?'selected':''}>${k}</option>`).join('');blKey.onchange=e=>{BL.key=e.target.value;BL.si=0;BL.fi=0;blDraw()};
 document.getElementById('blTempo').oninput=e=>{BL.tempo=+e.target.value;document.getElementById('blTempoV').textContent=BL.tempo;if(BL.run){blStop();BL.run=true;BL.timer=setInterval(blTick,60000/BL.tempo)}};
-document.getElementById('blGo').onclick=()=>{if(BL.mode==='jam'){if(BL.run)blStop();else{ac();BL.run=true;BL.bar=0;BL.beat=0;tone(96,0,.05,.08);blComp();BL.timer=setInterval(blTick,60000/BL.tempo)}}else{BL.play=!BL.play;BL.si=0;BL.fi=0;BL.played=[]}blDraw()};
-document.getElementById('blPlay').onclick=()=>{if(BL.mode==='box')boxSeq(BL.box).forEach((m,i)=>tone(m,i*.16));else if(BL.mode==='fda')fdaChain(PC[BL.key],BL.fda7).forEach((c,i)=>chord(c.fr.map((f,j)=>MIDI[c.strs[j]]+f),i*.55,.7));else blComp()};
+document.getElementById('blGo').onclick=()=>{if(BL.mode==='jam'||BL.mode==='boogie'){if(BL.run)blStop();else{ac();BL.run=true;BL.bar=0;BL.beat=0;tone(96,0,.05,.08);blComp();BL.timer=setInterval(blTick,60000/BL.tempo)}}else{BL.play=!BL.play;BL.si=0;BL.fi=0;BL.played=[]}blDraw()};
+document.getElementById('blPlay').onclick=()=>{if(BL.mode==='dbl'){turnSeq().forEach((st,i)=>chord(st.fr.map((f,j)=>MIDI[st.strs[j]]+f),i*.5,.7));return}if(BL.mode==='boogie'){const bp=boogiePos();[...new Set(pentaMaj(bp.root,bp.str,bp.f).map(n=>MIDI[n.s]+n.f))].sort((a,b)=>a-b).forEach((m,i)=>tone(m,i*.16));return}if(BL.mode==='box')boxSeq(BL.box).forEach((m,i)=>tone(m,i*.16));else if(BL.mode==='fda')fdaChain(PC[BL.key],BL.fda7).forEach((c,i)=>chord(c.fr.map((f,j)=>MIDI[c.strs[j]]+f),i*.55,.7));else blComp()};
 bindDots(document.getElementById('bSvg'),(s2,f)=>{tone(MIDI[s2]+f);vib(document.getElementById('bSvg'),s2);blNote(MIDI[s2]+f,false)});
 
 /* ================= MICRO ================= */

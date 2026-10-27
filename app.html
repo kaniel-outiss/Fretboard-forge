@@ -124,6 +124,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="frame" id="dFrame"><div class="big" id="dTitle">—</div><div class="info" id="dSub" style="text-align:center"></div>
       <div class="stats"><span>Série <b id="dStreak" class="streak">0</b></span><span>Dessins justes <b id="dOk">0</b></span><span>Intervalles <b id="dIv">0</b></span></div></div>
     <div id="rdStaff" style="display:none"></div>
+    <div class="row" id="rdCtl" style="display:none;justify-content:center"><button class="b" id="rdMode">Mode : hauteurs</button><button class="b go" id="rdGo">▶ Lancer</button><span class="lbl" style="min-width:0">Tempo</span><input type="range" id="rdTempo" min="40" max="160" value="70" step="5" style="width:120px"><span id="rdTempoV" style="font-size:12px">70</span><span id="rdLvls"></span></div>
     <div class="info" id="dInfo"></div>
     <div class="row" id="dOpts" style="justify-content:center"></div>
     <div class="row" style="justify-content:center"><button class="b go" id="dAct">Valider ✓</button><button class="b" id="dClr">Effacer</button><button class="b" id="dNext">Nouveau ⟳</button></div>
@@ -265,7 +266,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v1.2 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v1.3 — Boss</div>
 </section>
 
 </main>
@@ -561,7 +562,7 @@ for(let s=0;s<6;s++)for(let f=a;f<=Math.min(NF,a+4);f++){const iv=(TUNE[s]+f-k+2
 const dKey=document.getElementById('dKey');dKey.innerHTML='<option value="*">Aléatoire</option>'+KEYS.map(k=>`<option>${k}</option>`).join('');
 dKey.onchange=e=>{D.rand=e.target.value==='*';if(!D.rand)D.key=e.target.value;drNew()};
 document.querySelectorAll('#t-dr [data-dk]').forEach(b=>b.onclick=()=>{D.kind=b.dataset.dk;document.querySelectorAll('#t-dr [data-dk]').forEach(x=>x.classList.toggle('on',x===b));drNew()});
-function drNew(){if(D.kind==='rd'){rdNew();return}document.getElementById('rdStaff').style.display='none';document.getElementById('dSteps').style.visibility='visible';D.step=0;D.sel=[];D.res=null;D.counted=false;D.si=0;D.qi=0;D.qs=[];D.done=false;if(D.rand)D.key=rnd(KEYS);const k=PC[D.key];
+function drNew(){if(D.kind==='rd'){rdNew();return}rhyStop();document.getElementById('rdCtl').style.display='none';document.getElementById('rdStaff').style.display='none';document.getElementById('dSteps').style.visibility='visible';D.step=0;D.sel=[];D.res=null;D.counted=false;D.si=0;D.qi=0;D.qs=[];D.done=false;if(D.rand)D.key=rnd(KEYS);const k=PC[D.key];
 if(D.kind==='iv'){drIv();return}
 if(D.kind==='caged'){const sh=rnd(ORD);D.tgt=shapeIn(sh,D.key).map(([s,f])=>[s,f]);D.title=`${D.key} — forme ${sh}`;D.sub=`Accord majeur, forme CAGED « ${sh} » (toutes les cordes jouées)`}
 else if(D.kind==='tri'){let v=null,q,ss;for(let t=0;t<20&&!v;t++){q=rnd(['maj','min']);ss=Math.floor(Math.random()*4);const vs=triadVoicings(D.key,q,ss);if(vs.length)v=rnd(vs)}
@@ -574,7 +575,7 @@ D.ivq=q;D.sel=[];D.res=null;D.title=IVLONG[q.n];D.sub=`au-dessus de la fondament
 function drQs(){const k=PC[D.key],pool=[...D.tgt].sort(()=>Math.random()-.5).slice(0,3);
 D.qs=pool.map(([s,f])=>{const iv=(TUNE[s]+f-k+24)%12,ans=IVN[iv],opts=new Set([ans]);const others=[...new Set(D.tgt.map(([s2,f2])=>IVN[(TUNE[s2]+f2-k+24)%12]))].concat(['R','3','5','b3','b7','2','4','6','7']);
 for(const o of others.sort(()=>Math.random()-.5)){if(opts.size>=4)break;opts.add(o)}return{s,f,ans,opts:[...opts].sort(()=>Math.random()-.5)}})}
-function drDraw(){if(D.kind==='rd'){rdDraw();return}document.getElementById('rdStaff').style.display='none';document.getElementById('dSteps').style.visibility='visible';const k=PC[D.key];let h=neckBase();
+function drDraw(){if(D.kind==='rd'){rdDraw();return}document.getElementById('rdCtl').style.display='none';document.getElementById('rdStaff').style.display='none';document.getElementById('dSteps').style.visibility='visible';const k=PC[D.key];let h=neckBase();
 const st=document.querySelectorAll('#dSteps span');st.forEach((e,i)=>{e.className=D.kind==='iv'?(i===0?'on':''):(i<D.step||D.done&&i===2?'done':i===D.step?'on':'')});
 document.getElementById('dTitle').textContent=D.title||'—';document.getElementById('dSub').textContent=D.sub||'';
 const act=document.getElementById('dAct'),clr=document.getElementById('dClr'),opts=document.getElementById('dOpts'),info=document.getElementById('dInfo');opts.innerHTML='';
@@ -620,6 +621,8 @@ if(ok){flash('ok','dFrame');vibrate(30);drDraw();setTimeout(()=>{D.step=1;drQs()
 else if(D.step===2){D.seq.forEach((m,i)=>tone(m,i*.28))}};
 document.getElementById('dClr').onclick=()=>{if(D.kind==='rd'){RD.song=-1;rdNew();return}if(D.step!==0)return;if(D.res&&!D.res.ok){D.step=1;drQs();drDraw();return}D.sel=[];drDraw()};
 document.getElementById('dNext').onclick=()=>drNew();
+document.getElementById('rdMode').onclick=()=>{RD.rmode=!RD.rmode;rhyStop();rdNew()};document.getElementById('rdGo').onclick=()=>{if(RDR.run){rhyStop();drDraw()}else rhyStart()};
+document.getElementById('rdTempo').oninput=e=>{RDR.tempo=+e.target.value;document.getElementById('rdTempoV').textContent=RDR.tempo;if(!RDR.run)drDraw()};
 
 /* ================= JAZZ : SEPTIÈMES + HENDERSON ================= */
 const Q7={maj7:[0,4,7,11],'7':[0,4,7,10],m7:[0,3,7,10],m7b5:[0,3,6,10],dim7:[0,3,6,9],m6:[0,3,7,9],mMaj7:[0,3,7,11]};
@@ -935,25 +938,34 @@ const RD_LV=[
 const RD={lv:0,seq:[],i:0,res:[],song:-1,streak:0};
 const NATP=[0,2,4,5,7,9,11];
 function rdPool(){const L=RD_LV[RD.lv],o=[];for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){if(!L.f(s2,f))continue;const m=MIDI[s2]+f;if(L.nat&&!NATP.includes(m%12))continue;o.push({m,s:s2,f})}return o}
-async function rdNew(){RD.i=0;RD.res=[];
+async function rdNew(){RD.i=0;RD.res=[];rhyStop();if(RD_LV[RD.lv].rhy){RD.title='Rythme — '+['noires, blanches, silences','+ croches','+ pointées, syncopes'][RDR.lvl];RD.seq=[];rhyNew();return}
 if(RD_LV[RD.lv].mel){if(!STD){document.getElementById('dInfo').textContent='Chargement des mélodies…';await stdLoad()}const ms=STD.map((r,i)=>[r,i]).filter(([r])=>r[11]&&r[11].mel);
 if(RD.song<0||!STD[RD.song]||!(STD[RD.song][11]&&STD[RD.song][11].mel))RD.song=rnd(ms)[1];const bars=stdBars(STD[RD.song]);RD.seq=[];
-bars.forEach(b=>(b.mel||[]).forEach((x,j)=>{if(x.m==null||(j>0&&b.mel[j-1].tie&&b.mel[j-1].m===x.m))return;let t=x.m-12;if(t<40)t+=12;RD.seq.push({m:t,w:t+12})}));RD.title=STD[RD.song][1]}
-else{const P=rdPool();RD.seq=[];let last=null;for(let k=0;k<16;k++){let c;do{c=rnd(P)}while(last&&c.m===last.m&&P.length>1);last=c;RD.seq.push({m:c.m,w:c.m+12,pos:[c.s,c.f]})}RD.title=RD_LV[RD.lv].lb}
+bars.forEach(b=>(b.mel||[]).forEach((x,j)=>{if(x.m==null||(j>0&&b.mel[j-1].tie&&b.mel[j-1].m===x.m))return;let t=x.m-12;if(t<40)t+=12;RD.seq.push({m:t,w:t+12})}));RD.title=STD[RD.song][1];const kk=STD[RD.song][2]||'';RD.flat=/♭|b/.test(kk)||/^(F|Dm|Gm|Cm|Fm)/.test(kk);LET=RD.flat?LETF:LETS;if(RD.rmode)rhyNew()}
+else{RD.flat=false;LET=LETS;const P=rdPool();RD.seq=[];let last=null;for(let k=0;k<16;k++){let c;do{c=rnd(P)}while(last&&c.m===last.m&&P.length>1);last=c;RD.seq.push({m:c.m,w:c.m+12,pos:[c.s,c.f]})}RD.title=RD_LV[RD.lv].lb}
 drDraw()}
-const LET=['C','C','D','D','E','F','F','G','G','A','A','B'],ACC=[0,1,0,1,0,0,1,0,1,0,1,0],LIX={C:0,D:1,E:2,F:3,G:4,A:5,B:6};
+const LETS=['C','C','D','D','E','F','F','G','G','A','A','B'],LETF=['C','D','D','E','E','F','G','G','A','A','B','B'];let LET=LETS;const ACC=[0,1,0,1,0,0,1,0,1,0,1,0],accS=()=>RD.flat?'♭':'♯',LIX={C:0,D:1,E:2,F:3,G:4,A:5,B:6};
 function rdStaff(){const W=620,lg=12,bot=92,x0=100,dx=64,i0=Math.max(0,RD.i-2),vis=RD.seq.slice(i0,i0+8);let h=`<svg viewBox="0 0 ${W} 150" width="100%" style="max-height:150px">`;
 for(let k=0;k<5;k++)h+=`<line x1="10" x2="${W-10}" y1="${bot-k*lg}" y2="${bot-k*lg}" stroke="#5c6180" stroke-width="1.2"/>`;
 h+=`<text x="16" y="${bot+6}" font-size="62" fill="#2ee6ff" style="font-family:serif" filter="url(#glow)">𝄞</text><text x="38" y="${bot+30}" font-size="10" fill="#7d83a0">8</text>`;
 vis.forEach((n,k)=>{const idx=i0+k,w=n.w,step=(Math.floor(w/12)-1)*7+LIX[LET[w%12]],y=bot-(step-30)*lg/2,x=x0+k*dx,cur=idx===RD.i,r=RD.res[idx],col=cur?'#2ee6ff':r===true?'#39ff88':r===false?'#ff3b5c':'#c8c8d0';
 for(let st=28;st>=step;st-=2)if(st<30)h+=`<line x1="${x-14}" x2="${x+14}" y1="${bot-(st-30)*lg/2}" y2="${bot-(st-30)*lg/2}" stroke="#5c6180"/>`;
 for(let st=40;st<=step;st+=2)h+=`<line x1="${x-14}" x2="${x+14}" y1="${bot-(st-30)*lg/2}" y2="${bot-(st-30)*lg/2}" stroke="#5c6180"/>`;
-if(ACC[w%12])h+=`<text x="${x-22}" y="${y+5}" font-size="16" fill="${col}">♯</text>`;
+if(ACC[w%12])h+=`<text x="${x-22}" y="${y+5}" font-size="16" fill="${col}">${accS()}</text>`;
 h+=`<ellipse cx="${x}" cy="${y}" rx="8" ry="6" transform="rotate(-20 ${x} ${y})" fill="${col}" ${cur?'filter="url(#glow)"':''}/>`;
 if(cur)h+=`<rect x="${x-20}" y="6" width="40" height="138" rx="8" fill="none" stroke="#2ee6ff" stroke-opacity=".4"/>`});
 return h+'</svg>'}
 function rdLevelOf(m){const c=ST.rd.m[m]||0;return c<3?0:c<6?1:2}
-function rdDraw(){document.getElementById('rdStaff').style.display='';document.getElementById('dSteps').style.visibility='hidden';
+function rdDraw(){document.getElementById('rdStaff').style.display='';document.getElementById('dSteps').style.visibility='hidden';const isR=RD_LV[RD.lv].rhy||(RD_LV[RD.lv].mel&&RD.rmode);
+document.getElementById('rdCtl').style.display=(RD_LV[RD.lv].rhy||RD_LV[RD.lv].mel)?'flex':'none';document.getElementById('rdMode').style.display=RD_LV[RD.lv].mel?'':'none';document.getElementById('rdMode').textContent='Mode : '+(RD.rmode?'rythme':'hauteurs');
+document.getElementById('rdGo').style.display=isR?'':'none';document.getElementById('rdGo').textContent=RDR.run?'■ Stop':'▶ Lancer';
+document.getElementById('rdLvls').innerHTML=RD_LV[RD.lv].rhy?['N1','N2','N3'].map((x,i)=>`<button class="b ${RDR.lvl===i?'on':''}" data-rr="${i}" style="padding:3px 7px;font-size:11px">${x}</button>`).join(''):'';
+document.querySelectorAll('[data-rr]').forEach(b=>b.onclick=()=>{RDR.lvl=+b.dataset.rr;rdNew()});
+if(isR){document.getElementById('rdStaff').innerHTML=rhyStaff();document.getElementById('dTitle').textContent=RD.title||'Rythme';if(!RDR.run)document.getElementById('dSub').textContent=`${RDR.bpb}/4 · tempo ${RDR.tempo} · décompte d'une mesure`;
+const op=document.getElementById('dOpts');op.innerHTML=RD_LV.map((l,i)=>`<button class="b ${RD.lv===i?'on':''}" data-rl="${i}" style="font-size:11px;padding:3px 7px">${l.lb}</button>`).join('');op.querySelectorAll('[data-rl]').forEach(b=>b.onclick=()=>{RD.lv=+b.dataset.rl;RD.song=-1;rdNew()});
+document.getElementById('dAct').style.visibility='hidden';document.getElementById('dClr').style.visibility=RD_LV[RD.lv].mel?'visible':'hidden';document.getElementById('dClr').textContent='Autre mélodie';
+let h=neckBase();for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;setSvg('dSvg',h);
+if(!RDR.run)document.getElementById('dInfo').textContent=RD_LV[RD.lv].rhy?'Joue la note écrite (corde de sol à vide) sur chaque attaque, au toucher ou au micro — les silences se comptent. Le cadre clignote à chaque temps.':'Joue le thème en rythme : bonne note au bon moment (vert), bonne attaque mais mauvaise note (ambre), oubliée (rouge).';return}
 const cur=RD.seq[RD.i],cl=cur?rdLevelOf(cur.m):2;document.getElementById('dTitle').textContent=RD.title||'—';
 document.getElementById('dSub').textContent=cur?(cl===0?`${SHP[cur.m%12]} — ${['','béquille : nom + case'][1]}`:cl===1?`${SHP[cur.m%12]} — béquille : nom seul`:'sans béquille : lis !'):'Lecture terminée ✓';
 document.getElementById('rdStaff').innerHTML=rdStaff();
@@ -965,11 +977,50 @@ for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" d
 setSvg('dSvg',h);const ok=RD.res.filter(x=>x===true).length,n=RD.res.length;
 document.getElementById('dInfo').textContent=cur?`Note ${RD.i+1}/${RD.seq.length} · juste ${ok}/${n||0} — joue la note écrite (la guitare sonne une octave plus bas que l'écrit). Les béquilles disparaissent note par note.`:`Terminé : ${ok}/${n} justes. Nouveau ⟳ pour une autre série.`;
 const sk=document.getElementById('dStreak');sk.textContent=RD.streak;sk.className='streak'+(RD.streak>=20?' viol':RD.streak>=10?' gold':'');document.getElementById('dOk').textContent=ST.dr.ok;document.getElementById('dIv').textContent=ST.dr.iv}
-function rdNote(m,fromMic){const cur=RD.seq[RD.i];if(!cur)return;
+function rdNote(m,fromMic){if(RD_LV[RD.lv].rhy||(RD_LV[RD.lv].mel&&RD.rmode)){if(!fromMic)rhyHit(m,0);return}const cur=RD.seq[RD.i];if(!cur)return;
 if(m===cur.m){if(RD.res[RD.i]==null)RD.res[RD.i]=true;ST.rd.ok++;ST.rd.m[m]=(ST.rd.m[m]||0)+1;RD.streak++;flash('ok','dFrame');RD.i++;if(fromMic)MIC.mute=performance.now()+250;
 if(RD.i>=RD.seq.length){vibrate([30,40,30])}save();drDraw();return}
 if(m%12===cur.m%12){flash('warn','dFrame');document.getElementById('dInfo').textContent='Bonne note, mauvaise octave : relis la hauteur sur la portée.';return}
 RD.res[RD.i]=false;ST.rd.ko++;ST.rd.m[cur.m]=0;RD.streak=0;flash('ko','dFrame');vibrate([60,40,60]);save();drDraw()}
+
+/* ================= LECTURE RYTHMIQUE ================= */
+const RDR={on:false,run:false,ev:[],bpb:4,tempo:70,t0:0,raf:null,beatT:null,lastBeat:-1,lvl:0,hits:0,miss:0};
+RD_LV.push({lb:'𝅘𝅥 Rythme',rhy:true});
+const RCELLS=[[[[1,0]],[[2,0]],[[4,0]],[[1,1]],[[2,1]]],[[[.5,0],[.5,0]],[[.5,1],[.5,0]],[[1,0]],[[.5,0],[.5,0]]],[[[1.5,0],[.5,0]],[[.75,0],[.25,0]],[[.5,0],[1,0],[.5,0]],[[3,0]]]];
+function rhyGen(){const cells=RCELLS.slice(0,RDR.lvl+1).flat(),ev=[];let t=0;for(let b=0;b<4;b++){let left=4;while(left>0){const fit=cells.filter(c=>c.reduce((a,x)=>a+x[0],0)<=left+1e-9);const c=fit.length?rnd(fit):[[left,0]];
+c.forEach(([d,r])=>{ev.push({t,d,m:r?null:55,w:r?null:67});t+=d;left-=d})}}return ev}
+function rhyFromMel(){const bars=stdBars(STD[RD.song]),ev=[];let t0=0;RDR.bpb=bars[0]?bars[0].bpb:4;
+bars.forEach(b=>{(b.mel||[]).forEach((x,j)=>{if(j>0&&b.mel[j-1].tie&&b.mel[j-1].m===x.m&&x.m!=null){ev[ev.length-1].d+=x.d;return}let m=x.m==null?null:x.m-12;if(m!=null&&m<40)m+=12;ev.push({t:t0+x.p,d:x.d,m,w:m==null?null:m+12})});t0+=b.bpb});return ev}
+function rhyNew(){rhyStop();RDR.ev=RD_LV[RD.lv].rhy?rhyGen():rhyFromMel();if(RD_LV[RD.lv].rhy)RDR.bpb=4;RDR.ev.forEach(e=>{e.st=null});RDR.hits=0;RDR.miss=0;RDR.cur=0;drDraw()}
+function rhyFig(x,y,d,col,isRest,up){let h='';const dot=[3,1.5,.75].includes(+d.toFixed(2));const base=dot?d/1.5:d;
+if(isRest){if(base>=4)h+=`<rect x="${x-7}" y="${y-12}" width="14" height="6" fill="${col}"/>`;else if(base>=2)h+=`<rect x="${x-7}" y="${y-6}" width="14" height="6" fill="${col}"/>`;
+else if(base>=1)h+=`<path d="M${x-3} ${y-16} l6 7 l-6 6 l6 7 q-8 -3 -4 4" fill="none" stroke="${col}" stroke-width="2.2"/>`;else h+=`<circle cx="${x-3}" cy="${y-6}" r="2.6" fill="${col}"/><path d="M${x-3} ${y-4} q4 2 6 -2 l-5 16" fill="none" stroke="${col}" stroke-width="1.8"/>`+(base<.5?`<circle cx="${x-5}" cy="${y+2}" r="2.4" fill="${col}"/>`:'');}
+else{const hollow=base>=2;h+=`<ellipse cx="${x}" cy="${y}" rx="8" ry="6" transform="rotate(-20 ${x} ${y})" fill="${hollow?'#05060b':col}" stroke="${col}" stroke-width="2"/>`;
+if(base<4){const sx=up?x+7:x-7,sy=up?y-36:y+36;h+=`<line x1="${sx}" y1="${y}" x2="${sx}" y2="${sy}" stroke="${col}" stroke-width="1.8"/>`;
+const fl=base<=.25?2:base<=.5?1:0;for(let k=0;k<fl;k++)h+=`<path d="M${sx} ${sy+(up?k*8:-k*8)} q10 ${up?8:-8} 6 ${up?20:-20}" fill="none" stroke="${col}" stroke-width="2"/>`}}
+if(dot)h+=`<circle cx="${x+13}" cy="${y-2}" r="2.4" fill="${col}"/>`;return h}
+function rhyStaff(){const W=620,lg=12,bot=92,x0=90,bw=60,cb=rhyBeat(),page=Math.max(0,Math.floor(Math.max(0,cb)/8));let h=`<svg viewBox="0 0 ${W} 150" width="100%" style="max-height:150px">`;
+for(let k=0;k<5;k++)h+=`<line x1="10" x2="${W-10}" y1="${bot-k*lg}" y2="${bot-k*lg}" stroke="#5c6180" stroke-width="1.2"/>`;
+h+=`<text x="16" y="${bot+6}" font-size="62" fill="#2ee6ff" style="font-family:serif">𝄞</text>`;
+for(let bt=page*8;bt<=page*8+8;bt+=RDR.bpb)h+=`<line x1="${x0-14+(bt-page*8)*bw}" x2="${x0-14+(bt-page*8)*bw}" y1="${bot}" y2="${bot-4*lg}" stroke="#5c6180" stroke-width="1.5"/>`;
+RDR.ev.forEach(e=>{if(e.t<page*8||e.t>=page*8+8)return;const x=x0+(e.t-page*8)*bw,w=e.w||71,step=(Math.floor(w/12)-1)*7+LIX[LET[w%12]],y=e.m==null?bot-2*lg:bot-(step-30)*lg/2;
+const col=e.st==='ok'?'#39ff88':e.st==='ko'?'#ff3b5c':e.st==='am'?'#ffb020':(RDR.run&&cb>=e.t&&cb<e.t+e.d?'#2ee6ff':'#c8c8d0');
+if(e.m!=null){for(let st=28;st>=step;st-=2)if(st<30)h+=`<line x1="${x-14}" x2="${x+14}" y1="${bot-(st-30)*lg/2}" y2="${bot-(st-30)*lg/2}" stroke="#5c6180"/>`;for(let st=40;st<=step;st+=2)h+=`<line x1="${x-14}" x2="${x+14}" y1="${bot-(st-30)*lg/2}" y2="${bot-(st-30)*lg/2}" stroke="#5c6180"/>`;if(ACC[w%12])h+=`<text x="${x-22}" y="${y+5}" font-size="16" fill="${col}">${accS()}</text>`}
+h+=rhyFig(x,y,e.d,col,e.m==null,step<34)});
+if(RDR.run&&cb>=0)h+=`<line x1="${x0-6+(cb-page*8)*bw}" x2="${x0-6+(cb-page*8)*bw}" y1="10" y2="140" stroke="#2ee6ff" stroke-width="2" opacity=".7"/>`;
+return h+'</svg>'}
+const rhySpb=()=>60/RDR.tempo;
+function rhyBeat(){return RDR.run?(performance.now()/1000-RDR.t0)/rhySpb():-1}
+function rhyStart(){ac();RDR.ev.forEach(e=>e.st=null);RDR.hits=0;RDR.miss=0;RDR.run=true;RDR.t0=performance.now()/1000+RDR.bpb*rhySpb();RDR.lastBeat=-99;const loop=()=>{if(!RDR.run)return;const b=rhyBeat(),bi=Math.floor(b);
+if(bi!==RDR.lastBeat){RDR.lastBeat=bi;if(!MIC.on)tone(((bi%RDR.bpb)+RDR.bpb)%RDR.bpb===0?96:91,0,.05,.09);const fr=document.getElementById('dFrame');fr.style.borderColor=bi<0?'#ffd23f':'#2ee6ff';setTimeout(()=>fr.style.borderColor='',90);
+if(bi<0)document.getElementById('dSub').textContent=`Décompte : ${RDR.bpb+bi+1}`}
+const tol=.35;RDR.ev.forEach(e=>{if(e.m!=null&&!e.st&&b>e.t+tol){e.st='ko';RDR.miss++}});
+const end=RDR.ev.length?RDR.ev[RDR.ev.length-1].t+RDR.ev[RDR.ev.length-1].d:0;if(b>end+.5){rhyStop();rhyDone();return}
+document.getElementById('rdStaff').innerHTML=rhyStaff();RDR.raf=requestAnimationFrame(loop)};loop();drDraw()}
+function rhyStop(){RDR.run=false;if(RDR.raf)cancelAnimationFrame(RDR.raf)}
+function rhyDone(){const n=RDR.ev.filter(e=>e.m!=null).length,ok=RDR.ev.filter(e=>e.st==='ok').length;ST.rd.rh=(ST.rd.rh||0)+ok;save();flash(ok/n>=.8?'ok':'ko','dFrame');drDraw();document.getElementById('dInfo').textContent=`Terminé : ${ok}/${n} notes à temps (${Math.round(ok/n*100)} %).${ok/n>=.8?' Monte le tempo !':' Ralentis et recommence.'}`}
+function rhyHit(m,lat){if(!RDR.run)return;const b=rhyBeat()-lat/rhySpb();let best=null,bd=1e9;RDR.ev.forEach(e=>{if(e.m==null||e.st)return;const dd=Math.abs(b-e.t);if(dd<bd){bd=dd;best=e}});
+if(!best||bd>.35){flash('ko','dFrame');return}if(m!=null&&RD_LV[RD.lv].rhy!==true&&m%12!==best.m%12){best.st='am';flash('warn','dFrame');return}best.st='ok';RDR.hits++;flash('ok','dFrame')}
 
 /* ================= MICRO ================= */
 const NOTE_FR=m=>SHP[m%12]+(Math.floor(m/12)-1);
@@ -985,6 +1036,7 @@ catch(e){alert('Micro indisponible : '+e.message)}}
 function micStop(){MIC.on=false;if(MIC.stream)MIC.stream.getTracks().forEach(t=>t.stop());MIC.stream=null;micUi()}
 function micUi(){document.getElementById('btnMic').classList.toggle('live',MIC.on);const el=document.getElementById('micNote');el.classList.toggle('on',MIC.on);el.textContent='—'}
 function micLoop(){if(!MIC.on)return;MIC.an.getFloatTimeDomainData(MIC.buf);const [f,rms]=acf(MIC.buf,AC.sampleRate);const el=document.getElementById('micNote');
+const nowT=performance.now();if(RDR.run&&rms>.03&&rms>(MIC.lastRms||0)*1.6&&nowT-(MIC.lastOn||0)>110){MIC.lastOn=nowT;rhyHit(f>70?Math.round(69+12*Math.log2(f/440)):null,.06)}MIC.lastRms=rms;
 if(f>70&&f<1400){const mf=69+12*Math.log2(f/440),m=Math.round(mf),cents=Math.round((mf-m)*100);el.textContent=`${NOTE_FR(m)} ${cents>0?'+':''}${cents}`;
 if(m===MIC.last)MIC.cnt++;else{MIC.last=m;MIC.cnt=1}MIC.quiet=0;
 if(MIC.cnt===3&&m!==MIC.emitted&&performance.now()>MIC.mute){MIC.emitted=m;el.classList.add('hot');setTimeout(()=>el.classList.remove('hot'),200);micNote(m)}}

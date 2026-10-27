@@ -305,7 +305,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="frame" id="sFrame" style="padding:6px 10px">
       <div class="stats"><span>Cible <b id="sTgt">—</b></span><span>Série <b id="sStreak" class="streak">0</b></span><span>Juste <b id="sOk">0</b></span></div>
     </div>
-    <div class="row" style="justify-content:center"><button class="b" id="sPlay">▶ Écouter</button><button class="b" id="sDrill">🎯 Drill cible</button><button class="b" id="sBourdon">Bourdon</button></div>
+    <div class="row" style="justify-content:center"><button class="b" id="sPlay">▶ Écouter</button><button class="b" id="sDrill">🎯 Drill cible</button><button class="b" id="sBourdon">Bourdon</button><button class="b" id="sJam" title="Grille d'accompagnement du Total Guitar Ultimate Scale Book pour cette gamme">🎸 Jam</button></div>
     <div class="info" style="font-size:11px">Anneau blanc pulsant = altéré vs majeure · ★ = note caractéristique</div>
   </div>
   <div class="fill"><svg class="neck" id="sSvg" viewBox="0 0 372 624"></svg></div>
@@ -338,7 +338,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.7 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.8 — Boss</div>
 </section>
 
 </main>
@@ -444,7 +444,8 @@ const SCALES=[
 ['Overtone (lydien ♭7)','X',[0,2,4,6,7,9,10],6,'Jazz, brillant','7#11'],
 ['Roumaine','X',[0,2,3,6,7,9,10],6,'Klezmer, mineur dorien #4','m7'],
 ['Scriabine','X',[0,1,4,7,9],1,'Mystique','maj'],
-['Symétrique (½T‑T)','Y',[0,1,3,4,6,7,9,10],1,'Diminuée dominante','7b9']];
+['Symétrique (½T‑T)','Y',[0,1,3,4,6,7,9,10],1,'Diminuée dominante','7b9'],
+['Blues majeur (country)','P',[0,2,3,4,7,9],3,'Country, bluegrass, joyeux','maj, 6, 7']];
 const QUAL={maj:[0,4,7],min:[0,3,7],dim:[0,3,6],aug:[0,4,8]};
 const QN={maj:'',min:'m',dim:'°',aug:'+'};
 const SSETS=[[3,4,5],[2,3,4],[1,2,3],[0,1,2]]; // groupes de cordes (index graves→aigu)
@@ -708,7 +709,7 @@ if(T.run){T.mode='drill';document.getElementById('tMode').textContent='Mode : dr
 const S={s:5,k:9,p:-1,drill:false,tgt:null,streak:0};
 const sSel=document.getElementById('sSel');let og='';Object.keys(FAM).forEach(f=>{og+=`<optgroup label="${FAM[f][0]}">`+SCALES.map((s,i)=>s[1]===f?`<option value="${i}">${s[0]}</option>`:'').join('')+'</optgroup>'});sSel.innerHTML=og;sSel.value=5;
 const sKey=document.getElementById('sKey');sKey.innerHTML=SHP.map((k,i)=>`<option value="${i}">${FLP[i]===k?k:k+'/'+FLP[i]}</option>`).join('');sKey.value=9;
-sSel.onchange=e=>{S.s=+e.target.value;S.p=S.mo&&!S.mo.startsWith('lp')?0:-1;S.tgt=null;motBuild();drawSc()};sKey.onchange=e=>{S.k=+e.target.value;S.tgt=null;motBuild();drawSc()};
+sSel.onchange=e=>{if(S.jam)jamStop();S.s=+e.target.value;S.p=S.mo&&!S.mo.startsWith('lp')?0:-1;S.tgt=null;motBuild();drawSc()};sKey.onchange=e=>{if(S.jam)jamStop();S.k=+e.target.value;S.tgt=null;motBuild();drawSc()};
 function lab(iv,set){if(iv===6)return set.includes(7)?'b5':'#4';return IVN[iv]}
 function wins(){const rf=(S.k-4+12)%12;return[-1,1,4,6,9].map(d=>{let a=rf+d;while(a>10)a-=12;while(a<0)a+=12;return a})}
 function notesIn(){const set=SCALES[S.s][2],W=wins(),a=S.p<0?0:W[S.p],b=S.p<0?NF:W[S.p]+4,o=[];for(let s=0;s<6;s++)for(let f=Math.max(0,a);f<=Math.min(NF,b);f++){const iv=(TUNE[s]+f-S.k+24)%12;if(set.includes(iv))o.push([s,f,MIDI[s]+f,iv])}return o}
@@ -725,6 +726,9 @@ h+=dot(s,fr,NC[iv],FING&&S.p>=0&&inW&&fr>0?fingLab(fr,Math.max(1,wa)):lab(iv,set
 for(let s=0;s<6;s++)for(let fr=0;fr<=NF;fr++){const iv=(TUNE[s]+fr-S.k+24)%12;if(set.includes(iv))continue;h+=`<g class="dot" data-s="${s}" data-f="${fr}" style="cursor:pointer"><circle cx="${X(s)}" cy="${YN(fr)}" r="14" fill="#fff" opacity="0.01"/></g>`}
 if(S.mo&&S.mseq.length){if(S.mo.startsWith('lp')){const L=S.mseq.slice(0,Math.ceil(S.mseq.length/2)+1);h+=`<polyline points="${L.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="#ffd23f" stroke-width="2" stroke-opacity=".3"/>`+L.map(x=>`<circle cx="${X(x.s)}" cy="${YN(x.f)}" r="16.5" fill="none" stroke="#ffd23f" stroke-opacity=".55" stroke-width="1.5"/>`).join('')}const w=S.mseq[S.mi];if(w)h+=`<circle cx="${X(w.s)}" cy="${YN(w.f)}" r="19" fill="none" stroke="#ffd23f" stroke-width="3" filter="url(#glow)"/>`;h+=pathAhead(S.mseq,S.mi,4)}
 document.getElementById('sMotN').textContent=S.mo?`${S.mi+1}/${S.mseq.length}`:'';
+if(S.jam){const e=S.jam.ev[S.jam.i];if(e.p){const pcs=daPcs(e.p.f).map(x=>(e.p.r+x)%12);for(let s2=0;s2<6;s2++)for(let fr=0;fr<=NF;fr++){const pc=(TUNE[s2]+fr)%12;if(!pcs.includes(pc))continue;const iv=(pc-S.k+12)%12,inS=set.includes(iv),inW=S.p<0||(fr>=wa&&fr<=wb);if(!inW)continue;
+h+=inS?`<circle cx="${X(s2)}" cy="${YN(fr)}" r="19" fill="none" stroke="#fff" stroke-width="2.5" filter="url(#glow)"/>`:`<circle cx="${X(s2)}" cy="${YN(fr)}" r="12" fill="none" stroke="#ff3b5c" stroke-width="2" stroke-dasharray="3 2"/>`}}
+document.getElementById('sUse').innerHTML='Jam : '+S.jam.ev.map((x,i)=>i===S.jam.i?`<b style="color:#ffd23f">${x.cs}</b>`:x.cs).join(' · ')+' — anneau blanc = note de l\'accord dans la gamme, pointillé rouge = note de l\'accord hors gamme'}
 setSvg('sSvg',h);
 document.getElementById('sDrill').classList.toggle('on',S.drill);document.getElementById('sTgt').textContent=S.tgt?lab(S.tgt[3],set):'—';
 document.getElementById('sStreak').textContent=S.streak;document.getElementById('sOk').textContent=ST.sc.ok}
@@ -742,12 +746,27 @@ function motNote(m){if(!S.mo||!S.mseq.length)return false;const w=S.mseq[S.mi];i
 if(m===w.m){S.mi++;if(S.mi>=S.mseq.length){ST.sc.ok+=5;ST.sc.mot=(ST.sc.mot||0)+1;flash('ok','sFrame');vibrate([30,30,30]);S.mi=0;save()}}
 else if(m%12===w.m%12)flash('warn','sFrame');else{flash('ko','sFrame');vibrate([60,40,60])}drawSc();return true}
 document.getElementById('sMot').onchange=e=>{S.mo=e.target.value;S.drill=false;S.tgt=null;if(S.mo.startsWith('lp'))S.p=-1;else if(S.mo&&S.p<0)S.p=0;motBuild();drawSc()};
+/* Jam : grilles « sequence » du Total Guitar Ultimate Scale Book (1 mesure = 4 temps ; « | » sépare les mesures, espace = 2 accords dans la mesure) */
+const TGJAM={'Majeure (ionien)':['C','Cmaj7|Fmaj7|Dm7|C|G7|F|Dm|C'],'Mineure naturelle':['A','Am|Dm|Am|F G'],'Penta majeure':['E','E|A|E|B7'],
+'Penta mineure':['A','A7|D7|A7|A7|D7|D7|A7|A7|E7|D7|A7 D7|A7 E7'],'Blues':['A','Am7|Dm7|Am7|Am7 A7|Dm7|Dm7|Am7|Am7|F9|E7#9|Am7|E7#9'],
+'Blues majeur (country)':['A','A|A A7|D|D|E7|E7|A|E7|A|A A7|D|D#o7|A|E7|A|A Em7'],'Dorien':['A','Am7 D/A|D/A|Am7 D/A|D/A'],'Phrygien':['A','Am|Am|B♭|B♭|C7|B♭|Am|Am'],
+'Lydien':['A','A|B/A|G#m7|C#m7 B'],'Mixolydien':['A','A7|D|A7 G7|A7|D|A7|E7#9'],'Éolien':['A','Am G|F Em|Am G|F Em'],'Locrien':['A','F/A|E♭/A|Dm/A|Am7b5'],
+'Mineure harmonique':['A','Am|Dm E7|Am|Dm E7'],'Mineure mélodique':['A','Am7|Dm7|Am7|A7b9|Dm7|Dm7|Am7|Am7|F9|E7#9|Am7|E7b9'],
+'Diminuée (T-½T)':['A','A|A7|D|D#o7|A|E7|A E7|A E7'],'Par tons':['A','A|A7#5|A6|A7|D|E7|A|E7#5']};
+S.jam=null;let JAMT=null;
+function jamStop(){if(JAMT){clearInterval(JAMT);JAMT=null}S.jam=null;document.getElementById('sJam').classList.remove('on');document.getElementById('sJam').textContent='🎸 Jam'}
+function jamStart(){const g=TGJAM[SCALES[S.s][0]];if(!g){document.getElementById('sUse').textContent='Pas de grille Total Guitar pour cette gamme : choisis majeure, mineures, pentas, blues, un mode, diminuée ou par tons.';return}
+const tr=(S.k-PC[g[0]]+12)%12,ev=[];g[1].split('|').forEach(bar=>{const cs=bar.trim().split(/\s+/);cs.forEach(c=>{const t=trCs(c,tr),p=chParse(t);ev.push({cs:t,p,beats:4/cs.length})})});
+S.jam={ev,i:0,beat:0,bars:g[1].split('|').length};const b=document.getElementById('sJam');b.classList.add('on');b.textContent='■ Jam';ac();
+const spb=60/88;const play=()=>{const e=S.jam.ev[S.jam.i];if(e.p){const pcs=daPcs(e.p.f).map(x=>(e.p.r+x)%12),r=36+((e.p.r-36)%12+12)%12;tone(r+12,0,spb*e.beats*.9,.2);chord(pcs.map(x=>48+((x-48)%12+12)%12).sort((a,b)=>a-b),0.02,spb*e.beats*.9)}drawSc()};
+play();let beat=0;JAMT=setInterval(()=>{if(!S.jam||!document.getElementById('t-sc').classList.contains('on')){jamStop();drawSc();return}beat++;tone(96,0,.03,beat%4===0?.07:.04);const e=S.jam.ev[S.jam.i];if(beat>=e.beats){beat=0;S.jam.i=(S.jam.i+1)%S.jam.ev.length;play()}},spb*1000)}
 function newScT(){const ch=SCALES[S.s][3],c=notesIn().filter(x=>ch==null?x[3]!==0:x[3]===ch);S.tgt=c.length?c[Math.floor(Math.random()*c.length)]:null}
 bindDots(document.getElementById('sSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('sSvg'),s);if(S.mo&&!S.drill){motNote(MIDI[s]+f);return}if(!S.drill||!S.tgt)return;
 const ok=S.tgt[0]===s&&S.tgt[1]===f;if(ok){ST.sc.ok++;S.streak++;if(S.streak>ST.sc.max)ST.sc.max=S.streak;flash('ok','sFrame');vibrate(30);setTimeout(()=>{newScT();drawSc()},350)}
 else{const samePc=(TUNE[s]+f)%12===(TUNE[S.tgt[0]]+S.tgt[1])%12;if(samePc){flash('warn','sFrame')}else{S.streak=0;flash('ko','sFrame');vibrate([60,40,60])}}save();drawSc()});
 document.getElementById('sPlay').onclick=()=>{if(S.p<0){S.p=0}if(S.mo){motBuild();drawSc();demoRun('sSvg',S.mseq,S.mo.startsWith('lp')?.17:.2);return}drawSc();const N2=notesIn(),m=[...new Set(N2.map(x=>x[2]))].sort((a,b)=>a-b);demoRun('sSvg',m.map(x=>{const n=N2.find(y=>y[2]===x);return{s:n[0],f:n[1],m:x}}),.18)};
 document.getElementById('sDrill').onclick=()=>{S.drill=!S.drill;if(S.drill){S.mo='';S.mseq=[];document.getElementById('sMot').value=''}if(S.drill){if(S.p<0)S.p=0;newScT()}else S.tgt=null;drawSc()};
+document.getElementById('sJam').onclick=()=>{if(S.jam){jamStop();drawSc()}else jamStart()};
 document.getElementById('sBourdon').onclick=e=>{const on=toggleBourdon(S.k);e.target.classList.toggle('on',on)};
 
 /* ================= DESSINE (Dessine / Décris / Joue) ================= */

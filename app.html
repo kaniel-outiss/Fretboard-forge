@@ -109,7 +109,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 <section class="tab on land" id="t-neck">
   <div class="side">
     <div class="row"><span class="lbl">Tonalité</span><select id="nKey"></select>
-      <span class="lbl">Vue</span><select id="nView"><option value="caged">CAGED</option><option value="scale">Gamme</option><option value="triad">Triades</option><option value="layers">Couches (Ellis)</option><option value="taylor">Hiérarchie (Taylor)</option></select></div>
+      <span class="lbl">Vue</span><select id="nView"><option value="caged">CAGED</option><option value="scale">Gamme</option><option value="triad">Triades</option><option value="layers">Couches (Ellis)</option><option value="taylor">Hiérarchie (Taylor)</option><option value="jig">Tonalité (accords)</option><option value="mark">Repères C‑D‑E‑G‑A</option></select></div>
     <div class="row" id="nSub"></div>
     <div class="row"><span class="lbl">Pastilles</span><button class="b" data-m="iv">Intervalles</button><button class="b" data-m="nt">Notes</button><button class="b" data-m="dg">Doigts</button>
       <button class="b" id="nMv">Mouvement</button><button class="b" id="nPlay">▶ Écouter</button></div>
@@ -139,7 +139,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 <!-- ===== TRIADES ===== -->
 <section class="tab land" id="t-tri">
   <div class="side" id="triSide">
-    <div class="row"><span class="lbl">Module</span><button class="b on" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button></div>
+    <div class="row"><span class="lbl">Module</span><button class="b on" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button><button class="b" data-dm="nm">🧭 Nommer</button></div>
     <div class="row"><span class="lbl">Cordes</span><button class="b on" data-ss="0">1-2-3</button><button class="b" data-ss="1">2-3-4</button><button class="b" data-ss="2">3-4-5</button><button class="b" data-ss="3">4-5-6</button></div>
     <div class="row"><span class="lbl">Qualité</span><button class="b on" data-q="maj">Maj</button><button class="b" data-q="min">Min</button><button class="b" data-q="dim">Dim</button><button class="b" data-q="aug">Aug</button></div>
     <div class="row"><span class="lbl">Tempo</span><input type="range" id="tTempo" min="40" max="160" value="70" step="5" style="flex:1"><span id="tTempoV" style="font-size:12px;min-width:30px">70</span>
@@ -153,7 +153,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="info" id="tInfo">Cycle des quartes, renversement le plus proche. Touche les 3 notes sur le manche.</div>
   </div>
   <div class="side" id="tkSide" style="display:none">
-    <div class="row"><span class="lbl">Module</span><button class="b" data-dm="tri">Triades</button><button class="b on" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button></div>
+    <div class="row"><span class="lbl">Module</span><button class="b" data-dm="tri">Triades</button><button class="b on" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button><button class="b" data-dm="nm">🧭 Nommer</button></div>
     <div class="row"><button class="b on" data-tx="find">Trouve la note</button><button class="b" data-tx="spider">Araignée</button><button class="b" data-tx="harm">Harmonisée</button><button class="b" data-tx="one">Une corde</button><button class="b" data-tx="arp">Arpèges 6 c.</button><button class="b" data-tx="grp">Groupes de 3</button><button class="b" data-tx="sweep">Sweep</button><button class="b" data-tx="bend">Bends</button></div>
     <div class="row"><span id="tkOpt" style="display:flex;gap:6px;flex-wrap:wrap"></span><span id="tkKeyW"><select id="tkKey"></select></span></div>
     <div class="row"><span class="lbl">Tempo</span><input type="range" id="tkTempo" min="40" max="200" value="60" step="5" style="flex:1"><span id="tkTempoV" style="font-size:12px;min-width:28px">60</span><button class="b" id="tkMet">▶ Métronome</button></div>
@@ -164,7 +164,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="row" style="justify-content:center"><button class="b" id="tkPlay">▶ Écouter</button><button class="b go" id="tkGo">⟳ Recommencer / Nouveau</button></div>
   </div>
   <div class="side" id="earSide" style="display:none">
-    <div class="row"><span class="lbl">Module</span><button class="b" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b on" data-dm="ear">👂 Oreille</button></div>
+    <div class="row"><span class="lbl">Module</span><button class="b" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b on" data-dm="ear">👂 Oreille</button><button class="b" data-dm="nm">🧭 Nommer</button></div>
     <div class="row"><button class="b on" data-ex="iv">Intervalles</button><button class="b" data-ex="ch">Qualités</button><button class="b" data-ex="dg">Degrés</button><button class="b" data-ex="pg">Progressions</button><button class="b" data-ex="ec">Écho</button>
       <span class="lbl" style="min-width:0">Niveau</span><button class="b on" data-el="0">1</button><button class="b" data-el="1">2</button></div>
     <div class="frame" id="erFrame"><div class="big" id="erBig" style="font-size:22px">—</div><div class="info" id="erSub" style="text-align:center"></div>
@@ -172,6 +172,15 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="row" id="erOpts" style="justify-content:center"></div>
     <div class="info" id="erInfo"></div>
     <div class="row" style="justify-content:center"><button class="b go" id="erPlay">▶ Réécouter</button><button class="b" id="erNext">⟳ Suivant</button></div>
+  </div>
+  <div class="side" id="nmSide" style="display:none">
+    <div class="row"><span class="lbl">Module</span><button class="b" data-dm="tri">Triades</button><button class="b" data-dm="tk">💪 Technique</button><button class="b" data-dm="ear">👂 Oreille</button><button class="b on" data-dm="nm">🧭 Nommer</button></div>
+    <div class="row"><button class="b on" data-nx="ch">Accord : forme + position → nom</button><button class="b" data-nx="sc">Gamme : forme + position → nom</button><button class="b" data-nx="pos">Nom + forme → position</button></div>
+    <div class="frame" id="nmFrame"><div class="big" id="nmBig" style="font-size:22px">—</div><div class="info" id="nmSub" style="text-align:center"></div>
+      <div class="stats"><span>Série <b id="nmStreak" class="streak">0</b></span><span>Justes <b id="nmOk">0</b></span></div></div>
+    <div class="row" id="nmOpts" style="justify-content:center"></div>
+    <div class="info" id="nmInfo"></div>
+    <div class="row" style="justify-content:center"><button class="b" id="nmPlay">▶ Écouter</button><button class="b go" id="nmNext">⟳ Suivant</button></div>
   </div>
   <div class="fill"><svg class="neck" id="tSvg" viewBox="0 0 372 624"></svg></div>
 </section>
@@ -269,7 +278,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="side">
     <div class="row"><span class="lbl">Gamme</span><select id="sSel" style="max-width:200px"></select><select id="sKey"></select></div>
     <div class="row" id="sPos"></div>
-    <div class="row"><span class="lbl">Motif</span><select id="sMot" style="max-width:210px"><option value="">— aucun (gamme seule)</option><option value="g3">Groupes de 3 (1‑2‑3, 2‑3‑4…)</option><option value="g4">Groupes de 4 (1‑2‑3‑4…)</option><option value="t3">Tierces (1‑3, 2‑4…)</option><option value="t4">Quartes (1‑4, 2‑5…)</option><option value="tr">Triades diatoniques (1‑3‑5)</option><option value="s7">Arpèges 7e diatoniques (1‑3‑5‑7)</option><option value="b1235">Bergonzi 1‑2‑3‑5</option><option value="b1345">Bergonzi 1‑3‑4‑5</option><option value="b5321">Bergonzi 5‑3‑2‑1</option><option value="b3215">Bergonzi 3‑2‑1‑5</option></select><span id="sMotN" class="lbl"></span></div>
+    <div class="row"><span class="lbl">Motif</span><select id="sMot" style="max-width:210px"><option value="">— aucun (gamme seule)</option><option value="g3">Groupes de 3 (1‑2‑3, 2‑3‑4…)</option><option value="g4">Groupes de 4 (1‑2‑3‑4…)</option><option value="t3">Tierces (1‑3, 2‑4…)</option><option value="t4">Quartes (1‑4, 2‑5…)</option><option value="tr">Triades diatoniques (1‑3‑5)</option><option value="s7">Arpèges 7e diatoniques (1‑3‑5‑7)</option><option value="b1235">Bergonzi 1‑2‑3‑5</option><option value="b1345">Bergonzi 1‑3‑4‑5</option><option value="b5321">Bergonzi 5‑3‑2‑1</option><option value="b3215">Bergonzi 3‑2‑1‑5</option><option value="lpG">Diagonale le long du manche — depuis la R</option><option value="lpC">Diagonale le long du manche — depuis la 5te</option></select><span id="sMotN" class="lbl"></span></div>
     <div class="row" style="align-items:flex-start"><span class="lbl">Formule</span><span id="sFrm" class="chips" style="gap:3px"></span></div>
     <div class="info" id="sMood"></div>
     <div class="info" id="sUse"></div>
@@ -309,7 +318,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.1 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.2 — Boss</div>
 </section>
 
 </main>
@@ -465,7 +474,7 @@ if(vis.length){const anc=LASTP&&LASTP.id===id?LASTP.f:null;const pick=anc==null?
 const P=posOf(m);if(!P.length)return;const anc=LASTP&&LASTP.id===id?LASTP.f:7;const b=P.reduce((a,c)=>Math.abs(c[1]-anc)<Math.abs(a[1]-anc)?c:a);pulseAt(id,b[0],b[1],'#fff3a0',chordy,d||.6)}
 const fingLab=(f,lo)=>f===0?'0':String(Math.min(4,Math.max(1,f-lo+1)));
 const minPos=a=>{const v=a.filter(x=>x>0);return v.length?Math.min(...v):1};
-function redrawAll(){blDraw();drawNeck();if(DRM==='tk')tkDraw();else if(DRM==='ear')earDraw();else drawTri();drawSc();drDraw();jzDraw();if(STD)sgDraw()}
+function redrawAll(){blDraw();drawNeck();if(DRM==='tk')tkDraw();else if(DRM==='ear')earDraw();else if(DRM==='nm')nmDraw();else drawTri();drawSc();drDraw();jzDraw();if(STD)sgDraw()}
 
 /* ================= ÉTAT ================= */
 const ST=JSON.parse(localStorage.getItem('ff_state')||'{}');
@@ -474,14 +483,14 @@ function save(){localStorage.setItem('ff_state',JSON.stringify(ST))}
 ST.sess++;save();
 
 /* ================= ONGLETS ================= */
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));if(b.dataset.t==='t-pro')drawPro();if(b.dataset.t==='t-sc')drawSc();if(b.dataset.t==='t-tri'){if(DRM==='tk')tkDraw();else if(DRM==='ear')earDraw();else drawTri()}if(b.dataset.t==='t-dr')drDraw();if(b.dataset.t==='t-jz')jzDraw();if(b.dataset.t==='t-sg')sceneOpen();if(b.dataset.t==='t-bl')blDraw()});
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));if(b.dataset.t==='t-pro')drawPro();if(b.dataset.t==='t-sc')drawSc();if(b.dataset.t==='t-tri'){if(DRM==='tk')tkDraw();else if(DRM==='ear')earDraw();else if(DRM==='nm')nmDraw();else drawTri()}if(b.dataset.t==='t-dr')drDraw();if(b.dataset.t==='t-jz')jzDraw();if(b.dataset.t==='t-sg')sceneOpen();if(b.dataset.t==='t-bl')blDraw()});
 document.getElementById('btnFing').onclick=e=>{FING=!FING;e.currentTarget.classList.toggle('on',FING);redrawAll()};
 document.getElementById('btnSnd').onclick=e=>{sndOn=!sndOn;e.target.textContent=sndOn?'🔊':'🔇';ac()};
 
 /* ================= MANCHE ================= */
 const N={key:'C',view:'caged',shape:'C',mode:'iv',mv:true,pt:false,sc:0,pos:-1};
-const nKey=document.getElementById('nKey');nKey.innerHTML=KEYS.map(k=>`<option>${k}</option>`).join('');nKey.onchange=e=>{N.key=e.target.value;N.si=0;N.tc=null;drawNeck()};
-document.getElementById('nView').onchange=e=>{N.view=e.target.value;N.play=false;N.si=0;N.tc=null;if(nTm){clearInterval(nTm);nTm=null}drawNeck()};
+const nKey=document.getElementById('nKey');nKey.innerHTML=KEYS.map(k=>`<option>${k}</option>`).join('');nKey.onchange=e=>{N.key=e.target.value;N.si=0;N.tc=null;jgStop();drawNeck()};
+document.getElementById('nView').onchange=e=>{jgStop();N.view=e.target.value;N.play=false;N.si=0;N.tc=null;if(nTm){clearInterval(nTm);nTm=null}drawNeck()};
 document.querySelectorAll('#t-neck [data-m]').forEach(b=>b.onclick=()=>{N.mode=b.dataset.m;drawNeck()});
 document.getElementById('nMv').onclick=()=>{N.mv=!N.mv;drawNeck()};
 document.getElementById('nChips').innerHTML=[['R','Fondamentale'],['3','Tierce'],['5','Quinte'],['b3','Tierce m.'],['7','7e maj'],['b7','7e'],['2','9e'],['6','6te'],['4','11e']].map(([k,t])=>{const iv=Object.keys(IVN).find(i=>IVN[i]===k);return`<span class="chip"><b style="background:${NC[iv]}">${k}</b>${t}</span>`}).join('');
@@ -535,6 +544,20 @@ else if(sc.includes(iv))h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="c
 else h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer">${last?`<circle class="ring" cx="${X(s2)}" cy="${YN(f)}" r="12" fill="none" stroke="#ffb020" stroke-width="2.5"/>`:''}<circle cx="${X(s2)}" cy="${YN(f)}" r="14" fill="#fff" opacity="0.01"/><circle cx="${X(s2)}" cy="${YN(f)}" r="4" fill="none" stroke="#4a4f68" stroke-dasharray="2 2"/></g>`}
 const t=N.tc||{ct:0,sc:0,ch:0},n=t.ct+t.sc+t.ch,pc=x=>Math.round(x/n*100);
 info=`${N.key}${Q7N[N.tq]} — ● accord : excellent · ○ ${SCN7[N.tq]} : sûr · ◌ chromatique : avec prudence. `+(n?`Ton impro : accord ${pc(t.ct)}% · gamme ${pc(t.sc)}% · chromatique ${pc(t.ch)}% (${n} notes)`:'Improvise (micro ou touche) : le compteur classe chaque note.');
+}else if(N.view==='jig'){const deg=JIG.map(d=>({...d,r:(k+d.o)%12}));N.jc=N.jc??0;
+sub.innerHTML='<span class="lbl">Accords</span>'+deg.map((d,i)=>`<button class="b ${N.jc===i?'on':''}" data-jc="${i}" style="${d.out?'font-style:italic;opacity:.85':''}">${d.rn}<small style="opacity:.7"> ${jName(d.r,d.q,N.key,d.out)}</small></button>`).join('')+`<span class="lbl" style="min-width:0;margin-left:6px">Grille</span><select id="jgSel" style="max-width:190px">${PROGS.map((g,i)=>`<option value="${i}" ${N.jg===i?'selected':''}>${g.g} · ${g.n}</option>`).join('')}</select><button class="b ${JGT?'on':''}" id="jgGo">${JGT?'■':'▶'} Grille</button>`;
+sub.querySelectorAll('[data-jc]').forEach(b=>b.onclick=()=>{N.jc=+b.dataset.jc;const d=deg[N.jc];jgStop();drawNeck();chord(jVoice(d.r,d.q))});
+sub.querySelector('#jgSel').onchange=e=>{N.jg=+e.target.value;jgStop();drawNeck()};sub.querySelector('#jgGo').onclick=()=>{if(JGT){jgStop();drawNeck()}else jgPlay()};
+const cur=N.jcx||deg[N.jc],ct=QQ[cur.q].map(x=>(cur.r+x)%12),maj=[0,2,4,5,7,9,11];
+for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const pc=(TUNE[s2]+f)%12,iv=(pc-k+12)%12,inC=ct.includes(pc);
+if(inC)h+=dot(s2,f,NC[(pc-cur.r+12)%12],nm(pc,N.key),{r:pc===cur.r?15:13,ring:pc===cur.r?'#fff':null});
+else if(maj.includes(iv))h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="10" fill="#1c2033" stroke="${iv===0?'#fff':iv===9?'#a06bff':'#4a4f68'}" stroke-width="${iv===0||iv===9?2:1}"/><text x="${X(s2)}" y="${YN(f)+3.5}" text-anchor="middle" font-size="9" fill="#9a9fb8">${nm(pc,N.key)}</text></g>`}
+const rel=nm((k+9)%12,N.key)+'m',cap=['C','A','G','E','D'].map(x=>[x,(k-PC[x]+12)%12]).filter(([x,c])=>c>=1&&c<=7).map(([x,c])=>`formes de ${x} capo ${c}`).join(' · ');
+const g=PROGS[N.jg||0];info=`${N.key} majeur / ${rel} (relatif mineur, même notes). Romain majuscule = majeur, minuscule = mineur ; en italique, hors tonalité (♭VII « money chord »). Capo : ${cap||'—'}. Grille : ${g.n} → ${progNames(g).join(' – ')}`;
+}else if(N.view==='mark'){sub.innerHTML='';const M=[0,2,4,7,9];
+for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const pc=(TUNE[s2]+f)%12;if(M.includes(pc))h+=dot(s2,f,['#ff3b5c',0,'#ff9f1a',0,'#ffd23f',0,0,'#39ff88',0,'#2ee6ff'][pc],SHP[pc],{r:14});
+else h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="5" fill="#2a2f45"/></g>`}
+info='Fretboard Toolbox : apprends d\'abord ces 5 notes (C‑D‑E‑G‑A, la penta de C / A mineur) partout. Toute autre note est à une case à gauche (♭) ou à droite (♯) d\'une note que tu connais déjà — sauf E‑F et B‑C, collées.';
 }else{ // triades
 sub.innerHTML='<span class="lbl">Qualité</span>'+Object.keys(QUAL).map(q=>`<button class="b ${(N.q||'maj')===q?'on':''}" data-q="${q}">${q}</button>`).join('');
 sub.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{N.q=b.dataset.q;drawNeck()});
@@ -546,6 +569,21 @@ document.getElementById('nLayRow').style.display=(N.view==='layers'||N.view==='t
 document.getElementById('nGo').textContent=N.play?'■ Stop':'🎯 Joue la couche';
 setSvg('nSvg',h);document.getElementById('nInfo').textContent=info}
 bindDots(document.getElementById('nSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('nSvg'),s);nNote(MIDI[s]+f,false)});
+/* ===== Fretboard Toolbox (Scott Sharp) : accords d'une tonalité, grilles, capo ===== */
+const QQ={M:[0,4,7],m:[0,3,7],d:[0,3,6],'7':[0,4,7,10],m7:[0,3,7,10]};
+const JIG=[{rn:'I',o:0,q:'M'},{rn:'ii',o:2,q:'m'},{rn:'iii',o:4,q:'m'},{rn:'IV',o:5,q:'M'},{rn:'V',o:7,q:'M'},{rn:'vi',o:9,q:'m'},{rn:'vii°',o:11,q:'d'},{rn:'♭VII',o:10,q:'M',out:1},{rn:'♭III',o:3,q:'M',out:1}];
+const jName=(r,q,key,fl)=>(fl?FLP[r]:nm(r,key))+{M:'',m:'m',d:'dim','7':'7',m7:'m7'}[q];
+function jVoice(r,q){const b=48+((r-48)%12+12)%12;return QQ[q].map(x=>b+x)}
+const PROGS=[['Majeur','I-V-I'],['Majeur','I-IV-V'],['Majeur','I-V-IV'],['Majeur','I-vi-IV-V'],['Majeur','I-vi-ii-V'],['Majeur','I-ii-IV-V'],['Majeur','V-IV-I'],
+['Majeur +','I-iii-ii-V'],['Majeur +','ii-V-I'],['Majeur +','I-bVII-IV-V'],['Majeur +','I-II-IV-V'],['Majeur +','I-III-IV-iv'],['Majeur +','I-III7-VI7-II7-V7'],
+['Mineur','i-v-i'],['Mineur','i-VII-v'],['Mineur','i-VII-i'],['Mineur','i-V-i'],['Mineur','i-iv-V'],['Mineur','i-VII-VI-V'],['Mineur','i-iv-VI-V'],
+['Rock','V-IV-I'],['Rock','I-bIII-I'],['Rock','I-bIII-IV'],['Rock','I-bVII-I'],['Rock','I-bVII-IV'],['Rock','I-bIII-bVII-IV'],['Rock','I-V-IV-bIII'],
+['Blues','I7-I7-I7-I7-IV7-IV7-I7-I7-V7-IV7-I7-V7'],['Blues','I7-IV7-I7-I7-IV7-IV7-I7-I7-V7-IV7-I7-V7']].map(([g,n])=>({g:g==='Blues'?(n.startsWith('I7-IV7')?'Blues quick-change':'Blues 12 mes.'):g,n,min:g==='Mineur'}));
+function progChords(g){const MJ={I:0,II:2,III:4,IV:5,V:7,VI:9,VII:11},MN={I:0,II:2,III:3,IV:5,V:7,VI:8,VII:10},k=PC[N.key]+(g.min?9:0);
+return g.n.split('-').map(t=>{const m=t.match(/^(b?)([ivIV]+)(7?)$/),up=m[2]===m[2].toUpperCase(),o=(g.min?MN:MJ)[m[2].toUpperCase()]-(m[1]?1:0);return{r:(k+o+12)%12,q:up?(m[3]?'7':'M'):(m[3]?'m7':'m'),t,fl:!!m[1]}})}
+function progNames(g){return progChords(g).map(c=>jName(c.r,c.q,N.key,c.fl))}
+let JGT=null;function jgStop(){if(JGT){clearInterval(JGT);JGT=null}N.jcx=null}
+function jgPlay(){jgStop();const C=progChords(PROGS[N.jg||0]);let i=0;const step=()=>{if(N.view!=='jig'||!document.getElementById('t-neck').classList.contains('on')){jgStop();return}const c=C[i%C.length];N.jcx=c;drawNeck();chord(jVoice(c.r,c.q),0,1.5);document.getElementById('nInfo').textContent=`${c.t} → ${jName(c.r,c.q,N.key,c.fl)}  (${i%C.length+1}/${C.length})`;i++};JGT=setInterval(step,1700);step();drawNeck()}
 const LAY=[['Accord',null],['Arpège',[0,4,7]],['Majeure',[0,2,4,5,7,9,11]],['Arpège 7',[0,4,7,10]],['Mixolydien',[0,2,4,5,7,9,10]],['Penta',[0,2,4,7,9]]];
 const SC7={maj7:[0,2,4,5,7,9,11],'7':[0,2,4,5,7,9,10],m7:[0,2,3,5,7,9,10],m7b5:[0,1,3,5,6,8,10]},SCN7={maj7:'ionien','7':'mixolydien',m7:'dorien',m7b5:'locrien'};
 function layWin(){const fs=shapeIn(N.shape,N.key).map(x=>x[1]);return{a:Math.max(0,Math.min(...fs)-1),b:Math.min(NF,Math.max(...fs)+1)}}
@@ -611,7 +649,7 @@ CIRCLE4.forEach((k,i)=>{const a=-Math.PI/2-i*Math.PI/6,x=cx+R*Math.cos(a),y=cy+R
 h+=`<circle cx="${x}" cy="${y}" r="${cur?11:8}" fill="${cur?'#2ee6ff':'#161a2a'}" stroke="${cur?'#2ee6ff':m>0?`rgba(57,255,136,${.3+m*.7})`:'#2a2f45'}" stroke-width="${cur?0:2}" ${cur?'filter="url(#glow)"':''}/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="${cur?10:8}" font-weight="600" fill="${cur?'#05060b':'#9a9fb8'}">${k}</text>`});
 h+=`<text x="60" y="64" text-anchor="middle" font-size="9" fill="#5c6180">quartes ↺</text></svg>`;document.getElementById('tCof').innerHTML=h}
 function flash(cls,id){LASTV={cls,t:performance.now()};const fr=document.getElementById(id);fr.classList.remove('ok','ko','warn');void fr.offsetWidth;fr.classList.add(cls);setTimeout(()=>fr.classList.remove(cls),380)}
-bindDots(document.getElementById('tSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('tSvg'),s);if(DRM==='tk'){tkNote(MIDI[s]+f,false);return}if(DRM==='ear'){earNote(MIDI[s]+f);return}
+bindDots(document.getElementById('tSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('tSvg'),s);if(DRM==='tk'){tkNote(MIDI[s]+f,false);return}if(DRM==='ear'){earNote(MIDI[s]+f);return}if(DRM==='nm')return;
 if(T.mode!=='drill'||!T.target)return;const t=T.target,strs=SSETS[T.ss],i=strs.indexOf(s);
 if(i>=0&&t.frets[i]===f){if(!T.played.some(p=>p[0]===s&&p[1]===f))T.played.push([s,f]);
 if(T.played.length===3){hit(true)}else drawTri();return}
@@ -635,7 +673,7 @@ if(T.run){T.mode='drill';document.getElementById('tMode').textContent='Mode : dr
 const S={s:5,k:9,p:-1,drill:false,tgt:null,streak:0};
 const sSel=document.getElementById('sSel');let og='';Object.keys(FAM).forEach(f=>{og+=`<optgroup label="${FAM[f][0]}">`+SCALES.map((s,i)=>s[1]===f?`<option value="${i}">${s[0]}</option>`:'').join('')+'</optgroup>'});sSel.innerHTML=og;sSel.value=5;
 const sKey=document.getElementById('sKey');sKey.innerHTML=SHP.map((k,i)=>`<option value="${i}">${FLP[i]===k?k:k+'/'+FLP[i]}</option>`).join('');sKey.value=9;
-sSel.onchange=e=>{S.s=+e.target.value;S.p=S.mo?0:-1;S.tgt=null;motBuild();drawSc()};sKey.onchange=e=>{S.k=+e.target.value;S.tgt=null;motBuild();drawSc()};
+sSel.onchange=e=>{S.s=+e.target.value;S.p=S.mo&&!S.mo.startsWith('lp')?0:-1;S.tgt=null;motBuild();drawSc()};sKey.onchange=e=>{S.k=+e.target.value;S.tgt=null;motBuild();drawSc()};
 function lab(iv,set){if(iv===6)return set.includes(7)?'b5':'#4';return IVN[iv]}
 function wins(){const rf=(S.k-4+12)%12;return[-1,1,4,6,9].map(d=>{let a=rf+d;while(a>10)a-=12;while(a<0)a+=12;return a})}
 function notesIn(){const set=SCALES[S.s][2],W=wins(),a=S.p<0?0:W[S.p],b=S.p<0?NF:W[S.p]+4,o=[];for(let s=0;s<6;s++)for(let f=Math.max(0,a);f<=Math.min(NF,b);f++){const iv=(TUNE[s]+f-S.k+24)%12;if(set.includes(iv))o.push([s,f,MIDI[s]+f,iv])}return o}
@@ -644,13 +682,13 @@ document.getElementById('t-sc').style.setProperty('--acc',au);document.getElemen
 document.getElementById('sFrm').innerHTML=set.map(iv=>`<span class="chip"><b style="background:${NC[iv]};${!MAJ.includes(iv)?'outline:2px solid #fff;outline-offset:1px':''}">${lab(iv,set)}</b>${iv===ch?'★':''}</span>`).join('');
 document.getElementById('sMood').textContent=`${SHP[S.k]} ${n} — ${mood}`;document.getElementById('sUse').textContent='À jouer sur : '+use;
 const W=wins();document.getElementById('sPos').innerHTML='<span class="lbl">Position</span>'+['Tout',1,2,3,4,5].map((p,i)=>`<button class="b ${S.p===i-1?'on':''}" data-p="${i-1}">${i?'Pos '+p:p}</button>`).join('');
-document.querySelectorAll('#sPos [data-p]').forEach(b=>b.onclick=()=>{S.p=+b.dataset.p;if(S.mo&&S.p<0)S.p=0;if(S.drill)newScT();motBuild();drawSc()});
+document.querySelectorAll('#sPos [data-p]').forEach(b=>b.onclick=()=>{S.p=+b.dataset.p;if(S.mo&&!S.mo.startsWith('lp')&&S.p<0)S.p=0;if(S.drill)newScT();motBuild();drawSc()});
 let h=neckBase();let wa=-1,wb=99;if(S.p>=0){wa=W[S.p];wb=wa+4;h+=`<rect x="36" y="${YL(Math.max(0,wa))-(wa<=0?16:0)}" width="292" height="${YL(Math.min(NF,wb))-YL(Math.max(0,wa))+(wa<=0?16:0)}" rx="10" fill="none" stroke="${au}" stroke-width="2" filter="url(#glow)"/>`}
 for(let s=0;s<6;s++)for(let fr=0;fr<=NF;fr++){const iv=(TUNE[s]+fr-S.k+24)%12;if(!set.includes(iv))continue;const inW=S.p<0||(fr>=wa&&fr<=wb);const isT=S.tgt&&S.tgt[0]===s&&S.tgt[1]===fr;
 h+=dot(s,fr,NC[iv],FING&&S.p>=0&&inW&&fr>0?fingLab(fr,Math.max(1,wa)):lab(iv,set),{op:inW?1:.15,pulse:!MAJ.includes(iv)&&inW?'#fff':null,ring:iv===ch&&inW?NC[iv]:null,target:isT,r:iv===0?15:13})}
 // zones cliquables pour les cases hors gamme (erreurs)
 for(let s=0;s<6;s++)for(let fr=0;fr<=NF;fr++){const iv=(TUNE[s]+fr-S.k+24)%12;if(set.includes(iv))continue;h+=`<g class="dot" data-s="${s}" data-f="${fr}" style="cursor:pointer"><circle cx="${X(s)}" cy="${YN(fr)}" r="14" fill="#fff" opacity="0.01"/></g>`}
-if(S.mo&&S.mseq.length){const w=S.mseq[S.mi];if(w)h+=`<circle cx="${X(w.s)}" cy="${YN(w.f)}" r="19" fill="none" stroke="#ffd23f" stroke-width="3" filter="url(#glow)"/>`;h+=pathAhead(S.mseq,S.mi,4)}
+if(S.mo&&S.mseq.length){if(S.mo.startsWith('lp')){const L=S.mseq.slice(0,Math.ceil(S.mseq.length/2)+1);h+=`<polyline points="${L.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="#ffd23f" stroke-width="2" stroke-opacity=".3"/>`+L.map(x=>`<circle cx="${X(x.s)}" cy="${YN(x.f)}" r="16.5" fill="none" stroke="#ffd23f" stroke-opacity=".55" stroke-width="1.5"/>`).join('')}const w=S.mseq[S.mi];if(w)h+=`<circle cx="${X(w.s)}" cy="${YN(w.f)}" r="19" fill="none" stroke="#ffd23f" stroke-width="3" filter="url(#glow)"/>`;h+=pathAhead(S.mseq,S.mi,4)}
 document.getElementById('sMotN').textContent=S.mo?`${S.mi+1}/${S.mseq.length}`:'';
 setSvg('sSvg',h);
 document.getElementById('sDrill').classList.toggle('on',S.drill);document.getElementById('sTgt').textContent=S.tgt?lab(S.tgt[3],set):'—';
@@ -659,17 +697,21 @@ document.getElementById('sStreak').textContent=S.streak;document.getElementById(
 const MOTS={g3:[0,1,2],g4:[0,1,2,3],t3:[0,2],t4:[0,3],tr:[0,2,4],s7:[0,2,4,6],b1235:[0,1,2,4],b1345:[0,2,3,4],b5321:[4,2,1,0],b3215:[2,1,0,4]};
 S.mo='';S.mi=0;S.mseq=[];
 function scLine(){const sp=S.p;if(S.p<0)S.p=0;const N2=notesIn();S.p=sp;const m=[...new Set(N2.map(x=>x[2]))].sort((a,b)=>a-b);return m.map(x=>{const n=N2.find(y=>y[2]===x);return{s:n[0],f:n[1],m:x,iv:n[3]}})}
-function motBuild(){S.mi=0;S.mseq=[];if(!S.mo)return;const L=scLine(),o=MOTS[S.mo],top=Math.max(...o),R=[...L].reverse();
+function lpLine(){const set=SCALES[S.s][2],n=set.length>=7?3:2,st=S.mo==='lpG'?0:(set.includes(7)?7:set[Math.floor(set.length/2)]),tot=6*n+n;
+for(let f0=0;f0<=12;f0++){if((TUNE[0]+f0-S.k+24)%12!==st)continue;const m0=MIDI[0]+f0,ms=[];for(let m=m0;ms.length<tot&&m<m0+48;m++)if(set.includes((m-S.k+120)%12))ms.push(m);
+const L=ms.map((m,i)=>{const s2=Math.min(5,Math.floor(i/n));return{s:s2,f:m-MIDI[s2],m,iv:(m-S.k+120)%12}});if(L.every(x=>x.f>=0&&x.f<=NF))return L}
+return []}
+function motBuild(){S.mi=0;S.mseq=[];if(!S.mo)return;if(S.mo.startsWith('lp')){const L=lpLine();S.mseq=[...L,...L.slice(0,-1).reverse()];return}const L=scLine(),o=MOTS[S.mo],top=Math.max(...o),R=[...L].reverse();
 for(let i=0;i+top<L.length;i++)o.forEach(k=>S.mseq.push(L[i+k]));for(let i=0;i+top<R.length;i++)o.forEach(k=>S.mseq.push(R[i+k]))}
 function motNote(m){if(!S.mo||!S.mseq.length)return false;const w=S.mseq[S.mi];if(!w)return true;
 if(m===w.m){S.mi++;if(S.mi>=S.mseq.length){ST.sc.ok+=5;ST.sc.mot=(ST.sc.mot||0)+1;flash('ok','sFrame');vibrate([30,30,30]);S.mi=0;save()}}
 else if(m%12===w.m%12)flash('warn','sFrame');else{flash('ko','sFrame');vibrate([60,40,60])}drawSc();return true}
-document.getElementById('sMot').onchange=e=>{S.mo=e.target.value;S.drill=false;S.tgt=null;if(S.mo&&S.p<0)S.p=0;motBuild();drawSc()};
+document.getElementById('sMot').onchange=e=>{S.mo=e.target.value;S.drill=false;S.tgt=null;if(S.mo.startsWith('lp'))S.p=-1;else if(S.mo&&S.p<0)S.p=0;motBuild();drawSc()};
 function newScT(){const ch=SCALES[S.s][3],c=notesIn().filter(x=>ch==null?x[3]!==0:x[3]===ch);S.tgt=c.length?c[Math.floor(Math.random()*c.length)]:null}
 bindDots(document.getElementById('sSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('sSvg'),s);if(S.mo&&!S.drill){motNote(MIDI[s]+f);return}if(!S.drill||!S.tgt)return;
 const ok=S.tgt[0]===s&&S.tgt[1]===f;if(ok){ST.sc.ok++;S.streak++;if(S.streak>ST.sc.max)ST.sc.max=S.streak;flash('ok','sFrame');vibrate(30);setTimeout(()=>{newScT();drawSc()},350)}
 else{const samePc=(TUNE[s]+f)%12===(TUNE[S.tgt[0]]+S.tgt[1])%12;if(samePc){flash('warn','sFrame')}else{S.streak=0;flash('ko','sFrame');vibrate([60,40,60])}}save();drawSc()});
-document.getElementById('sPlay').onclick=()=>{if(S.p<0){S.p=0}if(S.mo){motBuild();drawSc();demoRun('sSvg',S.mseq,.2);return}drawSc();const N2=notesIn(),m=[...new Set(N2.map(x=>x[2]))].sort((a,b)=>a-b);demoRun('sSvg',m.map(x=>{const n=N2.find(y=>y[2]===x);return{s:n[0],f:n[1],m:x}}),.18)};
+document.getElementById('sPlay').onclick=()=>{if(S.p<0){S.p=0}if(S.mo){motBuild();drawSc();demoRun('sSvg',S.mseq,S.mo.startsWith('lp')?.17:.2);return}drawSc();const N2=notesIn(),m=[...new Set(N2.map(x=>x[2]))].sort((a,b)=>a-b);demoRun('sSvg',m.map(x=>{const n=N2.find(y=>y[2]===x);return{s:n[0],f:n[1],m:x}}),.18)};
 document.getElementById('sDrill').onclick=()=>{S.drill=!S.drill;if(S.drill){S.mo='';S.mseq=[];document.getElementById('sMot').value=''}if(S.drill){if(S.p<0)S.p=0;newScT()}else S.tgt=null;drawSc()};
 document.getElementById('sBourdon').onclick=e=>{const on=toggleBourdon(S.k);e.target.classList.toggle('on',on)};
 
@@ -1270,7 +1312,35 @@ const tkKey=document.getElementById('tkKey');tkKey.innerHTML=CIRCLE4.map(k=>`<op
 document.getElementById('tkTempo').oninput=e=>{TK.tempo=+e.target.value;document.getElementById('tkTempoV').textContent=TK.tempo;if(TK.metro){tkMetro();tkMetro()}};
 document.getElementById('tkMet').onclick=()=>tkMetro();document.getElementById('tkGo').onclick=()=>tkBuild();
 document.getElementById('tkPlay').onclick=()=>{if(TK.ex==='bend'&&TK.bend){tone(TK.bend.m,0,.6);tone(TK.bend.tg,.7,.8);return}demoRun('tSvg',TK.seq,60/TK.tempo)};
-function drillMode(m){document.getElementById('triSide').style.display=m==='tri'?'':'none';document.getElementById('tkSide').style.display=m==='tk'?'':'none';document.getElementById('earSide').style.display=m==='ear'?'':'none';if(m==='ear'){DRM=m;if(T.run)document.getElementById('tGo').click();document.querySelectorAll('[data-dm]').forEach(b=>b.classList.toggle('on',b.dataset.dm===m));if(!EAR.q)earNew();else earDraw();return}document.querySelectorAll('[data-dm]').forEach(b=>b.classList.toggle('on',b.dataset.dm===m));DRM=m;if(m==='tk'){if(T.run)document.getElementById('tGo').click();if(!TK.seq.length&&!TK.bend)tkBuild();else tkDraw()}else drawTri()}
+function drillMode(m){document.getElementById('triSide').style.display=m==='tri'?'':'none';document.getElementById('tkSide').style.display=m==='tk'?'':'none';document.getElementById('earSide').style.display=m==='ear'?'':'none';document.getElementById('nmSide').style.display=m==='nm'?'':'none';if(m==='nm'){DRM=m;if(T.run)document.getElementById('tGo').click();document.querySelectorAll('[data-dm]').forEach(b=>b.classList.toggle('on',b.dataset.dm===m));if(!NMQ.q)nmNew();else nmDraw();return}if(m==='ear'){DRM=m;if(T.run)document.getElementById('tGo').click();document.querySelectorAll('[data-dm]').forEach(b=>b.classList.toggle('on',b.dataset.dm===m));if(!EAR.q)earNew();else earDraw();return}document.querySelectorAll('[data-dm]').forEach(b=>b.classList.toggle('on',b.dataset.dm===m));DRM=m;if(m==='tk'){if(T.run)document.getElementById('tGo').click();if(!TK.seq.length&&!TK.bend)tkBuild();else tkDraw()}else drawTri()}
+/* ===== Fretboard Logic (Bill Edwards) : nommer par forme et position ===== */
+const NMQ={ex:'ch',q:null,res:null,streak:0};const SCOFF={E:-1,D:1,C:4,A:6,G:9};
+function nmNew(){const ex=NMQ.ex,form=rnd(ORD),key=rnd(['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B']);NMQ.res=null;
+if(ex==='sc'){const k=PC[key];let a=((k-4+12)%12)+SCOFF[form];while(a>10)a-=12;while(a<-1)a+=12;if(Math.random()<.35&&a+12+4<=NF)a+=12;a=Math.max(0,a);const set=[0,2,4,7,9],o=[];
+for(let s2=0;s2<6;s2++)for(let f=a;f<=Math.min(NF,a+4);f++){const iv=(TUNE[s2]+f-k+24)%12;if(set.includes(iv))o.push([s2,f,iv])}
+let p=(k-PC[form]+12)%12;if(Math.abs(p+12-a)<Math.abs(p-a))p+=12;NMQ.q={form,key,p,notes:o,kind:'sc'}}
+else{const sh=shapeIn(form,key),p0=(PC[key]-PC[form]+12)%12;const fr=sh.map(x=>x[1]);let p=p0;if(Math.min(...fr)>p0+3)p=p0+12;NMQ.q={form,key,p,notes:sh.map(([s2,f])=>[s2,f,(TUNE[s2]+f-PC[key]+24)%12]),kind:'ch'}}
+const q=NMQ.q;if(ex==='pos'){const ans=q.p%12;const o=new Set([ans]);while(o.size<4)o.add(Math.floor(Math.random()*12));q.opts=[...o].sort((a,b)=>a-b).map(v=>({v:String(v),t:v===0?'Ouverte (0)':'Pos '+v}));q.ans=String(ans)}
+else{q.opts=SHP.map((n2,i)=>({v:String(i),t:n2===FLP[i]?n2:n2+'/'+FLP[i]}));q.ans=String(PC[key])}nmDraw()}
+function nmAns(v){const q=NMQ.q;if(!q||NMQ.res)return;const ok=v===q.ans;NMQ.res={ok,v};ST.fl=ST.fl||{ok:0,ko:0};
+if(ok){ST.fl.ok++;NMQ.streak++;flash('ok','nmFrame');vibrate(30)}else{ST.fl.ko++;NMQ.streak=0;flash('ko','nmFrame');vibrate([60,40,60])}save();nmDraw();nmPlay()}
+function nmPlay(){const q=NMQ.q;if(!q)return;const ms=[...new Set(q.notes.map(([s2,f])=>MIDI[s2]+f))].sort((a,b)=>a-b);if(q.kind==='ch')chord(q.notes.map(([s2,f])=>MIDI[s2]+f));else demoRun('tSvg',ms.map(m=>{const n=q.notes.find(([s2,f])=>MIDI[s2]+f===m);return{s:n[0],f:n[1],m}}),.16)}
+function nmDraw(){const q=NMQ.q,big=document.getElementById('nmBig'),sub=document.getElementById('nmSub'),op=document.getElementById('nmOpts'),info=document.getElementById('nmInfo');
+document.querySelectorAll('[data-nx]').forEach(b=>b.classList.toggle('on',b.dataset.nx===NMQ.ex));document.getElementById('nmStreak').textContent=NMQ.streak;document.getElementById('nmOk').textContent=(ST.fl||{ok:0}).ok;
+let h=neckBase();if(q){const pz=q.p===0?'position ouverte':q.p+'e position',what=q.kind==='sc'?'Forme de gamme':'Forme';
+if(NMQ.ex==='pos'){big.textContent=`Fais un ${q.key}${q.kind==='sc'?' (gamme)':''} avec la forme ${q.form} : quelle position ?`;sub.textContent='Compte à partir de la lettre de la forme, case par case.'}
+else{big.textContent=`${what} ${q.form} · ${pz} → quel ${q.kind==='sc'?'gamme':'accord'} ?`;sub.textContent=`Compte depuis « ${q.form} » : une case = un demi-ton (pas de ♯ entre B‑C et E‑F).`}
+const rv=!!NMQ.res,show=rv||NMQ.ex!=='pos';
+if(show&&q.p>0){h+=`<rect x="34" y="${YL(q.p)-5}" width="296" height="10" rx="5" fill="#ffd23f" opacity=".55"/><text x="18" y="${YN(q.p)+5}" text-anchor="middle" font-size="13" font-weight="700" fill="#ffd23f">${q.p}</text>`}
+q.notes.forEach(([s2,f,iv])=>h+=rv?dot(s2,f,NC[iv],SHP[(TUNE[s2]+f)%12],{r:iv===0?15:13,ring:iv===0?'#fff':null}):(show?dot(s2,f,'#7d83a0','',{r:12}):''));
+op.innerHTML=q.opts.map(o=>`<button class="b ${rv&&o.v===q.ans?'on':''}" data-no="${o.v}" style="${rv&&o.v===NMQ.res.v&&!NMQ.res.ok?'border-color:#ff3b5c;color:#ff3b5c':''}">${o.t}</button>`).join('');
+op.querySelectorAll('[data-no]').forEach(b=>b.onclick=()=>nmAns(b.dataset.no));
+const nm2=q.kind==='sc'?'gamme de '+q.key:'accord de '+q.key;
+info.textContent=rv?(NMQ.res.ok?'✓ ':'✗ ')+`Forme ${q.form}, ${pz} = ${nm2}. ${q.form} + ${q.p%12} demi-ton${q.p%12>1?'s':''} = ${q.key}.`+(q.kind==='sc'?' Les formes de gamme prolongent la forme d’accord du même nom.':''):'Fretboard Logic : distingue la forme (ce que tu vois et doigtes) du nom (ce que tu entends).'}
+for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;
+setSvg('tSvg',h)}
+document.querySelectorAll('[data-nx]').forEach(b=>b.onclick=()=>{NMQ.ex=b.dataset.nx;nmNew()});
+document.getElementById('nmNext').onclick=nmNew;document.getElementById('nmPlay').onclick=nmPlay;
 let DRM='tri';document.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>drillMode(b.dataset.dm));
 /* ================= GARDEN : progressions gospel (Scène) + lignes de Ligon (Impro) ================= */
 const GQ={maj:'',min:'m','7':'7',maj7:'△',m7:'m7',dim7:'°7',dim:'°'};

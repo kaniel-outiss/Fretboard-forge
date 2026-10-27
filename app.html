@@ -338,7 +338,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.5 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.6 — Boss</div>
 </section>
 
 </main>
@@ -1363,27 +1363,29 @@ document.getElementById('nmEx').onchange=e=>{NMQ.ex=e.target.value;nmNew()};
 document.getElementById('nmNext').onclick=nmNew;document.getElementById('nmPlay').onclick=nmPlay;
 /* ===== 🧱 Doubles & arpèges : gammes harmonisées (doubles/triples) + arpèges/triades sur grilles ===== */
 const DA={mode:'sc',sc:0,key:'C',st:'t3',set:2,inv:0,src:'tb:3',pst:'cont',zone:5,tempo:70,ev:[],i:0,got:[],streak:0,title:'',std:null,stdName:''};
-const DA_ST={t3:['Tierces',[0,2],'adj'],t4:['Quartes',[0,3],'adj'],t6:['Sixtes',[0,5],'skip'],tri:['Triades',null,'tri'],trb:['Triades brisées',null,'tri']};
+const DA_ST={t3:['Tierces',[0,2],'adj'],t4:['Quartes',[0,3],'adj'],t6:['Sixtes',[0,5],'skip'],tri:['Triades',null,'tri'],trb:['Triades brisées',null,'tri'],q7:['7es serrées (Nelson)','q7','q4'],q7b:['7es serrées brisées','q7','q4'],d2:['7es drop 2','d2','q4']};
 const DA_PST={cont:'Arpège continu (note la plus proche)',up:'Arpège 1‑3‑5‑7 montant',ud:'Arpège montant‑descendant',brk:'Arpège brisé 1‑5‑3‑8',tri:'Triades enchaînées (triples notes)',gt:'Notes guides 3‑7 (doubles notes)'};
 const DA_PCS={maj:[0,4,7],min:[0,3,7],M:[0,4,7],m:[0,3,7],d:[0,3,6],dim:[0,3,6],aug:[0,4,8],'6':[0,4,7,9],'7#5':[0,4,8,10],'7sus4':[0,5,7,10],sus4:[0,5,7]};
 const daPcs=f=>Q7[f]||DA_PCS[f]||[0,4,7];
 const daLab=f=>({maj:'',min:'m',M:'',m:'m',d:'°',dim:'°',aug:'+','7':'7',m7:'m7',maj7:'maj7',m7b5:'m7♭5',dim7:'°7',m6:'m6',mMaj7:'mMaj7','6':'6','7#5':'7♯5','7sus4':'7sus4',sus4:'sus4'})[f]??f;
 const daName=c=>(FLATK.includes(DA.key)||c.fl?FLP:SHP)[c.r]+daLab(c.f);
-function daSets(){const t=DA_ST[DA.st][2];return t==='adj'?[[0,1],[1,2],[2,3],[3,4],[4,5]]:t==='skip'?[[0,2],[1,3],[2,4],[3,5]]:[[0,1,2],[1,2,3],[2,3,4],[3,4,5]]}
+function daSets(){const t=DA_ST[DA.st][2];return t==='q4'?[[0,1,2,3],[1,2,3,4],[2,3,4,5]]:t==='adj'?[[0,1],[1,2],[2,3],[3,4],[4,5]]:t==='skip'?[[0,2],[1,3],[2,4],[3,5]]:[[0,1,2],[1,2,3],[2,3,4],[3,4,5]]}
 const daSetLab=st=>st.map(s=>6-s).join('‑');
 const DQ={3:['3ce m','#2ee6ff'],4:['3ce M','#ffd23f'],5:['4te juste','#9a9fb8'],6:['triton','#ff3b5c'],7:['5te juste','#9a9fb8'],8:['6te m','#2ee6ff'],9:['6te M','#ffd23f']};
 function daQual(e){const ms=e.notes.map(x=>x.m).sort((a,b)=>a-b);if(ms.length===2){const d=(ms[1]-ms[0])%12;return DQ[d]||[String(d),'#fff']}
-if(ms.length===3){const pcs=[...new Set(ms.map(m=>m%12))];for(const r of pcs){const iv=pcs.map(p=>(p-r+12)%12).sort((a,b)=>a-b).join();const q={'0,4,7':['majeur','#ffd23f'],'0,3,7':['mineur','#2ee6ff'],'0,3,6':['diminué','#ff3b5c'],'0,4,8':['augmenté','#a06bff']}[iv];if(q)return q}}return['','#fff']}
+if(ms.length===3){const pcs=[...new Set(ms.map(m=>m%12))];for(const r of pcs){const iv=pcs.map(p=>(p-r+12)%12).sort((a,b)=>a-b).join();const q={'0,4,7':['majeur','#ffd23f'],'0,3,7':['mineur','#2ee6ff'],'0,3,6':['diminué','#ff3b5c'],'0,4,8':['augmenté','#a06bff']}[iv];if(q)return q.concat([r])}}
+if(ms.length===4){const pcs=[...new Set(ms.map(m=>m%12))];for(const r of pcs){const iv=pcs.map(p=>(p-r+12)%12).sort((a,b)=>a-b).join();const q={'0,4,7,11':['M7','#ffd23f'],'0,4,7,10':['7','#ff9f1a'],'0,3,7,10':['m7','#2ee6ff'],'0,3,6,10':['ø7','#ff3b5c'],'0,3,6,9':['°7','#ff3b5c'],'0,3,7,11':['mM7','#39ff88'],'0,4,8,11':['M7+','#a06bff']}[iv];if(q)return q.concat([r])}}return['','#fff']}
+function daChName(e){const q=daQual(e);if(q[2]==null||e.notes.length<3)return'';const nm2=(FLATK.includes(DA.key)?FLP:SHP)[q[2]];return nm2+({majeur:'',mineur:'m',diminué:'°',augmenté:'+'}[q[0]]??q[0])}
 /* --- gamme harmonisée --- */
 function daScale(){const set=SCALES[DA.sc][2],n=set.length,k=PC[DA.key],sets=daSets();if(DA.set>=sets.length)DA.set=sets.length-1;const strs=sets[DA.set];
-let off=DA_ST[DA.st][1];if(!off){off=[[0,2,4],[2,4,n],[4,n,n+2]][DA.inv]}
+let off=DA_ST[DA.st][1];if(off==='q7')off=[0,2,4,6];else if(off==='d2')off=[4-n,0,2,6];if(!off){off=[[0,2,4],[2,4,n],[4,n,n+2]][DA.inv]}
 const mid=(idx,base)=>base+12*Math.floor(idx/n)+set[((idx%n)+n)%n];const base=k+12*Math.floor((36-k)/12);
 let best=null,deg=null;for(let s0=0;s0<=4*n;s0++){const dg=[];for(let i=0;i<=n;i++)dg.push(s0+i);for(let i=n-1;i>=0;i--)dg.push(s0+i);
 const L=dg.map(d=>off.map((o,j)=>{const m=mid(d+o,base);return{s:strs[j],f:m-MIDI[strs[j]],m}}));if(!L.every(e=>e.every(x=>x.f>=0&&x.f<=NF)))continue;
-const mf=avg(L.flat().map(x=>x.f)),sc=(s0%n===0?0:5)+Math.abs(mf-7)*.5;if(!best||sc<best.sc){best={sc,L};deg=dg}}
+const mf=avg(L.flat().map(x=>x.f)),sp=Math.max(...L.map(e=>Math.max(...e.map(x=>x.f).filter(f=>f>0).concat([0]))-Math.min(...e.map(x=>x.f).filter(f=>f>0).concat([99])))),sc=(s0%n===0?0:5)+Math.abs(mf-7)*.5+Math.max(0,sp-3)*2;if(!best||sc<best.sc){best={sc,L};deg=dg}}
 if(!best){DA.ev=[];DA.title='Impossible sur ces cordes — change de cordes';return}
 const lab=x=>IVN[(x.m-k+120)%12],ev=[];
-best.L.forEach((e,i)=>{const dg=deg[i],rn=n===7?['I','II','III','IV','V','VI','VII'][dg%n]:'degré '+(dg%n+1);if(DA.st==='trb'){const up=i<=n;(up?e:[...e].reverse()).forEach(x=>ev.push({notes:[x],tag:rn}))}else ev.push({notes:e,tag:rn})});
+best.L.forEach((e,i)=>{const dg=deg[i],rn=n===7?['I','II','III','IV','V','VI','VII'][dg%n]:'degré '+(dg%n+1);if(DA.st==='trb'||DA.st==='q7b'){const up=i<=n;(up?e:[...e].reverse()).forEach(x=>ev.push({notes:[x],tag:rn}))}else ev.push({notes:e,tag:rn})});
 DA.ev=ev;DA.title=`${DA.key} ${SCALES[DA.sc][0]} · ${DA_ST[DA.st][0]}${DA_ST[DA.st][1]?'':' '+['fond.','1er renv.','2e renv.'][DA.inv]} · cordes ${daSetLab(strs)}`}
 /* --- grilles --- */
 function daChords(){const [t,id]=DA.src.split(':'),k=PC[DA.key];
@@ -1425,19 +1427,24 @@ if(ms.some(x=>x%12===m%12)){flash('warn','daFrame');return}flash('ko','daFrame')
 let DAT=null;function daStop(){DEMO++;if(DAT){clearTimeout(DAT);DAT=null}}
 function daPlay(){daStop();const tk=DEMO,dt=60/DA.tempo;DA.ev.forEach((e,i)=>setTimeout(()=>{if(tk!==DEMO)return;DA.i=i;DA.got=[];daDraw();if(e.notes.length>1)chord(e.notes.map(x=>x.m),0,dt*1.6);else tone(e.notes[0].m,0,dt*.95,.24)},i*dt*1000));DAT=setTimeout(()=>{if(tk!==DEMO)return;DA.i=0;daDraw()},DA.ev.length*dt*1000+400)}
 /* --- interface --- */
+const NELS=['C (aucune altération)','G (1♯)','D (2♯)','A (3♯)','E (4♯)','B (5♯)','F# (6♯)','Db (5♭)','Ab (4♭)','Eb (3♭)','Bb (2♭)','F (1♭)'],NKEY=['C','G','D','A','E','B','F#','Db','Ab','Eb','Bb','F'];
+const NMODES=[[0,'Ionien','Majeure (ionien)'],[2,'Dorien','Dorien'],[4,'Phrygien','Phrygien'],[5,'Lydien','Lydien'],[7,'Mixolydien','Mixolydien'],[9,'Éolien','Éolien'],[11,'Locrien','Locrien'],[9,'Mineure harmonique','Mineure harmonique'],[9,'Mineure mélodique','Mineure mélodique']];
+function daSetMode(){const M=NMODES[DA.mi||0],pc=(PC[NKEY[DA.sig]]+M[0])%12;DA.key=KEYS.find(x=>PC[x]===pc)||NKEY[DA.sig];const i=SCALES.findIndex(x=>x[0]===M[2]);if(i>=0)DA.sc=i;daCtl();daBuild()}
 function daCtl(){const box=document.getElementById('daCtl');let h='';
 const sel=(id,opts,cur,w)=>`<select id="${id}" ${w?`style="max-width:${w}px"`:''}>${opts.map(([v,t])=>`<option value="${v}" ${String(v)===String(cur)?'selected':''}>${t}</option>`).join('')}</select>`;
 const keySel=sel('daKey',KEYS.map(x=>[x,x]),DA.key);
 const modeSel=sel('daMode',[['sc','Gamme harmonisée'],['pg','Sur une grille']],DA.mode);
 if(DA.mode==='sc'){h+=`<div class="row">${modeSel}${sel('daSc',SCALES.map((x,i)=>[i,x[0]]).filter(([i])=>SCALES[i][2].length>=6),DA.sc,170)}${keySel}</div>`;
-h+=`<div class="row">${sel('daSt',Object.keys(DA_ST).map(x=>[x,DA_ST[x][0]]),DA.st)}${sel('daSet',daSets().map((st,i)=>[i,'Cordes '+daSetLab(st)]),DA.set)}${DA_ST[DA.st][1]?'':sel('daInv',[[0,'Fondamentale'],[1,'1er renversement'],[2,'2e renversement']],DA.inv)}</div>`}
+h+=`<div class="row"><button class="b" id="daDay" title="Nelson : toutes les gammes d'une armure par jour, cycle de 12 jours">📅 Armure du jour</button><button class="b" id="daNextMode">Mode suivant ▸</button><span class="lbl" style="min-width:0" id="daSig">${DA.sig!=null?NELS[DA.sig]+' · '+NMODES[DA.mi||0][1]:''}</span></div>`;h+=`<div class="row">${sel('daSt',Object.keys(DA_ST).map(x=>[x,DA_ST[x][0]]),DA.st)}${sel('daSet',daSets().map((st,i)=>[i,'Cordes '+daSetLab(st)]),DA.set)}${DA_ST[DA.st][1]?'':sel('daInv',[[0,'Fondamentale'],[1,'1er renversement'],[2,'2e renversement']],DA.inv)}</div>`}
 else{const og=`<optgroup label="Toolbox (Sharp)">${PROGS.map((g,i)=>`<option value="tb:${i}">${g.g} · ${g.n}</option>`).join('')}</optgroup><optgroup label="Gospel">${Object.keys(GOSP_PROGS).map(x=>`<option value="gp:${x}">${GOSP_PROGS[x].lb}</option>`).join('')}</optgroup>${DA.std?`<optgroup label="Standard"><option value="std:0">${DA.stdName}</option></optgroup>`:''}`;
 h+=`<div class="row">${modeSel}<select id="daSrc" style="max-width:210px">${og}</select>${DA.src.startsWith('std')?'':keySel}</div>`;
 h+=`<div class="row">${sel('daPst',Object.keys(DA_PST).map(x=>[x,DA_PST[x]]),DA.pst,230)}${DA.pst==='tri'?sel('daSet',SSETS.map((st,i)=>[i,'Cordes '+daSetLab(st)]),DA.set):''}<span class="lbl" style="min-width:0">Zone</span><input type="range" id="daZone" min="2" max="15" value="${DA.zone}" style="width:90px"><span style="font-size:11px">c.${DA.zone}</span></div>`;
 h+=`<div class="row"><input id="daQ" placeholder="Standard : titre…" style="width:130px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:3px 6px;font-size:11.5px"><button class="b" id="daQGo">Charger</button><button class="b" id="daRnd">🎲 Au hasard</button></div>`}
 box.innerHTML=h;
 const g=id=>box.querySelector(id),on=(id,fn)=>{const el=g(id);if(el)el.onchange=e=>fn(e.target.value)};
-on('#daMode',v=>{DA.mode=v;daStop();daCtl();daBuild()});on('#daKey',v=>{DA.key=v;daBuild()});on('#daSc',v=>{DA.sc=+v;daBuild()});
+on('#daMode',v=>{DA.mode=v;daStop();daCtl();daBuild()});
+if(g('#daDay'))g('#daDay').onclick=()=>{const d=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);DA.sig=d%12;DA.mi=0;daSetMode()};
+if(g('#daNextMode'))g('#daNextMode').onclick=()=>{if(DA.sig==null){DA.sig=KEYS.indexOf(KEYS.find(x=>PC[x]===PC[DA.key]))%12;if(DA.sig<0)DA.sig=0;DA.mi=0}else DA.mi=((DA.mi||0)+1)%NMODES.length;daSetMode()};on('#daKey',v=>{DA.key=v;daBuild()});on('#daSc',v=>{DA.sc=+v;daBuild()});
 on('#daSt',v=>{DA.st=v;daCtl();daBuild()});on('#daSet',v=>{DA.set=+v;daBuild()});on('#daInv',v=>{DA.inv=+v;daBuild()});
 if(g('#daSrc')){g('#daSrc').value=DA.src;on('#daSrc',v=>{DA.src=v;daCtl();daBuild()})}
 on('#daPst',v=>{DA.pst=v;if(DA.pst==='tri'&&DA.set>3)DA.set=2;daCtl();daBuild()});
@@ -1460,8 +1467,8 @@ for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" d
 setSvg('tSvg',h);
 if(!DA.ev.length){big.textContent=DA.title||'—';sub.textContent=DA.mode==='pg'?'Choisis une grille (ou un standard).':'';return}
 const nxt=DA.ev.slice(DA.i+1).find(x=>x.ci!==e.ci&&x.ch);
-big.textContent=DA.mode==='pg'&&e.ch?(e.tag+(nxt&&nxt.ch?' → '+daName(nxt.ch):'')):`${e.tag} · ${e.notes.map(x=>IVN[(x.m-k+120)%12]).join(' + ')}${e.notes.length>1?' · '+daQual(e)[0]:''}`;
-sub.innerHTML=`${DA.title} · ${DA.i+1}/${DA.ev.length}`+(DA.mode==='sc'&&e.notes.length>1?'<br>'+DA.ev.slice(0,Math.ceil(DA.ev.length/2)).map((x,i)=>{const q=daQual(x);return`<b style="color:${q[1]};${i===DA.i?'text-decoration:underline':''}">${q[0].replace(/^(3ce|6te) /,'').replace('4te juste','J').replace('5te juste','J').replace('triton','T').replace('majeur','M').replace('mineur','m').replace('diminué','°').replace('augmenté','+')}</b>`}).join(' '):'');
+big.textContent=DA.mode==='pg'&&e.ch?(e.tag+(nxt&&nxt.ch?' → '+daName(nxt.ch):'')):(e.notes.length>2&&daChName(e)?`${e.tag} · ${daChName(e)}`:`${e.tag} · ${e.notes.map(x=>IVN[(x.m-k+120)%12]).join(' + ')}${e.notes.length>1?' · '+daQual(e)[0]:''}`);
+sub.innerHTML=`${DA.title} · ${DA.i+1}/${DA.ev.length}`+(DA.mode==='sc'&&e.notes.length>1?'<br>'+DA.ev.slice(0,Math.ceil(DA.ev.length/2)).map((x,i)=>{const q=daQual(x);return`<b style="color:${q[1]};${i===DA.i?'text-decoration:underline':''}">${x.notes.length>2?(daChName(x)||'·'):q[0].replace(/^(3ce|6te) /,'').replace('4te juste','J').replace('5te juste','J').replace('triton','T').replace('majeur','M').replace('mineur','m').replace('diminué','°').replace('augmenté','+')}</b>`}).join(' '):'');
 document.getElementById('daFrame').title=DA.mode==='sc'?'Joue chaque forme (touche toutes ses notes, ou au micro une seule suffit). Les ombres montrent toute la gamme harmonisée sur ces cordes : vois la forme glisser.':'Reste dans la zone : les petites pastilles sont les notes de l\'accord en cours, les pointillés jaunes la forme suivante. Le jeu « continu » enchaîne chaque accord par la note la plus proche.'}
 document.getElementById('daPlay').onclick=()=>{if(DAT){daStop();DA.i=0;daDraw();return}ac();daPlay()};
 document.getElementById('daGo').onclick=()=>{daStop();DA.streak=DA.streak;daBuild()};

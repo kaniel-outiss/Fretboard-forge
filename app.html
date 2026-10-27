@@ -169,7 +169,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 <!-- ===== JAZZ ===== -->
 <section class="tab land" id="t-jz">
   <div class="side" id="jS7">
-    <div class="row"><span class="lbl">Module</span><button class="b on" data-jm="s7">Septièmes</button><button class="b" data-jm="h">Henderson</button><button class="b" data-jm="cm">Chord‑melody</button>
+    <div class="row"><span class="lbl">Module</span><button class="b on" data-jm="s7">Septièmes</button><button class="b" data-jm="h">Henderson</button><button class="b" data-jm="cm">Chord‑melody</button><button class="b" data-jm="im">Impro</button>
       <span class="lbl" style="min-width:0;margin-left:6px">Type</span><button class="b on" data-jt="d2">Drop 2</button><button class="b" data-jt="d3">Drop 3</button></div>
     <div class="row" id="jSets"></div>
     <div class="row"><span class="lbl">Accord</span><span id="jQs"></span><select id="jKey"></select></div>
@@ -180,7 +180,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="row" style="justify-content:center"><button class="b" id="jPlay">▶ Écouter</button><button class="b" id="jHint">💡 Indice</button><button class="b" id="jSkip">Suivant ⟳</button></div>
   </div>
   <div class="side" id="jH" style="display:none">
-    <div class="row"><span class="lbl">Module</span><button class="b" data-jm="s7">Septièmes</button><button class="b on" data-jm="h">Henderson</button><button class="b" data-jm="cm">Chord‑melody</button>
+    <div class="row"><span class="lbl">Module</span><button class="b" data-jm="s7">Septièmes</button><button class="b on" data-jm="h">Henderson</button><button class="b" data-jm="cm">Chord‑melody</button><button class="b" data-jm="im">Impro</button>
       <span class="lbl" style="min-width:0;margin-left:6px">Défi</span><button class="b on" data-hm="name">Nomme l'accord</button><button class="b" data-hm="bass">Trouve la basse</button></div>
     <div class="frame" id="hFrame"><div class="big" id="hBig" style="font-size:24px">—</div><div class="info" id="hSub" style="text-align:center"></div>
       <div class="stats"><span>Série <b id="hStreak" class="streak">0</b></span><span>Juste <b id="hOk">0</b></span><span>Raté <b id="hKo">0</b></span></div></div>
@@ -190,12 +190,24 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="row" style="justify-content:center"><button class="b" id="hPlay">▶ Écouter</button><button class="b go" id="hNext">Nouveau ⟳</button></div>
   </div>
   <div class="side" id="jCM" style="display:none">
-    <div class="row"><span class="lbl">Module</span><button class="b" data-jm="s7">Septièmes</button><button class="b" data-jm="h">Henderson</button><button class="b on" data-jm="cm">Chord‑melody</button></div>
+    <div class="row"><span class="lbl">Module</span><button class="b" data-jm="s7">Septièmes</button><button class="b" data-jm="h">Henderson</button><button class="b on" data-jm="cm">Chord‑melody</button><button class="b" data-jm="im">Impro</button></div>
     <div class="row"><span class="lbl">Dixièmes</span><button class="b on" data-cp="0">Basse corde 6 + corde 3</button><button class="b" data-cp="1">Basse corde 5 + corde 2</button><select id="cmKey"></select></div>
     <div class="frame" id="cmFrame"><div class="big" id="cmBig" style="font-size:22px">—</div><div class="info" id="cmSub" style="text-align:center"></div>
       <div class="stats"><span>Série <b id="cmStreak" class="streak">0</b></span><span>Gammes en 10es <b id="cmOk">0</b></span></div></div>
     <div class="info" id="cmInfo"></div>
     <div class="row" style="justify-content:center"><button class="b" id="cmPlay">▶ Écouter</button><button class="b go" id="cmGo">🎯 Joue la gamme en 10es</button></div>
+  </div>
+  <div class="side" id="jIM" style="display:none">
+    <div class="row"><span class="lbl">Module</span><button class="b" data-jm="s7">Septièmes</button><button class="b" data-jm="h">Henderson</button><button class="b" data-jm="cm">Chord‑melody</button><button class="b on" data-jm="im">Impro</button></div>
+    <div class="row"><span class="lbl">Impro</span><button class="b on" data-is="pj">Pentas jazz</button><button class="b" data-is="mm">Mineure mélodique</button><select id="imRoot"></select></div>
+    <div class="row" id="imPJ"><span class="lbl">Accord</span><button class="b on" data-it="7">7</button><button class="b" data-it="m7">m7</button><button class="b" data-it="maj7">maj7</button>
+      <span style="font-size:11px;color:var(--mut)">inside</span><input type="range" id="imCi" min="0" max="11" value="0" step="1" style="flex:1"><span style="font-size:11px;color:var(--mut)">outside</span></div>
+    <div class="row" id="imMM" style="display:none"><span class="lbl">Accord</span><button class="b" data-im="0">mMaj7</button><button class="b" data-im="1">7sus♭9</button><button class="b" data-im="2">maj7♯5</button><button class="b" data-im="3">7♯11</button><button class="b" data-im="4">7♭13</button><button class="b" data-im="5">m7♭5</button><button class="b on" data-im="6">7alt</button></div>
+    <div class="frame" id="imFrame"><div class="big" id="imBig" style="font-size:19px">—</div><div class="info" id="imSub" style="text-align:center"></div>
+      <div class="stats"><span>Série <b id="imStreak" class="streak">0</b></span><span>Quiz justes <b id="imOk">0</b></span></div></div>
+    <div class="info" id="imInfo"></div>
+    <div class="row" id="imOpts" style="justify-content:center"></div>
+    <div class="row" style="justify-content:center"><button class="b" id="imPlay">▶ Écouter</button><button class="b go" id="imQuiz">🎯 Quiz</button></div>
   </div>
   <div class="fill"><svg class="neck" id="jSvg" viewBox="0 0 372 624"></svg></div>
 </section>
@@ -266,7 +278,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v1.3 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v1.4 — Boss</div>
 </section>
 
 </main>
@@ -642,7 +654,7 @@ document.getElementById('jQs').innerHTML=['maj7','7','m7','m7b5','dim7'].map(q=>
 document.querySelectorAll('[data-jq]').forEach(b=>b.onclick=()=>{J.q=b.dataset.jq;document.querySelectorAll('[data-jq]').forEach(x=>x.classList.toggle('on',x===b));jzReset()});
 document.querySelectorAll('[data-jt]').forEach(b=>b.onclick=()=>{J.type=b.dataset.jt;J.ss=0;document.querySelectorAll('[data-jt]').forEach(x=>x.classList.toggle('on',x===b));jzReset()});
 document.querySelectorAll('[data-jv]').forEach(b=>b.onclick=()=>{J.view=b.dataset.jv;document.querySelectorAll('[data-jv]').forEach(x=>x.classList.toggle('on',x===b));jzReset()});
-document.querySelectorAll('[data-jm]').forEach(b=>b.onclick=()=>{J.mode=b.dataset.jm;document.getElementById('jS7').style.display=J.mode==='s7'?'':'none';document.getElementById('jH').style.display=J.mode==='h'?'':'none';document.getElementById('jCM').style.display=J.mode==='cm'?'':'none';if(J.mode==='h'&&!H.grip)hNew();jzDraw()});
+document.querySelectorAll('[data-jm]').forEach(b=>b.onclick=()=>{J.mode=b.dataset.jm;document.getElementById('jS7').style.display=J.mode==='s7'?'':'none';document.getElementById('jH').style.display=J.mode==='h'?'':'none';document.getElementById('jCM').style.display=J.mode==='cm'?'':'none';document.getElementById('jIM').style.display=J.mode==='im'?'':'none';if(J.mode==='h'&&!H.grip)hNew();jzDraw()});
 function jSetsUi(){const el=document.getElementById('jSets');el.innerHTML='<span class="lbl">Cordes</span>'+DSETS[J.type].map((st,i)=>`<button class="b ${J.ss===i?'on':''}" data-js="${i}">${dsn(st)}</button>`).join('');
 el.querySelectorAll('[data-js]').forEach(b=>b.onclick=()=>{J.ss=+b.dataset.js;jzReset()})}
 function voicings(root,q,type,strs){const out=[];for(let inv=0;inv<4;inv++){const ivs=dropOrder(Q7[q],inv,type);stackFrets(ivs.map(iv=>(root+iv)%12),strs).forEach(fr=>out.push({inv,fr,ivs,strs,bass:ivs[0]}))}return out}
@@ -652,7 +664,7 @@ else if(J.view==='iiVI'){J.seq=[];CIRCLE4.forEach(k=>{const r=PC[k];J.seq.push({
 else J.seq=[];jzTarget();jzDraw()}
 function jzTarget(){if(!J.seq.length){J.tgt=null;return}const c=J.seq[J.idx%J.seq.length],strs=DSETS[J.type][J.ss],vs=voicings(c.r,c.q,J.type,strs);
 if(!vs.length){J.tgt=null;return}J.tgt=J.prev?vs.reduce((a,b)=>dist(a.fr,J.prev)<dist(b.fr,J.prev)?a:b):vs.reduce((a,b)=>Math.abs(avg(a.fr)-5)<Math.abs(avg(b.fr)-5)?a:b);J.tgt.c=c;J.played=[]}
-function jzDraw(){if(J.mode==='h'){hDraw();return}if(J.mode==='cm'){cmDraw();return}jSetsUi();let h=neckBase();const strs=DSETS[J.type][J.ss];
+function jzDraw(){if(J.mode==='h'){hDraw();return}if(J.mode==='cm'){cmDraw();return}if(J.mode==='im'){imDraw();return}jSetsUi();let h=neckBase();const strs=DSETS[J.type][J.ss];
 h+=`<rect x="${X(strs[0])-20}" y="${YL(0)}" width="${X(strs[3])-X(strs[0])+40}" height="${YL(NF)-YL(0)}" fill="#a06bff" opacity=".05"/>`;
 const big=document.getElementById('jBig'),sub=document.getElementById('jSub'),info=document.getElementById('jInfo');
 const sk=document.getElementById('jStreak');sk.textContent=J.streak;sk.className='streak'+(J.streak>=20?' viol':J.streak>=10?' gold':'');
@@ -674,7 +686,7 @@ for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" d
 setSvg('jSvg',h)}
 function jzHit(ok){if(ok){ST.jz.ok++;if(J.view==='iiVI')ST.jz.iivi=(ST.jz.iivi||0)+1;J.streak++;flash('ok','jFrame');vibrate(30);chord(J.tgt.fr.map((f,i)=>MIDI[J.tgt.strs[i]]+f));J.prev=J.tgt.fr;J.idx++;setTimeout(()=>{jzTarget();jzDraw()},450)}
 else{ST.jz.ko++;J.streak=0;J.played=[];flash('ko','jFrame');vibrate([60,40,60]);jzDraw()}save()}
-function jzNote(m,fromMic,s0,f0){if(J.mode==='cm'){cmNote(m,fromMic);return}if(J.mode==='h'){if(!fromMic)hTap(s0,f0);return}if(!J.tgt||!J.seq.length)return;const t=J.tgt,want=t.fr.map((f,i)=>MIDI[t.strs[i]]+f),i=want.indexOf(m);
+function jzNote(m,fromMic,s0,f0){if(J.mode==='cm'){cmNote(m,fromMic);return}if(J.mode==='im')return;if(J.mode==='h'){if(!fromMic)hTap(s0,f0);return}if(!J.tgt||!J.seq.length)return;const t=J.tgt,want=t.fr.map((f,i)=>MIDI[t.strs[i]]+f),i=want.indexOf(m);
 if(i>=0){const p=[t.strs[i],t.fr[i]];if(!J.played.some(q=>q[0]===p[0]&&q[1]===p[1]))J.played.push(p);if(J.played.length===4){if(fromMic)MIC.mute=performance.now()+700;jzHit(true)}else jzDraw();return}
 if(want.some(w=>w%12===m%12)){flash('warn','jFrame');document.getElementById('jInfo').textContent='Presque : bonne note, mauvaise corde ou octave.';return}
 if(fromMic)MIC.mute=performance.now()+400;jzHit(false)}
@@ -1022,6 +1034,52 @@ function rhyDone(){const n=RDR.ev.filter(e=>e.m!=null).length,ok=RDR.ev.filter(e
 function rhyHit(m,lat){if(!RDR.run)return;const b=rhyBeat()-lat/rhySpb();let best=null,bd=1e9;RDR.ev.forEach(e=>{if(e.m==null||e.st)return;const dd=Math.abs(b-e.t);if(dd<bd){bd=dd;best=e}});
 if(!best||bd>.35){flash('ko','dFrame');return}if(m!=null&&RD_LV[RD.lv].rhy!==true&&m%12!==best.m%12){best.st='am';flash('warn','dFrame');return}best.st='ok';RDR.hits++;flash('ok','dFrame')}
 
+/* ================= IMPRO JAZZ : pentas « inside → outside » + mineure mélodique ================= */
+const PJ_CONT={'7':{deg:[0,3,10,5,6,8,2,7,1,4,9,11],imp:['7, 9, 13','7♯9','7sus','7sus','7♭9♯9, 7+, 7♯11','7+♯9','7♯11','7 (add △7)','7♭9♯9','7♭9♯9♯11♯5','7♭9♯11','7♭9♯9♯11♯5'],ct:[0,4,7,10]},
+ m7:{deg:[3,10,5,8,1,6,0,7,11,2,9,4],ct:[0,3,7,10]},maj7:{deg:[0,7,2,4,9,5,10,11,3,8,6,1],ct:[0,4,7,11]}};
+const PJ_SUG=[['7','7',[0,3,6,10]],['7♯9','7',[3,6,8,1]],['7♭9','7',[1,3,6]],['9♯11','7',[0,2,6]],['7+','7',[6,1,8]],['7sus','7',[10,5,3]],['13','7',[0,6,2]],['maj7','maj7',[0,2,7,9]],['maj7♯11','maj7',[2,7,9,11]],['m7','m7',[3,10,5,8]],['m7♭5','m7',[6,8]]];
+const DEGN={0:'R',1:'♭2',2:'2',3:'♭3',4:'3',5:'4',6:'♭5',7:'5',8:'♭6',9:'6',10:'♭7',11:'7'};
+const FN={0:'R',1:'♭9',2:'9',3:'♯9',4:'3',5:'11',6:'♯11',7:'5',8:'♭13',9:'13',10:'♭7',11:'△7'};
+const MM_MODES=[{k:'mMaj7',lb:'mMaj7',off:0,mode:'I · mineure mélodique',ct:[0,3,7,11]},{k:'sus♭9',lb:'7sus♭9',off:2,mode:'II · dorien ♭2',ct:[0,5,7,10]},{k:'maj7♯5',lb:'maj7♯5',off:3,mode:'III · lydien augmenté',ct:[0,4,8,11]},
+ {k:'7♯11',lb:'7♯11',off:5,mode:'IV · lydien dominant',ct:[0,4,7,10]},{k:'7♭13',lb:'7♭13',off:7,mode:'V · mixolydien ♭6',ct:[0,4,7,10]},{k:'m7♭5',lb:'m7♭5',off:9,mode:'VI · locrien ♮2',ct:[0,3,6,10]},{k:'alt',lb:'7alt',off:11,mode:'VII · altérée (super locrien)',ct:[0,4,10]}];
+const MELMIN=[0,2,3,5,7,9,11];
+const IM={sub:'pj',root:'C',ty:'7',ci:0,mm:6,quiz:null,ok:0,ko:0,streak:0};
+function pjRoot(){return PC[IM.root]}
+function imDraw(){const r=pjRoot();let h=neckBase();const big=document.getElementById('imBig'),sub=document.getElementById('imSub'),info=document.getElementById('imInfo'),op=document.getElementById('imOpts');
+document.querySelectorAll('[data-is]').forEach(b=>b.classList.toggle('on',b.dataset.is===IM.sub));document.getElementById('imPJ').style.display=IM.sub==='pj'?'flex':'none';document.getElementById('imMM').style.display=IM.sub==='mm'?'flex':'none';
+let set=[],ct=[],lbl='';
+if(IM.sub==='pj'){const C=PJ_CONT[IM.ty],d=C.deg[IM.ci],pr=(r+d)%12;set=[0,2,4,7,9].map(x=>(pr+x-r+12)%12);ct=C.ct;
+document.querySelectorAll('[data-it]').forEach(b=>b.classList.toggle('on',b.dataset.it===IM.ty));document.getElementById('imCi').value=IM.ci;
+big.textContent=`${JN[r]}${Q7N[IM.ty]||IM.ty} → penta majeure de ${JN[pr]} (sur la ${DEGN[d]})`;sub.textContent=`${IM.ci+1}/12 ${IM.ci<3?'· très inside':IM.ci>8?'· très outside':''}${C.imp?' · couleur : '+JN[r]+C.imp[IM.ci]:''}`;
+lbl=`Notes : ${set.map(x=>FN[x]).join(' · ')} — ${set.filter(x=>ct.includes(x)).length} note(s) de l'accord. Glisse vers la droite pour sortir (outside), reviens pour résoudre.`}
+else{const M=MM_MODES[IM.mm],mr=(r-M.off+12)%12;set=MELMIN.map(x=>(mr+x-r+12)%12);ct=M.ct;
+document.querySelectorAll('[data-im]').forEach(b=>b.classList.toggle('on',+b.dataset.im===IM.mm));
+big.textContent=`${JN[r]}${M.lb} → ${JN[mr]} mineure mélodique`;sub.textContent=`mode ${M.mode}`;lbl=`Degrés vus depuis ${JN[r]} : ${set.slice().sort((a,b)=>a-b).map(x=>FN[x]).join(' · ')}. Une seule gamme, sept couleurs : pense « ${JN[mr]} mineur mélodique » au lieu d'apprendre sept gammes.`}
+for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const iv=(TUNE[s2]+f-r+24)%12;if(!set.includes(iv))continue;const isC=ct.includes(iv);
+h+=isC?dot(s2,f,NC[iv],FN[iv],{r:iv===0?14:12}):`<g class="dot" data-s="${s2}" data-f="${f}"><circle cx="${X(s2)}" cy="${YN(f)}" r="11" fill="#1c1630" stroke="#b388ff" stroke-width="1.5"/><text x="${X(s2)}" y="${YN(f)+4}" text-anchor="middle" font-size="10" fill="#d9c8ff">${FN[iv]}</text></g>`}
+for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;
+setSvg('jSvg',h);
+if(IM.quiz){const q=IM.quiz;big.textContent=q.q;sub.textContent=q.sub;op.innerHTML=q.opts.map(o=>`<button class="b" data-qo="${o.v}">${o.t}</button>`).join('');op.querySelectorAll('[data-qo]').forEach(b=>b.onclick=()=>imAns(b.dataset.qo,b));info.textContent=q.hint||'Choisis.'}
+else{op.innerHTML='';info.textContent=lbl+' Pastilles pleines = notes de l\'accord, violettes = tensions.'}
+const sk=document.getElementById('imStreak');sk.textContent=IM.streak;sk.className='streak'+(IM.streak>=10?' gold':'');document.getElementById('imOk').textContent=ST.jz.im||0}
+function imQuiz(){const r=Math.floor(Math.random()*12),R=JN[r];
+if(IM.sub==='pj'){const [sym,fam,sug]=rnd(PJ_SUG.slice(0,11)),good=rnd(sug),C=PJ_CONT[fam],bad=C.deg.slice(-6).filter(d=>!sug.includes(d)).sort(()=>Math.random()-.5).slice(0,3);
+IM.root=R.replace('♭','b').replace('♯','#');IM.ty=fam;IM.ci=C.deg.indexOf(good);
+IM.quiz={q:`${R}${sym} : quelle pentatonique ?`,sub:'d\'après le tableau des pentas conseillées (mode I = penta majeure)',opts:[good,...bad].sort(()=>Math.random()-.5).map(d=>({v:d,t:`${JN[(r+d)%12]} penta`})),ans:sug.map(String),why:`Pentas conseillées sur ${R}${sym} : ${sug.map(d=>JN[(r+d)%12]).join(', ')}.`}}
+else{const M=rnd(MM_MODES),mr=(r-M.off+12)%12,opts=new Set([mr]);while(opts.size<4)opts.add(Math.floor(Math.random()*12));IM.mm=MM_MODES.indexOf(M);
+IM.quiz={q:`${R}${M.lb} : quelle mineure mélodique ?`,sub:`mode ${M.mode.split('·')[1].trim()}`,opts:[...opts].sort(()=>Math.random()-.5).map(v=>({v,t:`${JN[v]} m. mél.`})),ans:[String(mr)],why:`${R}${M.lb} = mode ${M.mode.split(' ')[0]} de ${JN[mr]} mineure mélodique — la mineure mélodique se trouve ${({0:'sur la même fondamentale',2:'un ton plus bas',3:'une tierce mineure plus bas',5:'une quinte plus haut',7:'une quarte plus haut',9:'une tierce mineure plus haut',11:'un demi-ton plus haut'})[M.off]}.`}}
+IM.root=Object.keys(PC).find(k=>PC[k]===r&&KEYS.includes(k))||'C';document.getElementById('imRoot').value=IM.root;imDraw()}
+function imAns(v,btn){const q=IM.quiz;if(!q)return;const ok=q.ans.includes(String(v));btn.classList.add(ok?'on':'');if(ok){ST.jz.im=(ST.jz.im||0)+1;IM.streak++;flash('ok','imFrame');vibrate(30)}else{IM.streak=0;flash('ko','imFrame');vibrate([60,40,60])}save();
+const why=q.why;IM.quiz=null;imDraw();document.getElementById('imInfo').textContent=(ok?'✓ ':'✗ ')+why}
+
+document.querySelectorAll('[data-is]').forEach(b=>b.onclick=()=>{IM.sub=b.dataset.is;IM.quiz=null;imDraw()});
+document.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>{IM.ty=b.dataset.it;IM.quiz=null;imDraw()});
+document.querySelectorAll('[data-im]').forEach(b=>b.onclick=()=>{IM.mm=+b.dataset.im;IM.quiz=null;imDraw()});
+document.getElementById('imCi').oninput=e=>{IM.ci=+e.target.value;IM.quiz=null;imDraw();const r=pjRoot(),d=PJ_CONT[IM.ty].deg[IM.ci];[0,2,4,7,9].forEach((x,i)=>tone(60+((r+d+x)%12),i*.12,.4))};
+const imRoot=document.getElementById('imRoot');imRoot.innerHTML=KEYS.map(k=>`<option>${k}</option>`).join('');imRoot.onchange=e=>{IM.root=e.target.value;IM.quiz=null;imDraw()};
+document.getElementById('imQuiz').onclick=()=>imQuiz();
+document.getElementById('imPlay').onclick=()=>{const r=pjRoot();let ct,set;if(IM.sub==='pj'){ct=PJ_CONT[IM.ty].ct;const d=PJ_CONT[IM.ty].deg[IM.ci];set=[0,2,4,7,9].map(x=>d+x)}else{const M=MM_MODES[IM.mm];ct=M.ct;set=MELMIN.map(x=>x-M.off+12).map(x=>x%12).sort((a,b)=>a-b)}
+chord(ct.map(x=>48+r+x),0,1.6);set.forEach((x,i)=>tone(60+r+x,.9+i*.16,.4))};
 /* ================= MICRO ================= */
 const NOTE_FR=m=>SHP[m%12]+(Math.floor(m/12)-1);
 function acf(buf,sr){let n=buf.length,rms=0;for(let i=0;i<n;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/n);if(rms<0.012)return[-1,rms];
@@ -1098,6 +1156,7 @@ const VIL=[
 {n:'🎷 Septièmes',v:()=>(ST.jz.ok-(ST.jz.iivi||0))/100,go:()=>{goTab('t-jz');if(J.mode==='h')clickSel('#jH [data-jm=s7]');clickSel('[data-jv=d4]')}},
 {n:'🔁 ii‑V‑I',v:()=>(ST.jz.iivi||0)/108,go:()=>{goTab('t-jz');if(J.mode==='h')clickSel('#jH [data-jm=s7]');clickSel('[data-jv=iiVI]')}},
 {n:'🐉 Bestiaire',v:()=>ST.sc.ok/120,go:()=>goTab('t-sc')},
+{n:'🌀 Impro jazz',v:()=>(ST.jz.im||0)/80,go:()=>{goTab('t-jz');clickSel('#jS7 [data-jm=im]')}},
 {n:'🌈 Henderson',v:()=>ST.jz.hok/60,go:()=>{goTab('t-jz');clickSel('#jS7 [data-jm=h]')}},
 {n:'🎼 Chord‑melody',v:()=>(ST.jz.cm||0)/24,go:()=>{goTab('t-jz');clickSel('#jS7 [data-jm=cm]')}},{n:'🙌 Gospel',soon:1},{n:'🎤 Scène',v:()=>(ST.scene||0)/20,go:()=>goTab('t-sg')}];
 function vilDraw(){document.getElementById('pvVil').innerHTML=VIL.map((v,i)=>{const p=v.soon?0:Math.min(1,Math.max(0,v.v())),col=p>=1?'#ffd23f':p>.5?'#39ff88':'#2ee6ff';

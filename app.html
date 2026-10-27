@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Fretboard Forge</title>
+<style>
+:root{
+  --bg:#05060b;--bg2:#0b0d16;--bg3:#12152200;--line:#1e2234;--txt:#e6e8f2;--mut:#7d83a0;
+  --R:#ff3b5c;--b2:#ff4fd8;--n2:#ff4fd8;--b3:#ffb020;--n3:#39ff88;--n4:#c8c8d0;--tt:#fff04a;--n5:#2ee6ff;--b6:#b388ff;--n6:#a06bff;--b7:#ff7a1a;--n7:#b6ff3b;
+  --ok:#39ff88;--ko:#ff3b5c;--warn:#ffb020;--acc:#2ee6ff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column;height:100dvh}
+header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line);flex:0 0 auto}
+header h1{font-size:17px;margin:0;font-weight:600;letter-spacing:1px}
+header h1 span{color:var(--acc);text-shadow:0 0 10px var(--acc)}
+.hdr-r{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mut)}
+.micn{display:none;min-width:64px;text-align:center;font-weight:600;font-size:14px;color:var(--mut);border:1px solid var(--line);border-radius:12px;padding:3px 8px}
+.micn.on{display:inline-block}.micn.hot{color:var(--ok);border-color:var(--ok);box-shadow:0 0 10px var(--ok)}
+#btnMic.live{border-color:var(--ko);color:var(--ko);box-shadow:0 0 10px var(--ko);animation:breathe 1.2s infinite}
+main{flex:1 1 auto;min-height:0;position:relative}
+.tab{position:absolute;inset:0;display:none;padding:8px 10px;overflow:hidden}
+.tab.on{display:flex;flex-direction:column;gap:6px}
+nav{display:flex;border-top:1px solid var(--line);flex:0 0 auto;background:var(--bg2);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;color:var(--mut);font-size:11px;padding:7px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button i{font-style:normal;font-size:20px;line-height:1}
+nav button.on{color:var(--acc);text-shadow:0 0 8px var(--acc)}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex:0 0 auto}
+.lbl{font-size:11px;color:var(--mut);min-width:52px}
+select,button.b{background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:14px;font-size:12px;padding:5px 10px;min-height:30px}
+button.b.on{border-color:var(--acc);color:var(--acc);box-shadow:0 0 8px var(--acc)55,inset 0 0 6px var(--acc)33}
+button.b.go{border-color:var(--ok);color:var(--ok)}
+button.b.stop{border-color:var(--ko);color:var(--ko)}
+.chips{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:11px;color:var(--mut);flex:0 0 auto}
+.chip b{display:inline-flex;width:17px;height:17px;border-radius:50%;align-items:center;justify-content:center;font-size:10px;color:#06060b;margin-right:3px;font-weight:600}
+.info{font-size:12px;color:var(--mut);min-height:16px;flex:0 0 auto}
+.fill{flex:1 1 auto;min-height:0;display:flex;align-items:stretch;justify-content:center}
+svg.neck{height:100%;width:auto;max-width:100%}
+svg.neck.h{width:100%;height:auto;max-height:100%}
+svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(90deg)}
+.frame{border:2px solid var(--line);border-radius:18px;transition:border-color .15s,box-shadow .15s;padding:6px}
+.frame.ok{border-color:var(--ok);box-shadow:0 0 18px var(--ok),inset 0 0 12px var(--ok)44}
+.frame.ko{border-color:var(--ko);box-shadow:0 0 18px var(--ko),inset 0 0 12px var(--ko)44}
+.frame.warn{border-color:var(--warn);box-shadow:0 0 18px var(--warn)}
+.big{font-size:30px;font-weight:600;text-align:center;line-height:1.1}
+.big small{display:block;font-size:12px;color:var(--mut);font-weight:400;margin-top:2px}
+.stats{display:flex;gap:10px;justify-content:center;font-size:12px;color:var(--mut)}
+.stats b{color:var(--txt);font-size:15px}
+.streak{color:var(--ok)}.streak.gold{color:#ffd23f;text-shadow:0 0 8px #ffd23f}.streak.viol{color:#a06bff;text-shadow:0 0 10px #a06bff}
+.heat{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;flex:0 0 auto}
+.heat div{aspect-ratio:1;border-radius:4px;background:#161a2a;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--mut)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:12px}
+.card h3{margin:0 0 4px;font-size:12px;color:var(--mut);font-weight:500}
+.card .v{font-size:20px;font-weight:600}
+.ring{animation:pz 1.3s ease-in-out infinite}
+@keyframes pz{0%,100%{stroke-opacity:.2}50%{stroke-opacity:1}}
+@keyframes breathe{0%,100%{opacity:.85}50%{opacity:1}}
+.breathe{animation:breathe 1.6s ease-in-out infinite}
+.vib{animation:vib .35s linear}
+@keyframes vib{0%{transform:translateX(0)}25%{transform:translateX(1.5px)}50%{transform:translateX(-1.5px)}75%{transform:translateX(1px)}100%{transform:translateX(0)}}
+.cof{display:flex;justify-content:center;flex:0 0 auto}
+.cof svg{height:112px}
+.wide .cof svg{height:150px}
+@media (orientation:landscape){
+  .tab.land .side{display:flex;flex-direction:column;gap:6px}
+  .tab.land .fill{align-items:center}
+  #t-tri.land .side{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 12px;align-items:center}
+  #t-tri.land .side .row:nth-child(1){grid-column:1}#t-tri.land .side .cof{grid-row:1/4;grid-column:2}#t-tri.land .side .frame{grid-row:1/4;grid-column:3}
+  #t-tri.land .side .info{grid-column:1/4}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>FRETBOARD <span>FORGE</span></h1>
+  <div class="hdr-r"><span id="micNote" class="micn">—</span><span id="hdrKey"></span><button class="b" id="btnMic" title="Micro">🎤</button><button class="b" id="btnSnd" title="Son">🔊</button></div>
+</header>
+<main>
+
+<!-- ===== MANCHE ===== -->
+<section class="tab on land" id="t-neck">
+  <div class="side">
+    <div class="row"><span class="lbl">Tonalité</span><select id="nKey"></select>
+      <span class="lbl">Vue</span><select id="nView"><option value="caged">CAGED</option><option value="scale">Gamme</option><option value="triad">Triades</option></select></div>
+    <div class="row" id="nSub"></div>
+    <div class="row"><span class="lbl">Pastilles</span><button class="b" data-m="iv">Intervalles</button><button class="b" data-m="nt">Notes</button><button class="b" data-m="dg">Doigts</button>
+      <button class="b" id="nMv">Mouvement</button><button class="b" id="nPlay">▶ Écouter</button></div>
+    <div class="chips" id="nChips"></div>
+    <div class="info" id="nInfo"></div>
+  </div>
+  <div class="fill"><svg class="neck" id="nSvg" viewBox="0 0 372 580"></svg></div>
+</section>
+
+<!-- ===== TRIADES ===== -->
+<section class="tab land" id="t-tri">
+  <div class="side">
+    <div class="row"><span class="lbl">Cordes</span><button class="b on" data-ss="0">1-2-3</button><button class="b" data-ss="1">2-3-4</button><button class="b" data-ss="2">3-4-5</button><button class="b" data-ss="3">4-5-6</button></div>
+    <div class="row"><span class="lbl">Qualité</span><button class="b on" data-q="maj">Maj</button><button class="b" data-q="min">Min</button><button class="b" data-q="dim">Dim</button><button class="b" data-q="aug">Aug</button></div>
+    <div class="row"><span class="lbl">Tempo</span><input type="range" id="tTempo" min="40" max="160" value="70" step="5" style="flex:1"><span id="tTempoV" style="font-size:12px;min-width:30px">70</span>
+      <button class="b" id="tMode">Mode : explorer</button></div>
+    <div class="cof" id="tCof"></div>
+    <div class="frame" id="tFrame">
+      <div class="big" id="tBig">C<small>fondamentale · touche la position</small></div>
+      <div class="stats"><span>Série <b id="tStreak" class="streak">0</b></span><span>Juste <b id="tOk">0</b></span><span>Raté <b id="tKo">0</b></span><span>Max <b id="tMax">0</b></span></div>
+    </div>
+    <div class="row" style="justify-content:center"><button class="b go" id="tGo">▶ Lancer le cercle</button><button class="b" id="tHint">💡 Indice</button></div>
+    <div class="info" id="tInfo">Cycle des quartes, renversement le plus proche. Touche les 3 notes sur le manche.</div>
+  </div>
+  <div class="fill"><svg class="neck" id="tSvg" viewBox="0 0 372 580"></svg></div>
+</section>
+
+<!-- ===== GAMMES ===== -->
+<section class="tab land" id="t-sc">
+  <div class="side">
+    <div class="row"><span class="lbl">Gamme</span><select id="sSel" style="max-width:200px"></select><select id="sKey"></select></div>
+    <div class="row" id="sPos"></div>
+    <div class="row" style="align-items:flex-start"><span class="lbl">Formule</span><span id="sFrm" class="chips" style="gap:3px"></span></div>
+    <div class="info" id="sMood"></div>
+    <div class="info" id="sUse"></div>
+    <div class="frame" id="sFrame" style="padding:6px 10px">
+      <div class="stats"><span>Cible <b id="sTgt">—</b></span><span>Série <b id="sStreak" class="streak">0</b></span><span>Juste <b id="sOk">0</b></span></div>
+    </div>
+    <div class="row" style="justify-content:center"><button class="b" id="sPlay">▶ Écouter</button><button class="b" id="sDrill">🎯 Drill cible</button><button class="b" id="sBourdon">Bourdon</button></div>
+    <div class="info" style="font-size:11px">Anneau blanc pulsant = altéré vs majeure · ★ = note caractéristique</div>
+  </div>
+  <div class="fill"><svg class="neck" id="sSvg" viewBox="0 0 372 580"></svg></div>
+</section>
+
+<!-- ===== PROFIL ===== -->
+<section class="tab" id="t-pro">
+  <div class="grid2">
+    <div class="card"><h3>Triades justes</h3><div class="v" id="pTri">0</div></div>
+    <div class="card"><h3>Gammes justes</h3><div class="v" id="pSc">0</div></div>
+    <div class="card"><h3>Meilleure série</h3><div class="v" id="pMax">0</div></div>
+    <div class="card"><h3>Séances</h3><div class="v" id="pSess">0</div></div>
+  </div>
+  <div class="info">Chaleur par tonalité (triades) — plus c'est brillant, plus c'est maîtrisé</div>
+  <div class="heat" id="pHeat"></div>
+  <div class="info">Chaleur par groupe de cordes</div>
+  <div class="heat" id="pHeatSS" style="grid-template-columns:repeat(4,1fr)"></div>
+  <div class="info" id="pWeak"></div>
+  <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v0.2 — Boss</div>
+</section>
+
+</main>
+<nav>
+  <button class="on" data-t="t-neck"><i>🎸</i>Manche</button>
+  <button data-t="t-tri"><i>⚡</i>Triades</button>
+  <button data-t="t-sc"><i>🐉</i>Gammes</button>
+  <button data-t="t-pro"><i>📊</i>Profil</button>
+</nav>
+
+<script>
+/* ================= DONNÉES ================= */
+const NC={0:'#ff3b5c',1:'#ff4fd8',2:'#ff4fd8',3:'#ffb020',4:'#39ff88',5:'#c8c8d0',6:'#fff04a',7:'#2ee6ff',8:'#b388ff',9:'#a06bff',10:'#ff7a1a',11:'#b6ff3b'};
+const IVN={0:'R',1:'b2',2:'2',3:'b3',4:'3',5:'4',6:'b5',7:'5',8:'b6',9:'6',10:'b7',11:'7'};
+const MAJ=[0,2,4,5,7,9,11];
+const TUNE=[4,9,2,7,11,4],MIDI=[40,45,50,55,59,64]; // index 0 = Mi grave (corde 6)
+const KEYS=['C','G','D','A','E','B','F#','Db','Ab','Eb','Bb','F'];
+const PC={C:0,'C#':1,Db:1,D:2,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,Ab:8,A:9,Bb:10,B:11};
+const SHP=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],FLP=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+const FLATK=['F','Bb','Eb','Ab','Db'];
+const nm=(pc,key)=>(FLATK.includes(key)?FLP:SHP)[((pc%12)+12)%12];
+// formes CAGED (do majeur) : [corde 0..5 grave→aigu, case, doigt]
+const CAGED={C:[[1,3,3],[2,2,2],[3,0,0],[4,1,1],[5,0,0]],A:[[1,3,1],[2,5,2],[3,5,3],[4,5,4],[5,3,1]],G:[[0,8,3],[1,7,2],[2,5,1],[3,5,1],[4,5,1],[5,8,4]],E:[[0,8,1],[1,10,3],[2,10,4],[3,9,2],[4,8,1],[5,8,1]],D:[[2,10,1],[3,12,2],[4,13,4],[5,12,3]]};
+const ORD=['C','A','G','E','D'];
+const FAM={F:['Fondations','#ffd23f'],P:['Pentatoniques','#ff7a1a'],M:['Les 7 modes','#a06bff'],S:['Mineures savantes','#ff3b5c'],Y:['Symétriques','#2ee6ff'],X:['Exotiques','#7dff3b']};
+const SCALES=[
+['Majeure (ionien)','F',[0,2,4,5,7,9,11],null,'Lumineux, stable','maj, maj7'],
+['Mineure naturelle','F',[0,2,3,5,7,8,10],8,'Sombre, mélancolique','m, m7'],
+['Penta majeure','P',[0,2,4,7,9],null,'Ouvert, country, gospel','maj'],
+['Penta mineure','P',[0,3,5,7,10],null,'Rock, blues, direct','m, m7'],
+['Blues','P',[0,3,5,6,7,10],6,'Tendu, rugueux','m, 7, blues'],
+['Dorien','M',[0,2,3,5,7,9,10],9,'Mineur soul, groove','m7 — la 6te éclaire'],
+['Phrygien','M',[0,1,3,5,7,8,10],1,'Sombre, hispanique','m — la b2 mord'],
+['Lydien','M',[0,2,4,6,7,9,11],6,'Rêveur, flottant','maj7 — la #4 plane'],
+['Mixolydien','M',[0,2,4,5,7,9,10],10,'Bluesy, rock\'n\'roll','7 de dominante'],
+['Éolien','M',[0,2,3,5,7,8,10],8,'Dramatique, épique','m, m7'],
+['Locrien','M',[0,1,3,5,6,8,10],6,'Instable, suspendu','m7b5'],
+['Mineure harmonique','S',[0,2,3,5,7,8,11],11,'Classique, inquiétant','m, V7 en mineur'],
+['Mineure mélodique','S',[0,2,3,5,7,9,11],11,'Jazz, raffiné','m6, mMaj7'],
+['Diminuée (T-½T)','Y',[0,2,3,5,6,8,9,11],null,'Labyrinthe, suspense','dim7 — se répète toutes les 3 cases'],
+['Par tons','Y',[0,2,4,6,8,10],null,'Flou, onirique','7#5 — se répète toutes les 2 cases'],
+['Hirajoshi','X',[0,2,3,7,8],8,'Japon, épuré','m'],
+['Hongroise tzigane','X',[0,2,3,6,7,8,10],6,'Tzigane, ardent','m, m7'],
+['Napolitaine mineure','X',[0,1,3,5,7,8,11],1,'Baroque, tragique','m'],
+['Persane','X',[0,1,4,5,7,8,11],1,'Oriental, mystique','maj']];
+const QUAL={maj:[0,4,7],min:[0,3,7],dim:[0,3,6],aug:[0,4,8]};
+const QN={maj:'',min:'m',dim:'°',aug:'+'};
+const SSETS=[[3,4,5],[2,3,4],[1,2,3],[0,1,2]]; // groupes de cordes (index graves→aigu)
+const CIRCLE4=['C','F','Bb','Eb','Ab','Db','F#','B','E','A','D','G'];
+
+/* ================= AUDIO ================= */
+let AC=null,sndOn=true;
+const MIC={on:false,stream:null,an:null,buf:null,last:-1,cnt:0,emitted:-1,quiet:0,mute:0};
+function ac(){if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)()}if(AC.state==='suspended')AC.resume();return AC}
+function tone(m,t=0,d=.9,g=.22){if(!sndOn||MIC.on)return;try{const c=ac(),o=c.createOscillator(),o2=c.createOscillator(),gn=c.createGain(),T=c.currentTime+t,f=440*Math.pow(2,(m-69)/12);
+o.type='triangle';o.frequency.value=f;o2.type='sine';o2.frequency.value=f*2;
+gn.gain.setValueAtTime(0,T);gn.gain.linearRampToValueAtTime(g,T+.008);gn.gain.exponentialRampToValueAtTime(.001,T+d);
+o.connect(gn);o2.connect(gn);gn.connect(c.destination);o.start(T);o2.start(T);o.stop(T+d);o2.stop(T+d)}catch(e){}}
+function chord(ms,t=0,d=1.4){ms.forEach((m,i)=>tone(m,t+i*.03,d,.16))}
+let bourdon=null;
+function toggleBourdon(pc){if(bourdon){bourdon.g.gain.exponentialRampToValueAtTime(.001,ac().currentTime+.3);bourdon.o.stop(ac().currentTime+.35);bourdon.o2.stop(ac().currentTime+.35);bourdon=null;return false}
+const c=ac(),o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),f=440*Math.pow(2,(48+pc-69)/12);
+o.type='sawtooth';o.frequency.value=f;o2.type='sine';o2.frequency.value=f*1.5;g.gain.value=0;g.gain.linearRampToValueAtTime(.08,c.currentTime+.4);
+const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=600;o.connect(lp);o2.connect(lp);lp.connect(g);g.connect(c.destination);o.start();o2.start();bourdon={o,o2,g};return true}
+function vibrate(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+
+/* ================= MANCHE SVG ================= */
+const X=s=>52+s*52,YN=f=>f===0?24:40+(f-.5)*34,YL=f=>40+f*34;
+const NF=15;
+const LAND=()=>window.innerWidth>window.innerHeight;
+function setSvg(id,h){const el=document.getElementById(id);if(LAND()){el.setAttribute('viewBox','0 0 580 372');el.classList.add('h');el.innerHTML=GLOW+`<g transform="matrix(0,-1,1,0,0,372)">${h}</g>`}else{el.setAttribute('viewBox','0 0 372 580');el.classList.remove('h');el.innerHTML=GLOW+h}}
+function neckBase(){let h=`<rect x="34" y="${YL(0)}" width="296" height="${YL(NF)-YL(0)}" fill="#0e0c0a"/>`;
+[3,5,7,9,15].forEach(f=>h+=`<circle cx="182" cy="${YN(f)}" r="6" fill="#23201c"/>`);
+h+=`<circle cx="156" cy="${YN(12)}" r="6" fill="#23201c"/><circle cx="208" cy="${YN(12)}" r="6" fill="#23201c"/>`;
+for(let f=0;f<=NF;f++){h+=`<line x1="${X(0)}" x2="${X(5)}" y1="${YL(f)}" y2="${YL(f)}" stroke="${f?'#3a3d52':'#e6e8f2'}" stroke-width="${f?1.2:5}"/>`;if(f)h+=`<text x="18" y="${YN(f)+5}" text-anchor="middle" font-size="13" fill="#5c6180">${f}</text>`}
+for(let s=0;s<6;s++)h+=`<line class="str" id="str${s}" x1="${X(s)}" x2="${X(s)}" y1="${YL(0)}" y2="${YL(NF)}" stroke="#9a9fb8" stroke-width="${2.4-s*.3}"/>`;
+return h}
+function dot(s,f,col,lab,o={}){const open=f===0,r=o.r||(open?11:15);let h='';
+if(o.ring)h+=`<circle cx="${X(s)}" cy="${YN(f)}" r="${r+5}" fill="none" stroke="${o.ring}" stroke-width="2"/>`;
+if(o.pulse)h+=`<circle class="ring" cx="${X(s)}" cy="${YN(f)}" r="${r+3}" fill="none" stroke="${o.pulse}" stroke-width="1.8"/>`;
+if(o.target)h+=`<circle class="ring" cx="${X(s)}" cy="${YN(f)}" r="${r+9}" fill="none" stroke="var(--ok)" stroke-width="3"/>`;
+h+=`<circle cx="${X(s)}" cy="${YN(f)}" r="${r}" fill="${open?'#05060b':col}" stroke="${col}" stroke-width="${open?2.5:0}" opacity="${o.op??1}" filter="url(#glow)"/>`;
+h+=`<text x="${X(s)}" y="${YN(f)+5}" text-anchor="middle" font-size="${open?12:14}" font-weight="600" fill="${open?col:'#06060b'}" opacity="${o.op??1}">${lab}</text>`;
+return `<g class="dot" data-s="${s}" data-f="${f}" style="cursor:pointer">${h}</g>`}
+const GLOW=`<defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#2ee6ff" stroke-width="2"/></marker></defs>`;
+function vib(svg,s){const el=svg.querySelector('#str'+s);if(!el)return;el.classList.remove('vib');void el.getBBox();el.classList.add('vib');el.setAttribute('stroke','#fff');setTimeout(()=>el.setAttribute('stroke','#9a9fb8'),350)}
+function bindDots(svg,fn){svg.onclick=e=>{const g=e.target.closest('.dot');if(!g)return;fn(+g.dataset.s,+g.dataset.f)}}
+
+/* ================= ÉTAT ================= */
+const ST=JSON.parse(localStorage.getItem('ff_state')||'{}');
+ST.tri=ST.tri||{ok:0,ko:0,max:0,byKey:{},bySS:{}};ST.sc=ST.sc||{ok:0,max:0};ST.sess=ST.sess||0;
+function save(){localStorage.setItem('ff_state',JSON.stringify(ST))}
+ST.sess++;save();
+
+/* ================= ONGLETS ================= */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));if(b.dataset.t==='t-pro')drawPro();if(b.dataset.t==='t-sc')drawSc();if(b.dataset.t==='t-tri')drawTri()});
+document.getElementById('btnSnd').onclick=e=>{sndOn=!sndOn;e.target.textContent=sndOn?'🔊':'🔇';ac()};
+
+/* ================= MANCHE ================= */
+const N={key:'C',view:'caged',shape:'C',mode:'iv',mv:true,pt:false,sc:0,pos:-1};
+const nKey=document.getElementById('nKey');nKey.innerHTML=KEYS.map(k=>`<option>${k}</option>`).join('');nKey.onchange=e=>{N.key=e.target.value;drawNeck()};
+document.getElementById('nView').onchange=e=>{N.view=e.target.value;drawNeck()};
+document.querySelectorAll('#t-neck [data-m]').forEach(b=>b.onclick=()=>{N.mode=b.dataset.m;drawNeck()});
+document.getElementById('nMv').onclick=()=>{N.mv=!N.mv;drawNeck()};
+document.getElementById('nChips').innerHTML=[['R','Fondamentale'],['3','Tierce'],['5','Quinte'],['b3','Tierce m.'],['7','7e maj'],['b7','7e'],['2','9e'],['6','6te'],['4','11e']].map(([k,t])=>{const iv=Object.keys(IVN).find(i=>IVN[i]===k);return`<span class="chip"><b style="background:${NC[iv]}">${k}</b>${t}</span>`}).join('');
+function shapeIn(name,key){const k=PC[key];let n=CAGED[name].map(([s,f,d])=>[s,f+k,d]);if(Math.max(...n.map(x=>x[1]))>NF)n=n.map(([s,f,d])=>[s,f-12,d]);if(Math.min(...n.map(x=>x[1]))<0)n=n.map(([s,f,d])=>[s,f+12,d]);return n}
+function drawNeck(){
+document.getElementById('hdrKey').textContent=N.key;
+document.querySelectorAll('#t-neck [data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m===N.mode));
+document.getElementById('nMv').classList.toggle('on',N.mv);
+const sub=document.getElementById('nSub');const k=PC[N.key];let h=neckBase();let info='';
+if(N.view==='caged'){
+sub.innerHTML='<span class="lbl">Forme</span>'+[...ORD,'Toutes'].map(s=>`<button class="b ${N.shape===s?'on':''}" data-sh="${s}">${s}</button>`).join('');
+sub.querySelectorAll('[data-sh]').forEach(b=>b.onclick=()=>{N.shape=b.dataset.sh;drawNeck()});
+const list=N.shape==='Toutes'?ORD:[N.shape],all={};ORD.forEach(n=>all[n]=shapeIn(n,N.key));
+list.forEach(n=>{const fs=all[n].map(x=>x[1]),a=Math.max(0,Math.min(...fs)-1),b=Math.max(...fs);
+h+=`<rect x="34" y="${YL(a)-(a===0?14:0)}" width="296" height="${YL(b)-YL(a)+(a===0?14:0)}" rx="10" fill="#fff" opacity=".04" stroke="#5c6180" stroke-dasharray="4 4"/>`;
+h+=`<text x="352" y="${(YL(a)+YL(b))/2+6}" text-anchor="middle" font-size="18" font-weight="600" fill="#7d83a0">${n}</text>`});
+if(N.mv&&N.shape!=='Toutes'){const i=ORD.indexOf(N.shape),nx=ORD[(i+1)%5],cur=all[N.shape],nxt=all[nx];
+const piv=cur.filter(([s,f])=>nxt.some(([s2,f2])=>s2===s&&f2===f));
+const a1=(Math.min(...cur.map(x=>x[1]))+Math.max(...cur.map(x=>x[1])))/2,a2=(Math.min(...nxt.map(x=>x[1]))+Math.max(...nxt.map(x=>x[1])))/2;
+nxt.forEach(([s,f])=>{if(!piv.some(p=>p[0]===s&&p[1]===f))h+=`<circle cx="${X(s)}" cy="${YN(f)}" r="13" fill="none" stroke="#7d83a0" stroke-dasharray="3 3" stroke-width="1.5"/>`});
+const y1=YN(Math.round(a1)),y2=YN(Math.round(a2));
+h+=`<path d="M352 ${y1+18} C370 ${(y1+y2)/2} 370 ${(y1+y2)/2} 352 ${y2-22}" fill="none" stroke="#2ee6ff" stroke-width="2" marker-end="url(#ar)"/>`;
+piv.forEach(([s,f])=>h+=`<circle cx="${X(s)}" cy="${YN(f)}" r="20" fill="none" stroke="#2ee6ff" stroke-width="2.5" filter="url(#glow)"/>`);
+info=`Vers ${nx} : ${piv.length} pivot${piv.length>1?'s':''} (anneau cyan) — ${piv.length>1?'ces doigts restent':'ce doigt reste'}, les autres glissent vers les cercles pointillés.`}
+list.forEach(n=>all[n].forEach(([s,f,d])=>{const pc=(TUNE[s]+f)%12,iv=(pc-k+12)%12,col=NC[iv];
+const lab=N.mode==='iv'?IVN[iv]:N.mode==='nt'?nm(pc,N.key):(f===0?'0':d);h+=dot(s,f,col,lab)}));
+if(!info)info=N.shape==='Toutes'?'Les cinq formes s\'emboîtent : chacune partage des notes avec la suivante.':'';
+}else if(N.view==='scale'){
+sub.innerHTML='<span class="lbl">Gamme</span><select id="nScSel" style="max-width:170px">'+SCALES.map((s,i)=>`<option value="${i}" ${N.sc===i?'selected':''}>${s[0]}</option>`).join('')+'</select>';
+sub.querySelector('#nScSel').onchange=e=>{N.sc=+e.target.value;drawNeck()};
+const [name,fam,set,ch]=SCALES[N.sc];
+for(let s=0;s<6;s++)for(let f=0;f<=NF;f++){const iv=(TUNE[s]+f-k+24)%12;if(!set.includes(iv))continue;
+const lab=N.mode==='nt'?nm((TUNE[s]+f)%12,N.key):IVN[iv];h+=dot(s,f,NC[iv],lab,{pulse:!MAJ.includes(iv)?'#fff':null,ring:iv===ch?NC[iv]:null,r:iv===0?15:13})}
+info=`${N.key} ${name} — ${SCALES[N.sc][4]}. Détail et drill dans l'onglet 🐉 Gammes.`;
+}else{ // triades
+sub.innerHTML='<span class="lbl">Qualité</span>'+Object.keys(QUAL).map(q=>`<button class="b ${(N.q||'maj')===q?'on':''}" data-q="${q}">${q}</button>`).join('');
+sub.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{N.q=b.dataset.q;drawNeck()});
+const set=QUAL[N.q||'maj'];
+for(let s=0;s<6;s++)for(let f=0;f<=NF;f++){const iv=(TUNE[s]+f-k+24)%12;if(!set.includes(iv))continue;
+const lab=N.mode==='nt'?nm((TUNE[s]+f)%12,N.key):IVN[iv];h+=dot(s,f,NC[iv],lab,{r:iv===0?15:13})}
+info='Toutes les notes de l\'accord : vois les triades serrées se dessiner sur chaque groupe de 3 cordes.'}
+setSvg('nSvg',h);document.getElementById('nInfo').textContent=info}
+bindDots(document.getElementById('nSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('nSvg'),s)});
+let nTm=null;document.getElementById('nPlay').onclick=()=>{if(nTm){clearInterval(nTm);nTm=null;return}
+if(N.view==='caged'){let i=0;const go=()=>{N.shape=ORD[i%5];drawNeck();shapeIn(N.shape,N.key).sort((a,b)=>a[0]-b[0]).forEach((x,j)=>setTimeout(()=>tone(MIDI[x[0]]+x[1]),j*110));i++;if(i>5){clearInterval(nTm);nTm=null}};go();nTm=setInterval(go,2200)}
+else{const k=PC[N.key],set=N.view==='scale'?SCALES[N.sc][2]:QUAL[N.q||'maj'];const ms=[];for(let m=48+k;m<=48+k+12;m++)if(set.includes((m-48-k)%12)||m===48+k+12)ms.push(m);ms.forEach((m,i)=>tone(m,i*.18))}};
+
+/* ================= TRIADES ================= */
+const T={ss:0,q:'maj',mode:'explore',run:false,idx:0,key:'C',target:null,played:[],streak:0,tempo:70,prevFrets:null,timer:null,ringT:0};
+document.querySelectorAll('#t-tri [data-ss]').forEach(b=>b.onclick=()=>{T.ss=+b.dataset.ss;document.querySelectorAll('#t-tri [data-ss]').forEach(x=>x.classList.toggle('on',x===b));newTarget(true);drawTri()});
+document.querySelectorAll('#t-tri [data-q]').forEach(b=>b.onclick=()=>{T.q=b.dataset.q;document.querySelectorAll('#t-tri [data-q]').forEach(x=>x.classList.toggle('on',x===b));newTarget(true);drawTri()});
+document.getElementById('tTempo').oninput=e=>{T.tempo=+e.target.value;document.getElementById('tTempoV').textContent=T.tempo};
+document.getElementById('tMode').onclick=e=>{T.mode=T.mode==='explore'?'drill':'explore';e.target.textContent='Mode : '+(T.mode==='explore'?'explorer':'drill');newTarget(true);drawTri()};
+document.getElementById('tHint').onclick=()=>{T.hint=true;drawTri();setTimeout(()=>{T.hint=false;drawTri()},1500)};
+// toutes les triades serrées (3 renversements) sur un groupe de cordes, pour une fondamentale
+function triadVoicings(key,q,ss){const k=PC[key],set=QUAL[q],strs=SSETS[ss],out=[];
+for(let inv=0;inv<3;inv++){const order=[set[inv%3],set[(inv+1)%3],set[(inv+2)%3]];// grave→aigu
+let ok=true,fr=[];for(let i=0;i<3;i++){const s=strs[i],want=(k+order[i])%12;let f=(want-TUNE[s]+24)%12;fr.push(f)}
+// choisir octave la plus compacte : essayer f et f+12
+const cand=[];[0,12].forEach(o0=>[0,12].forEach(o1=>[0,12].forEach(o2=>{const g=[fr[0]+o0,fr[1]+o1,fr[2]+o2];if(Math.max(...g)<=NF&&Math.max(...g)-Math.min(...g)<=4)cand.push(g)})));
+cand.forEach(g=>out.push({inv,frets:g,strs,ivs:order}))}
+return out}
+function closest(vs,prev){if(!prev)return vs.reduce((a,b)=>avg(a.frets)<avg(b.frets)?a:b);return vs.reduce((a,b)=>dist(a.frets,prev)<dist(b.frets,prev)?a:b)}
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length,dist=(a,p)=>a.reduce((s,f,i)=>s+Math.abs(f-p[i]),0);
+function newTarget(reset){if(reset){T.idx=0;T.prevFrets=null;T.streak=0;T.played=[]}
+T.key=CIRCLE4[T.idx%12];const vs=triadVoicings(T.key,T.q,T.ss);T.target=vs.length?closest(vs,T.prevFrets):null;T.played=[];T.ringT=0;
+if(T.target){const invN=['fondamentale','1er renversement','2e renversement'][T.target.inv];document.getElementById('tBig').innerHTML=`${T.key}${QN[T.q]}<small>${invN} · cordes ${SSETS[T.ss].map(s=>6-s).join('-')}</small>`}
+updStats()}
+function updStats(){const st=document.getElementById('tStreak');st.textContent=T.streak;st.className='streak'+(T.streak>=20?' viol':T.streak>=10?' gold':'');
+document.getElementById('tOk').textContent=ST.tri.ok;document.getElementById('tKo').textContent=ST.tri.ko;document.getElementById('tMax').textContent=ST.tri.max}
+function drawTri(){let h=neckBase();const k=PC[T.key],strs=SSETS[T.ss];
+// bande du groupe de cordes
+h+=`<rect x="${X(strs[0])-20}" y="${YL(0)}" width="${X(strs[2])-X(strs[0])+40}" height="${YL(NF)-YL(0)}" fill="#2ee6ff" opacity=".05"/>`;
+if(T.mode==='explore'){const vs=triadVoicings(T.key,T.q,T.ss);
+vs.forEach(v=>{const a=Math.min(...v.frets),b=Math.max(...v.frets);h+=`<rect x="${X(strs[0])-22}" y="${YL(Math.max(0,a-1))}" width="${X(strs[2])-X(strs[0])+44}" height="${YL(b)-YL(Math.max(0,a-1))}" rx="10" fill="none" stroke="${['#ff3b5c','#39ff88','#2ee6ff'][v.inv]}" stroke-width="1.5" stroke-dasharray="5 4" opacity=".8"/>`;
+h+=`<text x="352" y="${(YL(Math.max(0,a-1))+YL(b))/2+5}" text-anchor="middle" font-size="12" fill="${['#ff3b5c','#39ff88','#2ee6ff'][v.inv]}">${['F','1','2'][v.inv]}</text>`;
+v.frets.forEach((f,i)=>h+=dot(strs[i],f,NC[v.ivs[i]],IVN[v.ivs[i]]))});
+document.getElementById('tInfo').textContent=`${T.key}${QN[T.q]} : les 3 renversements serrés sur ce groupe. Touche pour entendre. Passe en mode drill pour le cercle.`}
+else if(T.target){const t=T.target;
+// pastilles fantômes (toutes notes de l'accord, ternes) pour guider
+if(T.hint)t.frets.forEach((f,i)=>h+=dot(strs[i],f,NC[t.ivs[i]],IVN[t.ivs[i]],{op:.5}));
+// anneau timer autour des 3 positions attendues
+t.frets.forEach((f,i)=>{const done=T.played.some(p=>p[0]===strs[i]&&p[1]===f);
+if(done)h+=dot(strs[i],f,NC[t.ivs[i]],IVN[t.ivs[i]]);
+else{const r=18,c=2*Math.PI*r;h+=`<circle cx="${X(strs[i])}" cy="${YN(f)}" r="${r}" fill="none" stroke="#2a2f45" stroke-width="3"/><circle class="tring" cx="${X(strs[i])}" cy="${YN(f)}" r="${r}" fill="none" stroke="#2ee6ff" stroke-width="3" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-T.ringT)}" transform="rotate(-90 ${X(strs[i])} ${YN(f)})" filter="url(#glow)"/>`;
+h+=`<g class="dot" data-s="${strs[i]}" data-f="${f}" style="cursor:pointer"><circle cx="${X(strs[i])}" cy="${YN(f)}" r="14" fill="#161a2a"/></g>`}});
+// zones cliquables invisibles sur tout le groupe (pour détecter les erreurs)
+for(let s=0;s<6;s++)for(let f=0;f<=NF;f++){if(t.frets.some((ff,i)=>strs[i]===s&&ff===f))continue;h+=`<g class="dot" data-s="${s}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`}
+document.getElementById('tInfo').textContent=T.run?'Joue les 3 notes avant que les anneaux se remplissent.':'Cycle des quartes, renversement le plus proche. ▶ Lancer, puis touche les 3 notes.'}
+setSvg('tSvg',h);drawCof()}
+function drawCof(){const R=48,cx=60,cy=60;let h=`<svg viewBox="0 0 120 120">`;
+CIRCLE4.forEach((k,i)=>{const a=-Math.PI/2-i*Math.PI/6,x=cx+R*Math.cos(a),y=cy+R*Math.sin(a),cur=T.key===k,hot=ST.tri.byKey[k]||{ok:0,ko:0};const m=hot.ok+hot.ko?hot.ok/(hot.ok+hot.ko):0;
+h+=`<circle cx="${x}" cy="${y}" r="${cur?11:8}" fill="${cur?'#2ee6ff':'#161a2a'}" stroke="${cur?'#2ee6ff':m>0?`rgba(57,255,136,${.3+m*.7})`:'#2a2f45'}" stroke-width="${cur?0:2}" ${cur?'filter="url(#glow)"':''}/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="${cur?10:8}" font-weight="600" fill="${cur?'#05060b':'#9a9fb8'}">${k}</text>`});
+h+=`<text x="60" y="64" text-anchor="middle" font-size="9" fill="#5c6180">quartes ↺</text></svg>`;document.getElementById('tCof').innerHTML=h}
+function flash(cls,id){const fr=document.getElementById(id);fr.classList.remove('ok','ko','warn');void fr.offsetWidth;fr.classList.add(cls);setTimeout(()=>fr.classList.remove(cls),380)}
+bindDots(document.getElementById('tSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('tSvg'),s);
+if(T.mode!=='drill'||!T.target)return;const t=T.target,strs=SSETS[T.ss],i=strs.indexOf(s);
+if(i>=0&&t.frets[i]===f){if(!T.played.some(p=>p[0]===s&&p[1]===f))T.played.push([s,f]);
+if(T.played.length===3){hit(true)}else drawTri();return}
+// presque : bonne hauteur (même note) ailleurs
+const wantPcs=t.ivs.map(iv=>(PC[T.key]+iv)%12),pc=(TUNE[s]+f)%12;
+if(wantPcs.includes(pc)){flash('warn','tFrame');document.getElementById('tInfo').textContent='Presque : bonne note, mauvaise corde ou octave.';return}
+hit(false)});
+function hit(ok){const k=T.key;ST.tri.byKey[k]=ST.tri.byKey[k]||{ok:0,ko:0};ST.tri.bySS[T.ss]=ST.tri.bySS[T.ss]||{ok:0,ko:0};
+if(ok){ST.tri.ok++;ST.tri.byKey[k].ok++;ST.tri.bySS[T.ss].ok++;T.streak++;if(T.streak>ST.tri.max)ST.tri.max=T.streak;flash('ok','tFrame');vibrate(30);
+chord(T.target.frets.map((f,i)=>MIDI[SSETS[T.ss][i]]+f));T.prevFrets=T.target.frets;T.idx++;
+setTimeout(()=>{newTarget(false);drawTri();if(T.run)startRing()},420)}
+else{ST.tri.ko++;ST.tri.byKey[k].ko++;ST.tri.bySS[T.ss].ko++;T.streak=0;flash('ko','tFrame');vibrate([60,40,60]);T.played=[];drawTri()}
+save();updStats()}
+function startRing(){if(T.timer)clearInterval(T.timer);const beat=60000/T.tempo,total=beat*4,t0=performance.now();T.ringT=0;
+T.timer=setInterval(()=>{T.ringT=Math.min(1,(performance.now()-t0)/total);document.querySelectorAll('#tSvg .tring').forEach(c=>{const r=18,cc=2*Math.PI*r;c.setAttribute('stroke-dashoffset',cc*(1-T.ringT));c.setAttribute('stroke',T.ringT>.75?'#ff3b5c':'#2ee6ff')});
+if(T.ringT>=1){clearInterval(T.timer);T.timer=null;if(T.run)hit(false)}},50)}
+document.getElementById('tGo').onclick=e=>{T.run=!T.run;e.target.textContent=T.run?'■ Stop':'▶ Lancer le cercle';e.target.classList.toggle('go',!T.run);e.target.classList.toggle('stop',T.run);
+if(T.run){T.mode='drill';document.getElementById('tMode').textContent='Mode : drill';newTarget(true);drawTri();startRing();ac()}else{if(T.timer)clearInterval(T.timer);T.timer=null;drawTri()}};
+
+/* ================= GAMMES ================= */
+const S={s:5,k:9,p:-1,drill:false,tgt:null,streak:0};
+const sSel=document.getElementById('sSel');let og='';Object.keys(FAM).forEach(f=>{og+=`<optgroup label="${FAM[f][0]}">`+SCALES.map((s,i)=>s[1]===f?`<option value="${i}">${s[0]}</option>`:'').join('')+'</optgroup>'});sSel.innerHTML=og;sSel.value=5;
+const sKey=document.getElementById('sKey');sKey.innerHTML=SHP.map((k,i)=>`<option value="${i}">${FLP[i]===k?k:k+'/'+FLP[i]}</option>`).join('');sKey.value=9;
+sSel.onchange=e=>{S.s=+e.target.value;S.p=-1;S.tgt=null;drawSc()};sKey.onchange=e=>{S.k=+e.target.value;S.tgt=null;drawSc()};
+function lab(iv,set){if(iv===6)return set.includes(7)?'b5':'#4';return IVN[iv]}
+function wins(){const rf=(S.k-4+12)%12;return[-1,1,4,6,9].map(d=>{let a=rf+d;while(a>10)a-=12;while(a<0)a+=12;return a})}
+function notesIn(){const set=SCALES[S.s][2],W=wins(),a=S.p<0?0:W[S.p],b=S.p<0?NF:W[S.p]+4,o=[];for(let s=0;s<6;s++)for(let f=Math.max(0,a);f<=Math.min(NF,b);f++){const iv=(TUNE[s]+f-S.k+24)%12;if(set.includes(iv))o.push([s,f,MIDI[s]+f,iv])}return o}
+function drawSc(){const [n,f,set,ch,mood,use]=SCALES[S.s],au=FAM[f][1];
+document.getElementById('t-sc').style.setProperty('--acc',au);document.getElementById('sFrame').style.borderColor=au;
+document.getElementById('sFrm').innerHTML=set.map(iv=>`<span class="chip"><b style="background:${NC[iv]};${!MAJ.includes(iv)?'outline:2px solid #fff;outline-offset:1px':''}">${lab(iv,set)}</b>${iv===ch?'★':''}</span>`).join('');
+document.getElementById('sMood').textContent=`${SHP[S.k]} ${n} — ${mood}`;document.getElementById('sUse').textContent='À jouer sur : '+use;
+const W=wins();document.getElementById('sPos').innerHTML='<span class="lbl">Position</span>'+['Tout',1,2,3,4,5].map((p,i)=>`<button class="b ${S.p===i-1?'on':''}" data-p="${i-1}">${i?'Pos '+p:p}</button>`).join('');
+document.querySelectorAll('#sPos [data-p]').forEach(b=>b.onclick=()=>{S.p=+b.dataset.p;if(S.drill)newScT();drawSc()});
+let h=neckBase();let wa=-1,wb=99;if(S.p>=0){wa=W[S.p];wb=wa+4;h+=`<rect x="36" y="${YL(Math.max(0,wa))-(wa<=0?16:0)}" width="292" height="${YL(Math.min(NF,wb))-YL(Math.max(0,wa))+(wa<=0?16:0)}" rx="10" fill="none" stroke="${au}" stroke-width="2" filter="url(#glow)"/>`}
+for(let s=0;s<6;s++)for(let fr=0;fr<=NF;fr++){const iv=(TUNE[s]+fr-S.k+24)%12;if(!set.includes(iv))continue;const inW=S.p<0||(fr>=wa&&fr<=wb);const isT=S.tgt&&S.tgt[0]===s&&S.tgt[1]===fr;
+h+=dot(s,fr,NC[iv],lab(iv,set),{op:inW?1:.15,pulse:!MAJ.includes(iv)&&inW?'#fff':null,ring:iv===ch&&inW?NC[iv]:null,target:isT,r:iv===0?15:13})}
+// zones cliquables pour les cases hors gamme (erreurs)
+for(let s=0;s<6;s++)for(let fr=0;fr<=NF;fr++){const iv=(TUNE[s]+fr-S.k+24)%12;if(set.includes(iv))continue;h+=`<g class="dot" data-s="${s}" data-f="${fr}" style="cursor:pointer"><circle cx="${X(s)}" cy="${YN(fr)}" r="14" fill="#fff" opacity="0.01"/></g>`}
+setSvg('sSvg',h);
+document.getElementById('sDrill').classList.toggle('on',S.drill);document.getElementById('sTgt').textContent=S.tgt?lab(S.tgt[3],set):'—';
+document.getElementById('sStreak').textContent=S.streak;document.getElementById('sOk').textContent=ST.sc.ok}
+function newScT(){const ch=SCALES[S.s][3],c=notesIn().filter(x=>ch==null?x[3]!==0:x[3]===ch);S.tgt=c.length?c[Math.floor(Math.random()*c.length)]:null}
+bindDots(document.getElementById('sSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('sSvg'),s);if(!S.drill||!S.tgt)return;
+const ok=S.tgt[0]===s&&S.tgt[1]===f;if(ok){ST.sc.ok++;S.streak++;if(S.streak>ST.sc.max)ST.sc.max=S.streak;flash('ok','sFrame');vibrate(30);setTimeout(()=>{newScT();drawSc()},350)}
+else{const samePc=(TUNE[s]+f)%12===(TUNE[S.tgt[0]]+S.tgt[1])%12;if(samePc){flash('warn','sFrame')}else{S.streak=0;flash('ko','sFrame');vibrate([60,40,60])}}save();drawSc()});
+document.getElementById('sPlay').onclick=()=>{if(S.p<0){S.p=0}const m=[...new Set(notesIn().map(x=>x[2]))].sort((a,b)=>a-b);m.forEach((x,i)=>tone(x,i*.16));drawSc()};
+document.getElementById('sDrill').onclick=()=>{S.drill=!S.drill;if(S.drill){if(S.p<0)S.p=0;newScT()}else S.tgt=null;drawSc()};
+document.getElementById('sBourdon').onclick=e=>{const on=toggleBourdon(S.k);e.target.classList.toggle('on',on)};
+
+/* ================= MICRO ================= */
+const NOTE_FR=m=>SHP[m%12]+(Math.floor(m/12)-1);
+function acf(buf,sr){let n=buf.length,rms=0;for(let i=0;i<n;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/n);if(rms<0.012)return[-1,rms];
+let r1=0,r2=n-1;const th=.2;for(let i=0;i<n/2;i++)if(Math.abs(buf[i])<th){r1=i;break}for(let i=1;i<n/2;i++)if(Math.abs(buf[n-i])<th){r2=n-i;break}
+const b=buf.slice(r1,r2);n=b.length;const c=new Float32Array(n);for(let i=0;i<n;i++){let v=0;for(let j=0;j<n-i;j++)v+=b[j]*b[j+i];c[i]=v}
+let d=0;while(d<n-1&&c[d]>c[d+1])d++;let mx=-1,mp=-1;for(let i=d;i<n;i++)if(c[i]>mx){mx=c[i];mp=i}if(mp<1||mp>=n-1)return[-1,rms];
+const x1=c[mp-1],x2=c[mp],x3=c[mp+1],a=(x1+x3-2*x2)/2,bb=(x3-x1)/2;let T0=a?mp-bb/(2*a):mp;return[sr/T0,rms]}
+async function micStart(){try{const c=ac();MIC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+const src=c.createMediaStreamSource(MIC.stream);MIC.an=c.createAnalyser();MIC.an.fftSize=4096;src.connect(MIC.an);MIC.buf=new Float32Array(MIC.an.fftSize);MIC.on=true;
+if(bourdon)toggleBourdon(0);document.getElementById('sBourdon').classList.remove('on');micLoop();micUi()}
+catch(e){alert('Micro indisponible : '+e.message)}}
+function micStop(){MIC.on=false;if(MIC.stream)MIC.stream.getTracks().forEach(t=>t.stop());MIC.stream=null;micUi()}
+function micUi(){document.getElementById('btnMic').classList.toggle('live',MIC.on);const el=document.getElementById('micNote');el.classList.toggle('on',MIC.on);el.textContent='—'}
+function micLoop(){if(!MIC.on)return;MIC.an.getFloatTimeDomainData(MIC.buf);const [f,rms]=acf(MIC.buf,AC.sampleRate);const el=document.getElementById('micNote');
+if(f>70&&f<1400){const mf=69+12*Math.log2(f/440),m=Math.round(mf),cents=Math.round((mf-m)*100);el.textContent=`${NOTE_FR(m)} ${cents>0?'+':''}${cents}`;
+if(m===MIC.last)MIC.cnt++;else{MIC.last=m;MIC.cnt=1}MIC.quiet=0;
+if(MIC.cnt===3&&m!==MIC.emitted&&performance.now()>MIC.mute){MIC.emitted=m;el.classList.add('hot');setTimeout(()=>el.classList.remove('hot'),200);micNote(m)}}
+else{MIC.quiet++;if(MIC.quiet>6){MIC.emitted=-1;MIC.last=-1;MIC.cnt=0}}
+requestAnimationFrame(micLoop)}
+// positions possibles d'une hauteur sur le manche
+const posOf=m=>{const o=[];for(let s=0;s<6;s++){const f=m-MIDI[s];if(f>=0&&f<=NF)o.push([s,f])}return o};
+function micNote(m){const tab=document.querySelector('.tab.on').id;
+if(tab==='t-neck'){posOf(m).forEach(([s])=>vib(document.getElementById('nSvg'),s));document.getElementById('nInfo').textContent=`Entendu : ${NOTE_FR(m)} — ${posOf(m).map(([s,f])=>`corde ${6-s} case ${f}`).join(' · ')}`}
+else if(tab==='t-tri'&&T.mode==='drill'&&T.target){const t=T.target,strs=SSETS[T.ss],want=t.frets.map((f,i)=>MIDI[strs[i]]+f),i=want.indexOf(m);
+if(i>=0){vib(document.getElementById('tSvg'),strs[i]);const p=[strs[i],t.frets[i]];if(!T.played.some(q=>q[0]===p[0]&&q[1]===p[1]))T.played.push(p);if(T.played.length===3){MIC.mute=performance.now()+700;hit(true)}else drawTri();return}
+if(want.some(w=>w%12===m%12)){flash('warn','tFrame');document.getElementById('tInfo').textContent=`Presque : ${NOTE_FR(m)} — bonne note, mauvaise octave.`;return}
+MIC.mute=performance.now()+400;hit(false);document.getElementById('tInfo').textContent=`Entendu ${NOTE_FR(m)} — hors accord.`}
+else if(tab==='t-sc'&&S.drill&&S.tgt){const w=S.tgt[2];
+if(m===w){ST.sc.ok++;S.streak++;if(S.streak>ST.sc.max)ST.sc.max=S.streak;flash('ok','sFrame');vibrate(30);MIC.mute=performance.now()+500;save();setTimeout(()=>{newScT();drawSc()},350)}
+else if(m%12===w%12)flash('warn','sFrame');
+else{S.streak=0;flash('ko','sFrame');save()}drawSc()}}
+document.getElementById('btnMic').onclick=()=>{MIC.on?micStop():micStart()};
+
+/* ================= PROFIL ================= */
+function drawPro(){document.getElementById('pTri').textContent=ST.tri.ok;document.getElementById('pSc').textContent=ST.sc.ok;document.getElementById('pMax').textContent=Math.max(ST.tri.max,ST.sc.max);document.getElementById('pSess').textContent=ST.sess;
+const heat=(obj,keys,lab)=>keys.map((k,i)=>{const d=obj[k]||{ok:0,ko:0},n=d.ok+d.ko,m=n?d.ok/n:0,a=n?.25+m*.75:0;return`<div style="background:${n?`rgba(46,230,255,${a})`:'#161a2a'};color:${n&&m>.5?'#05060b':'#7d83a0'};${n?'box-shadow:0 0 '+(m*10)+'px rgba(46,230,255,'+m+')':''}">${lab?lab[i]:k}</div>`}).join('');
+document.getElementById('pHeat').innerHTML=heat(ST.tri.byKey,CIRCLE4);document.getElementById('pHeatSS').innerHTML=heat(ST.tri.bySS,[0,1,2,3],['1-2-3','2-3-4','3-4-5','4-5-6']);
+const weak=Object.entries(ST.tri.byKey).filter(([k,d])=>d.ok+d.ko>=3).map(([k,d])=>[k,d.ok/(d.ok+d.ko)]).sort((a,b)=>a[1]-b[1]).slice(0,3);
+document.getElementById('pWeak').textContent=weak.length?'Points faibles : '+weak.map(w=>`${w[0]} (${Math.round(w[1]*100)}%)`).join(', ')+' — le coach les proposera en priorité.':'Fais quelques cercles de triades pour allumer la carte.'}
+document.getElementById('pReset').onclick=()=>{if(confirm('Effacer toute la progression ?')){localStorage.removeItem('ff_state');location.reload()}};
+
+/* ================= INIT ================= */
+drawNeck();newTarget(true);drawTri();drawSc();
+let rz=null;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{drawNeck();drawTri();drawSc()},150)});
+</script>
+</body>
+</html>

@@ -269,6 +269,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="side">
     <div class="row"><span class="lbl">Gamme</span><select id="sSel" style="max-width:200px"></select><select id="sKey"></select></div>
     <div class="row" id="sPos"></div>
+    <div class="row"><span class="lbl">Motif</span><select id="sMot" style="max-width:210px"><option value="">— aucun (gamme seule)</option><option value="g3">Groupes de 3 (1‑2‑3, 2‑3‑4…)</option><option value="g4">Groupes de 4 (1‑2‑3‑4…)</option><option value="t3">Tierces (1‑3, 2‑4…)</option><option value="t4">Quartes (1‑4, 2‑5…)</option><option value="tr">Triades diatoniques (1‑3‑5)</option><option value="s7">Arpèges 7e diatoniques (1‑3‑5‑7)</option><option value="b1235">Bergonzi 1‑2‑3‑5</option><option value="b1345">Bergonzi 1‑3‑4‑5</option><option value="b5321">Bergonzi 5‑3‑2‑1</option><option value="b3215">Bergonzi 3‑2‑1‑5</option></select><span id="sMotN" class="lbl"></span></div>
     <div class="row" style="align-items:flex-start"><span class="lbl">Formule</span><span id="sFrm" class="chips" style="gap:3px"></span></div>
     <div class="info" id="sMood"></div>
     <div class="info" id="sUse"></div>
@@ -308,7 +309,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.0 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.1 — Boss</div>
 </section>
 
 </main>
@@ -634,7 +635,7 @@ if(T.run){T.mode='drill';document.getElementById('tMode').textContent='Mode : dr
 const S={s:5,k:9,p:-1,drill:false,tgt:null,streak:0};
 const sSel=document.getElementById('sSel');let og='';Object.keys(FAM).forEach(f=>{og+=`<optgroup label="${FAM[f][0]}">`+SCALES.map((s,i)=>s[1]===f?`<option value="${i}">${s[0]}</option>`:'').join('')+'</optgroup>'});sSel.innerHTML=og;sSel.value=5;
 const sKey=document.getElementById('sKey');sKey.innerHTML=SHP.map((k,i)=>`<option value="${i}">${FLP[i]===k?k:k+'/'+FLP[i]}</option>`).join('');sKey.value=9;
-sSel.onchange=e=>{S.s=+e.target.value;S.p=-1;S.tgt=null;drawSc()};sKey.onchange=e=>{S.k=+e.target.value;S.tgt=null;drawSc()};
+sSel.onchange=e=>{S.s=+e.target.value;S.p=S.mo?0:-1;S.tgt=null;motBuild();drawSc()};sKey.onchange=e=>{S.k=+e.target.value;S.tgt=null;motBuild();drawSc()};
 function lab(iv,set){if(iv===6)return set.includes(7)?'b5':'#4';return IVN[iv]}
 function wins(){const rf=(S.k-4+12)%12;return[-1,1,4,6,9].map(d=>{let a=rf+d;while(a>10)a-=12;while(a<0)a+=12;return a})}
 function notesIn(){const set=SCALES[S.s][2],W=wins(),a=S.p<0?0:W[S.p],b=S.p<0?NF:W[S.p]+4,o=[];for(let s=0;s<6;s++)for(let f=Math.max(0,a);f<=Math.min(NF,b);f++){const iv=(TUNE[s]+f-S.k+24)%12;if(set.includes(iv))o.push([s,f,MIDI[s]+f,iv])}return o}
@@ -643,21 +644,33 @@ document.getElementById('t-sc').style.setProperty('--acc',au);document.getElemen
 document.getElementById('sFrm').innerHTML=set.map(iv=>`<span class="chip"><b style="background:${NC[iv]};${!MAJ.includes(iv)?'outline:2px solid #fff;outline-offset:1px':''}">${lab(iv,set)}</b>${iv===ch?'★':''}</span>`).join('');
 document.getElementById('sMood').textContent=`${SHP[S.k]} ${n} — ${mood}`;document.getElementById('sUse').textContent='À jouer sur : '+use;
 const W=wins();document.getElementById('sPos').innerHTML='<span class="lbl">Position</span>'+['Tout',1,2,3,4,5].map((p,i)=>`<button class="b ${S.p===i-1?'on':''}" data-p="${i-1}">${i?'Pos '+p:p}</button>`).join('');
-document.querySelectorAll('#sPos [data-p]').forEach(b=>b.onclick=()=>{S.p=+b.dataset.p;if(S.drill)newScT();drawSc()});
+document.querySelectorAll('#sPos [data-p]').forEach(b=>b.onclick=()=>{S.p=+b.dataset.p;if(S.mo&&S.p<0)S.p=0;if(S.drill)newScT();motBuild();drawSc()});
 let h=neckBase();let wa=-1,wb=99;if(S.p>=0){wa=W[S.p];wb=wa+4;h+=`<rect x="36" y="${YL(Math.max(0,wa))-(wa<=0?16:0)}" width="292" height="${YL(Math.min(NF,wb))-YL(Math.max(0,wa))+(wa<=0?16:0)}" rx="10" fill="none" stroke="${au}" stroke-width="2" filter="url(#glow)"/>`}
 for(let s=0;s<6;s++)for(let fr=0;fr<=NF;fr++){const iv=(TUNE[s]+fr-S.k+24)%12;if(!set.includes(iv))continue;const inW=S.p<0||(fr>=wa&&fr<=wb);const isT=S.tgt&&S.tgt[0]===s&&S.tgt[1]===fr;
 h+=dot(s,fr,NC[iv],FING&&S.p>=0&&inW&&fr>0?fingLab(fr,Math.max(1,wa)):lab(iv,set),{op:inW?1:.15,pulse:!MAJ.includes(iv)&&inW?'#fff':null,ring:iv===ch&&inW?NC[iv]:null,target:isT,r:iv===0?15:13})}
 // zones cliquables pour les cases hors gamme (erreurs)
 for(let s=0;s<6;s++)for(let fr=0;fr<=NF;fr++){const iv=(TUNE[s]+fr-S.k+24)%12;if(set.includes(iv))continue;h+=`<g class="dot" data-s="${s}" data-f="${fr}" style="cursor:pointer"><circle cx="${X(s)}" cy="${YN(fr)}" r="14" fill="#fff" opacity="0.01"/></g>`}
+if(S.mo&&S.mseq.length){const w=S.mseq[S.mi];if(w)h+=`<circle cx="${X(w.s)}" cy="${YN(w.f)}" r="19" fill="none" stroke="#ffd23f" stroke-width="3" filter="url(#glow)"/>`;h+=pathAhead(S.mseq,S.mi,4)}
+document.getElementById('sMotN').textContent=S.mo?`${S.mi+1}/${S.mseq.length}`:'';
 setSvg('sSvg',h);
 document.getElementById('sDrill').classList.toggle('on',S.drill);document.getElementById('sTgt').textContent=S.tgt?lab(S.tgt[3],set):'—';
 document.getElementById('sStreak').textContent=S.streak;document.getElementById('sOk').textContent=ST.sc.ok}
+/* Motifs : cellules appliquées à chaque degré de la position, montée puis descente */
+const MOTS={g3:[0,1,2],g4:[0,1,2,3],t3:[0,2],t4:[0,3],tr:[0,2,4],s7:[0,2,4,6],b1235:[0,1,2,4],b1345:[0,2,3,4],b5321:[4,2,1,0],b3215:[2,1,0,4]};
+S.mo='';S.mi=0;S.mseq=[];
+function scLine(){const sp=S.p;if(S.p<0)S.p=0;const N2=notesIn();S.p=sp;const m=[...new Set(N2.map(x=>x[2]))].sort((a,b)=>a-b);return m.map(x=>{const n=N2.find(y=>y[2]===x);return{s:n[0],f:n[1],m:x,iv:n[3]}})}
+function motBuild(){S.mi=0;S.mseq=[];if(!S.mo)return;const L=scLine(),o=MOTS[S.mo],top=Math.max(...o),R=[...L].reverse();
+for(let i=0;i+top<L.length;i++)o.forEach(k=>S.mseq.push(L[i+k]));for(let i=0;i+top<R.length;i++)o.forEach(k=>S.mseq.push(R[i+k]))}
+function motNote(m){if(!S.mo||!S.mseq.length)return false;const w=S.mseq[S.mi];if(!w)return true;
+if(m===w.m){S.mi++;if(S.mi>=S.mseq.length){ST.sc.ok+=5;ST.sc.mot=(ST.sc.mot||0)+1;flash('ok','sFrame');vibrate([30,30,30]);S.mi=0;save()}}
+else if(m%12===w.m%12)flash('warn','sFrame');else{flash('ko','sFrame');vibrate([60,40,60])}drawSc();return true}
+document.getElementById('sMot').onchange=e=>{S.mo=e.target.value;S.drill=false;S.tgt=null;if(S.mo&&S.p<0)S.p=0;motBuild();drawSc()};
 function newScT(){const ch=SCALES[S.s][3],c=notesIn().filter(x=>ch==null?x[3]!==0:x[3]===ch);S.tgt=c.length?c[Math.floor(Math.random()*c.length)]:null}
-bindDots(document.getElementById('sSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('sSvg'),s);if(!S.drill||!S.tgt)return;
+bindDots(document.getElementById('sSvg'),(s,f)=>{tone(MIDI[s]+f);vib(document.getElementById('sSvg'),s);if(S.mo&&!S.drill){motNote(MIDI[s]+f);return}if(!S.drill||!S.tgt)return;
 const ok=S.tgt[0]===s&&S.tgt[1]===f;if(ok){ST.sc.ok++;S.streak++;if(S.streak>ST.sc.max)ST.sc.max=S.streak;flash('ok','sFrame');vibrate(30);setTimeout(()=>{newScT();drawSc()},350)}
 else{const samePc=(TUNE[s]+f)%12===(TUNE[S.tgt[0]]+S.tgt[1])%12;if(samePc){flash('warn','sFrame')}else{S.streak=0;flash('ko','sFrame');vibrate([60,40,60])}}save();drawSc()});
-document.getElementById('sPlay').onclick=()=>{if(S.p<0){S.p=0}drawSc();const N2=notesIn(),m=[...new Set(N2.map(x=>x[2]))].sort((a,b)=>a-b);demoRun('sSvg',m.map(x=>{const n=N2.find(y=>y[2]===x);return{s:n[0],f:n[1],m:x}}),.18)};
-document.getElementById('sDrill').onclick=()=>{S.drill=!S.drill;if(S.drill){if(S.p<0)S.p=0;newScT()}else S.tgt=null;drawSc()};
+document.getElementById('sPlay').onclick=()=>{if(S.p<0){S.p=0}if(S.mo){motBuild();drawSc();demoRun('sSvg',S.mseq,.2);return}drawSc();const N2=notesIn(),m=[...new Set(N2.map(x=>x[2]))].sort((a,b)=>a-b);demoRun('sSvg',m.map(x=>{const n=N2.find(y=>y[2]===x);return{s:n[0],f:n[1],m:x}}),.18)};
+document.getElementById('sDrill').onclick=()=>{S.drill=!S.drill;if(S.drill){S.mo='';S.mseq=[];document.getElementById('sMot').value=''}if(S.drill){if(S.p<0)S.p=0;newScT()}else S.tgt=null;drawSc()};
 document.getElementById('sBourdon').onclick=e=>{const on=toggleBourdon(S.k);e.target.classList.toggle('on',on)};
 
 /* ================= DESSINE (Dessine / Décris / Joue) ================= */
@@ -1398,6 +1411,7 @@ else if(tab==='t-dr'){if(D.kind==='rd')rdNote(m,true);else drPlay(m,true)}
 else if(tab==='t-jz'){jzNote(m,true)}
 else if(tab==='t-sg'){sgMelNote(m)}
 else if(tab==='t-bl'){blNote(m,true)}
+else if(tab==='t-sc'&&S.mo&&!S.drill){MIC.mute=performance.now()+150;motNote(m)}
 else if(tab==='t-sc'&&S.drill&&S.tgt){const w=S.tgt[2];
 if(m===w){ST.sc.ok++;S.streak++;if(S.streak>ST.sc.max)ST.sc.max=S.streak;flash('ok','sFrame');vibrate(30);MIC.mute=performance.now()+500;save();setTimeout(()=>{newScT();drawSc()},350)}
 else if(m%12===w%12)flash('warn','sFrame');

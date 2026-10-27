@@ -62,6 +62,9 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 .vib{animation:vib .35s linear}
 @keyframes vib{0%{transform:translateX(0)}25%{transform:translateX(1.5px)}50%{transform:translateX(-1.5px)}75%{transform:translateX(1px)}100%{transform:translateX(0)}}
 .cof{display:flex;justify-content:center;flex:0 0 auto}
+.steps{display:flex;gap:4px;margin-left:auto}.steps span{font-size:11px;padding:3px 8px;border-radius:10px;border:1px solid var(--line);color:var(--mut);opacity:.5}
+.steps span.on{opacity:1;color:var(--acc);border-color:var(--acc);box-shadow:0 0 8px var(--acc)}.steps span.done{opacity:1;color:var(--ok);border-color:var(--ok)}
+#dTitle{font-size:22px}#dOpts button{min-width:64px}
 .cof svg{height:112px}
 .wide .cof svg{height:150px}
 @media (orientation:landscape){
@@ -92,6 +95,20 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="info" id="nInfo"></div>
   </div>
   <div class="fill"><svg class="neck" id="nSvg" viewBox="0 0 372 580"></svg></div>
+</section>
+
+<!-- ===== DESSINE ===== -->
+<section class="tab land" id="t-dr">
+  <div class="side">
+    <div class="row"><span class="lbl">Exercice</span><button class="b on" data-dk="caged">CAGED</button><button class="b" data-dk="tri">Triade</button><button class="b" data-dk="sc">Gamme</button><button class="b" data-dk="iv">Intervalle</button></div>
+    <div class="row"><span class="lbl">Tonalité</span><select id="dKey"></select><div class="steps" id="dSteps"><span>✏️ Dessine</span><span>🗣️ Décris</span><span>🎸 Joue</span></div></div>
+    <div class="frame" id="dFrame"><div class="big" id="dTitle">—</div><div class="info" id="dSub" style="text-align:center"></div>
+      <div class="stats"><span>Série <b id="dStreak" class="streak">0</b></span><span>Dessins justes <b id="dOk">0</b></span><span>Intervalles <b id="dIv">0</b></span></div></div>
+    <div class="info" id="dInfo"></div>
+    <div class="row" id="dOpts" style="justify-content:center"></div>
+    <div class="row" style="justify-content:center"><button class="b go" id="dAct">Valider ✓</button><button class="b" id="dClr">Effacer</button><button class="b" id="dNext">Nouveau ⟳</button></div>
+  </div>
+  <div class="fill"><svg class="neck" id="dSvg" viewBox="0 0 372 580"></svg></div>
 </section>
 
 <!-- ===== TRIADES ===== -->
@@ -136,6 +153,8 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="card"><h3>Gammes justes</h3><div class="v" id="pSc">0</div></div>
     <div class="card"><h3>Meilleure série</h3><div class="v" id="pMax">0</div></div>
     <div class="card"><h3>Séances</h3><div class="v" id="pSess">0</div></div>
+    <div class="card"><h3>Dessins justes</h3><div class="v" id="pDr">0</div></div>
+    <div class="card"><h3>Intervalles justes</h3><div class="v" id="pIv">0</div></div>
   </div>
   <div class="info">Chaleur par tonalité (triades) — plus c'est brillant, plus c'est maîtrisé</div>
   <div class="heat" id="pHeat"></div>
@@ -143,12 +162,13 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="heat" id="pHeatSS" style="grid-template-columns:repeat(4,1fr)"></div>
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v0.2 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v0.3 — Boss</div>
 </section>
 
 </main>
 <nav>
   <button class="on" data-t="t-neck"><i>🎸</i>Manche</button>
+  <button data-t="t-dr"><i>✏️</i>Dessine</button>
   <button data-t="t-tri"><i>⚡</i>Triades</button>
   <button data-t="t-sc"><i>🐉</i>Gammes</button>
   <button data-t="t-pro"><i>📊</i>Profil</button>
@@ -234,12 +254,12 @@ function bindDots(svg,fn){svg.onclick=e=>{const g=e.target.closest('.dot');if(!g
 
 /* ================= ÉTAT ================= */
 const ST=JSON.parse(localStorage.getItem('ff_state')||'{}');
-ST.tri=ST.tri||{ok:0,ko:0,max:0,byKey:{},bySS:{}};ST.sc=ST.sc||{ok:0,max:0};ST.sess=ST.sess||0;
+ST.tri=ST.tri||{ok:0,ko:0,max:0,byKey:{},bySS:{}};ST.sc=ST.sc||{ok:0,max:0};ST.sess=ST.sess||0;ST.dr=ST.dr||{ok:0,ko:0,iv:0,ivko:0,played:0,byKind:{}};
 function save(){localStorage.setItem('ff_state',JSON.stringify(ST))}
 ST.sess++;save();
 
 /* ================= ONGLETS ================= */
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));if(b.dataset.t==='t-pro')drawPro();if(b.dataset.t==='t-sc')drawSc();if(b.dataset.t==='t-tri')drawTri()});
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===b.dataset.t));if(b.dataset.t==='t-pro')drawPro();if(b.dataset.t==='t-sc')drawSc();if(b.dataset.t==='t-tri')drawTri();if(b.dataset.t==='t-dr')drDraw()});
 document.getElementById('btnSnd').onclick=e=>{sndOn=!sndOn;e.target.textContent=sndOn?'🔊':'🔇';ac()};
 
 /* ================= MANCHE ================= */
@@ -391,6 +411,76 @@ document.getElementById('sPlay').onclick=()=>{if(S.p<0){S.p=0}const m=[...new Se
 document.getElementById('sDrill').onclick=()=>{S.drill=!S.drill;if(S.drill){if(S.p<0)S.p=0;newScT()}else S.tgt=null;drawSc()};
 document.getElementById('sBourdon').onclick=e=>{const on=toggleBourdon(S.k);e.target.classList.toggle('on',on)};
 
+/* ================= DESSINE (Dessine / Décris / Joue) ================= */
+const D={kind:'caged',step:0,tgt:[],sel:[],res:null,counted:false,qs:[],qi:0,seq:[],si:0,key:'C',rand:true,streak:0,ivq:null,done:false};
+const IVLONG=['unisson','2de mineure','2de majeure','3ce mineure','3ce majeure','4te juste','triton','5te juste','6te mineure','6te majeure','7e mineure','7e majeure','octave'];
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const has=(L,s,f)=>L.some(x=>x[0]===s&&x[1]===f);
+function scaleWin(set,k,p){const rf=(k-4+12)%12;let a=rf+[-1,1,4,6,9][p];while(a>10)a-=12;while(a<0)a+=12;a=Math.max(0,a);const o=[];
+for(let s=0;s<6;s++)for(let f=a;f<=Math.min(NF,a+4);f++){const iv=(TUNE[s]+f-k+24)%12;if(set.includes(iv))o.push([s,f])}return{a,b:a+4,notes:o}}
+const dKey=document.getElementById('dKey');dKey.innerHTML='<option value="*">Aléatoire</option>'+KEYS.map(k=>`<option>${k}</option>`).join('');
+dKey.onchange=e=>{D.rand=e.target.value==='*';if(!D.rand)D.key=e.target.value;drNew()};
+document.querySelectorAll('#t-dr [data-dk]').forEach(b=>b.onclick=()=>{D.kind=b.dataset.dk;document.querySelectorAll('#t-dr [data-dk]').forEach(x=>x.classList.toggle('on',x===b));drNew()});
+function drNew(){D.step=0;D.sel=[];D.res=null;D.counted=false;D.si=0;D.qi=0;D.qs=[];D.done=false;if(D.rand)D.key=rnd(KEYS);const k=PC[D.key];
+if(D.kind==='iv'){drIv();return}
+if(D.kind==='caged'){const sh=rnd(ORD);D.tgt=shapeIn(sh,D.key).map(([s,f])=>[s,f]);D.title=`${D.key} — forme ${sh}`;D.sub=`Accord majeur, forme CAGED « ${sh} » (toutes les cordes jouées)`}
+else if(D.kind==='tri'){let v=null,q,ss;for(let t=0;t<20&&!v;t++){q=rnd(['maj','min']);ss=Math.floor(Math.random()*4);const vs=triadVoicings(D.key,q,ss);if(vs.length)v=rnd(vs)}
+D.tgt=v.frets.map((f,i)=>[v.strs[i],f]);D.title=`${D.key}${QN[q]} — ${['fondamentale','1er renv.','2e renv.'][v.inv]}`;D.sub=`Triade serrée sur les cordes ${v.strs.map(s=>6-s).join('-')}`}
+else{const si=rnd([0,1,2,3,5,8]),p=Math.floor(Math.random()*5),w=scaleWin(SCALES[si][2],k,p);D.tgt=w.notes;D.title=`${D.key} ${SCALES[si][0]} — pos ${p+1}`;D.sub=`Toutes les notes de la gamme entre les cases ${w.a} et ${w.b}`}
+D.seq=[...new Set(D.tgt.map(([s,f])=>MIDI[s]+f))].sort((a,b)=>a-b);drDraw()}
+function ivValid(q){const o=[],want=MIDI[q.s]+q.f+q.n;for(let s=q.s+1;s<6;s++){const f=want-MIDI[s];if(f>=0&&f<=NF&&Math.abs(f-q.f)<=5)o.push([s,f])}return o}
+function drIv(){let q;do{q={s:Math.floor(Math.random()*5),f:1+Math.floor(Math.random()*9),n:1+Math.floor(Math.random()*12)}}while(!ivValid(q).length);
+D.ivq=q;D.sel=[];D.res=null;D.title=IVLONG[q.n];D.sub=`au-dessus de la fondamentale (corde ${6-q.s}, case ${q.f}) — sur une corde plus aiguë`;drDraw()}
+function drQs(){const k=PC[D.key],pool=[...D.tgt].sort(()=>Math.random()-.5).slice(0,3);
+D.qs=pool.map(([s,f])=>{const iv=(TUNE[s]+f-k+24)%12,ans=IVN[iv],opts=new Set([ans]);const others=[...new Set(D.tgt.map(([s2,f2])=>IVN[(TUNE[s2]+f2-k+24)%12]))].concat(['R','3','5','b3','b7','2','4','6','7']);
+for(const o of others.sort(()=>Math.random()-.5)){if(opts.size>=4)break;opts.add(o)}return{s,f,ans,opts:[...opts].sort(()=>Math.random()-.5)}})}
+function drDraw(){const k=PC[D.key];let h=neckBase();
+const st=document.querySelectorAll('#dSteps span');st.forEach((e,i)=>{e.className=D.kind==='iv'?(i===0?'on':''):(i<D.step||D.done&&i===2?'done':i===D.step?'on':'')});
+document.getElementById('dTitle').textContent=D.title||'—';document.getElementById('dSub').textContent=D.sub||'';
+const act=document.getElementById('dAct'),clr=document.getElementById('dClr'),opts=document.getElementById('dOpts'),info=document.getElementById('dInfo');opts.innerHTML='';
+act.style.visibility='visible';clr.style.visibility='visible';
+if(D.kind==='iv'){const q=D.ivq,val=ivValid(q);act.style.visibility='hidden';clr.style.visibility='hidden';
+h+=dot(q.s,q.f,NC[0],'R');
+if(D.res){val.forEach(([s,f])=>h+=dot(s,f,NC[q.n%12],IVN[q.n%12],{ring:'#2ee6ff'}));D.sel.forEach(([s,f])=>{if(!has(val,s,f))h+=dot(s,f,'#ff3b5c','✗')})}
+info.textContent=D.res?D.resTxt:'Touche la case de l\'intervalle (vers les aigus, à portée de main).'}
+else if(D.step===0){
+D.sel.forEach(([s,f])=>{if(D.res){const ok=has(D.tgt,s,f);h+=dot(s,f,ok?'#39ff88':'#ff3b5c',ok?'✓':'✗')}else h+=dot(s,f,'#2ee6ff','•')});
+if(D.res)D.tgt.forEach(([s,f])=>{if(!has(D.sel,s,f))h+=dot(s,f,'#fff04a','?',{pulse:'#fff04a',op:.85})});
+act.textContent=D.res&&!D.res.ok?'Réessayer':'Valider ✓';clr.textContent=D.res&&!D.res.ok?'Voir la forme':'Effacer';
+info.textContent=D.res?(D.res.ok?'Parfait — passe à la description.':`${D.res.good} juste(s) · ${D.res.bad} en trop (rouge) · ${D.res.miss} oubliée(s) (jaune)`):`Pose les ${D.tgt.length} notes de mémoire, puis Valider.`}
+else if(D.step===1){act.style.visibility='hidden';clr.style.visibility='hidden';const q=D.qs[D.qi];
+D.tgt.forEach(([s,f])=>{const iv=(TUNE[s]+f-k+24)%12,isQ=q&&q.s===s&&q.f===f;h+=dot(s,f,isQ?'#2ee6ff':NC[iv],isQ?'?':'•',{target:isQ,op:isQ?1:.55})});
+if(q){info.textContent=`Question ${D.qi+1}/3 — quel degré se trouve corde ${6-q.s}, case ${q.f} ?`;opts.innerHTML=q.opts.map(o=>`<button class="b" data-o="${o}">${o}</button>`).join('');
+opts.querySelectorAll('button').forEach(b=>b.onclick=()=>drAnswer(b.dataset.o,b))}}
+else{clr.style.visibility='hidden';act.textContent='▶ Modèle';
+D.tgt.forEach(([s,f])=>{const iv=(TUNE[s]+f-k+24)%12,m=MIDI[s]+f,pl=D.seq.indexOf(m)<D.si,nx=D.seq[D.si]===m&&!D.done;h+=dot(s,f,NC[iv],IVN[iv],{op:pl||D.done?1:.3,target:nx})});
+info.textContent=D.done?'Forme gravée ✓ — Nouveau pour la suivante.':`Joue les ${D.seq.length} notes de la plus grave à la plus aiguë (micro 🎤 ou touche) — ${D.si}/${D.seq.length}`}
+// cases cliquables partout
+for(let s=0;s<6;s++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;
+setSvg('dSvg',h);document.getElementById('dNext').classList.toggle('go',D.done||(D.kind==='iv'&&!!D.res));
+const sk=document.getElementById('dStreak');sk.textContent=D.streak;sk.className='streak'+(D.streak>=20?' viol':D.streak>=10?' gold':'');
+document.getElementById('dOk').textContent=ST.dr.ok;document.getElementById('dIv').textContent=ST.dr.iv}
+function drAnswer(o,btn){const q=D.qs[D.qi];if(o===q.ans){btn.classList.add('on');flash('ok','dFrame');D.qi++;if(D.qi>=D.qs.length){setTimeout(()=>{D.step=2;D.si=0;drDraw()},350)}else setTimeout(drDraw,300)}
+else{flash('ko','dFrame');btn.style.borderColor='var(--ko)';btn.style.color='var(--ko)';vibrate([60,40,60])}}
+function drPlay(m,fromMic){if(D.step!==2||D.done||D.kind==='iv')return;
+if(m===D.seq[D.si]){D.si++;if(D.si>=D.seq.length){D.done=true;D.streak++;ST.dr.played++;flash('ok','dFrame');vibrate(30);save();if(fromMic)MIC.mute=performance.now()+600}drDraw()}
+else{flash('ko','dFrame');vibrate([60,40,60])}}
+bindDots(document.getElementById('dSvg'),(s,f)=>{const m=MIDI[s]+f;tone(m);vib(document.getElementById('dSvg'),s);
+if(D.kind==='iv'){if(D.res)return;const val=ivValid(D.ivq),ok=has(val,s,f);D.sel=[[s,f]];D.res=true;const q=D.ivq;
+if(ok){ST.dr.iv++;D.streak++;flash('ok','dFrame');vibrate(30);const df=f-q.f,cross=q.s<=3&&s>=4;D.resTxt=`Juste ✓ — ${s-q.s} corde(s) plus haut, ${df>=0?'+':''}${df} case(s)${cross?' (passage de la corde de Si : +1 case)':''}. Autres formes en cyan.`}
+else{ST.dr.ivko++;D.streak=0;flash('ko','dFrame');vibrate([60,40,60]);const pc=(TUNE[s]+f-TUNE[q.s]-q.f+48)%12;D.resTxt=`Tu as posé : ${IVLONG[pc]||'unisson'}. La bonne réponse est en cyan.`}
+save();drDraw();return}
+if(D.step===0){if(D.res)return;const i=D.sel.findIndex(x=>x[0]===s&&x[1]===f);if(i>=0)D.sel.splice(i,1);else D.sel.push([s,f]);drDraw()}
+else if(D.step===2)drPlay(m,false)});
+document.getElementById('dAct').onclick=()=>{
+if(D.step===0){if(D.res&&!D.res.ok){D.sel=[];D.res=null;drDraw();return}
+const good=D.sel.filter(([s,f])=>has(D.tgt,s,f)).length,bad=D.sel.length-good,miss=D.tgt.length-good,ok=!bad&&!miss;D.res={ok,good,bad,miss};
+ST.dr.byKind[D.kind]=ST.dr.byKind[D.kind]||{ok:0,ko:0};if(!D.counted){D.counted=true;if(ok){ST.dr.ok++;ST.dr.byKind[D.kind].ok++}else{ST.dr.ko++;ST.dr.byKind[D.kind].ko++;D.streak=0}save()}
+if(ok){flash('ok','dFrame');vibrate(30);drDraw();setTimeout(()=>{D.step=1;drQs();drDraw()},700)}else{flash('ko','dFrame');vibrate([60,40,60]);drDraw()}}
+else if(D.step===2){D.seq.forEach((m,i)=>tone(m,i*.28))}};
+document.getElementById('dClr').onclick=()=>{if(D.step!==0)return;if(D.res&&!D.res.ok){D.step=1;drQs();drDraw();return}D.sel=[];drDraw()};
+document.getElementById('dNext').onclick=()=>drNew();
+
 /* ================= MICRO ================= */
 const NOTE_FR=m=>SHP[m%12]+(Math.floor(m/12)-1);
 function acf(buf,sr){let n=buf.length,rms=0;for(let i=0;i<n;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/n);if(rms<0.012)return[-1,rms];
@@ -418,6 +508,7 @@ else if(tab==='t-tri'&&T.mode==='drill'&&T.target){const t=T.target,strs=SSETS[T
 if(i>=0){vib(document.getElementById('tSvg'),strs[i]);const p=[strs[i],t.frets[i]];if(!T.played.some(q=>q[0]===p[0]&&q[1]===p[1]))T.played.push(p);if(T.played.length===3){MIC.mute=performance.now()+700;hit(true)}else drawTri();return}
 if(want.some(w=>w%12===m%12)){flash('warn','tFrame');document.getElementById('tInfo').textContent=`Presque : ${NOTE_FR(m)} — bonne note, mauvaise octave.`;return}
 MIC.mute=performance.now()+400;hit(false);document.getElementById('tInfo').textContent=`Entendu ${NOTE_FR(m)} — hors accord.`}
+else if(tab==='t-dr'){drPlay(m,true)}
 else if(tab==='t-sc'&&S.drill&&S.tgt){const w=S.tgt[2];
 if(m===w){ST.sc.ok++;S.streak++;if(S.streak>ST.sc.max)ST.sc.max=S.streak;flash('ok','sFrame');vibrate(30);MIC.mute=performance.now()+500;save();setTimeout(()=>{newScT();drawSc()},350)}
 else if(m%12===w%12)flash('warn','sFrame');
@@ -425,7 +516,7 @@ else{S.streak=0;flash('ko','sFrame');save()}drawSc()}}
 document.getElementById('btnMic').onclick=()=>{MIC.on?micStop():micStart()};
 
 /* ================= PROFIL ================= */
-function drawPro(){document.getElementById('pTri').textContent=ST.tri.ok;document.getElementById('pSc').textContent=ST.sc.ok;document.getElementById('pMax').textContent=Math.max(ST.tri.max,ST.sc.max);document.getElementById('pSess').textContent=ST.sess;
+function drawPro(){document.getElementById('pTri').textContent=ST.tri.ok;document.getElementById('pSc').textContent=ST.sc.ok;document.getElementById('pMax').textContent=Math.max(ST.tri.max,ST.sc.max);document.getElementById('pSess').textContent=ST.sess;document.getElementById('pDr').textContent=ST.dr.ok;document.getElementById('pIv').textContent=ST.dr.iv;
 const heat=(obj,keys,lab)=>keys.map((k,i)=>{const d=obj[k]||{ok:0,ko:0},n=d.ok+d.ko,m=n?d.ok/n:0,a=n?.25+m*.75:0;return`<div style="background:${n?`rgba(46,230,255,${a})`:'#161a2a'};color:${n&&m>.5?'#05060b':'#7d83a0'};${n?'box-shadow:0 0 '+(m*10)+'px rgba(46,230,255,'+m+')':''}">${lab?lab[i]:k}</div>`}).join('');
 document.getElementById('pHeat').innerHTML=heat(ST.tri.byKey,CIRCLE4);document.getElementById('pHeatSS').innerHTML=heat(ST.tri.bySS,[0,1,2,3],['1-2-3','2-3-4','3-4-5','4-5-6']);
 const weak=Object.entries(ST.tri.byKey).filter(([k,d])=>d.ok+d.ko>=3).map(([k,d])=>[k,d.ok/(d.ok+d.ko)]).sort((a,b)=>a[1]-b[1]).slice(0,3);
@@ -433,8 +524,8 @@ document.getElementById('pWeak').textContent=weak.length?'Points faibles : '+wea
 document.getElementById('pReset').onclick=()=>{if(confirm('Effacer toute la progression ?')){localStorage.removeItem('ff_state');location.reload()}};
 
 /* ================= INIT ================= */
-drawNeck();newTarget(true);drawTri();drawSc();
-let rz=null;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{drawNeck();drawTri();drawSc()},150)});
+drawNeck();newTarget(true);drawTri();drawSc();drNew();
+let rz=null;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{drawNeck();drawTri();drawSc();drDraw()},150)});
 </script>
 </body>
 </html>

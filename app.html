@@ -84,10 +84,10 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 .vib{animation:vib .35s linear}
 @keyframes vib{0%{transform:translateX(0)}25%{transform:translateX(1.5px)}50%{transform:translateX(-1.5px)}75%{transform:translateX(1px)}100%{transform:translateX(0)}}
 .cof{display:flex;justify-content:center;flex:0 0 auto}
-#t-tri .side.g2{display:grid;grid-template-columns:1fr;gap:6px 10px;align-items:start}
+.side.g2{display:grid;grid-template-columns:1fr;gap:6px 10px;align-items:start}
 .g2 .gL,.g2 .gR{display:flex;flex-direction:column;gap:5px;min-width:0}
 .g2 .frame{padding:3px 8px}.g2 .big{font-size:16px!important}.g2 .stats b{font-size:13px}
-.g2 .gInfo{display:none}.g2 button.b{white-space:nowrap}
+.g2 .gR .gInfo{display:none!important}.g2 button.b{white-space:nowrap}
 .modbar{display:flex;gap:4px;flex-wrap:nowrap;overflow-x:auto;flex:0 0 auto;scrollbar-width:none}.modbar::-webkit-scrollbar{display:none}
 .modbar button.b{min-height:24px;padding:2px 9px;font-size:11.5px;white-space:nowrap}
 .steps{display:flex;gap:4px;margin-left:auto}.steps span{font-size:11px;padding:3px 8px;border-radius:10px;border:1px solid var(--line);color:var(--mut);opacity:.5}
@@ -101,8 +101,10 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   #t-tri.land .side.g3{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 12px;align-items:center}
   #t-tri.land .side.g3 .row:nth-child(1){grid-column:1}#t-tri.land .side.g3 .cof{grid-row:1/4;grid-column:2}#t-tri.land .side.g3 .frame{grid-row:1/4;grid-column:3}
   #t-tri.land .side.g3 .info{grid-column:1/4}
-  #t-tri.land .side.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,34%)}
-  .g2 .gInfo{display:none}
+  .tab.land .side.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,36%)}
+  .g2 .gR .info{font-size:11px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .g2 .cof svg{height:84px}
+  .g2 .gR .gInfo{display:none!important}
   .side select,.side button.b{min-height:26px;padding:3px 8px;font-size:11.5px}
 }
 </style>
@@ -336,7 +338,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.4 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.5 — Boss</div>
 </section>
 
 </main>
@@ -1369,6 +1371,9 @@ const daLab=f=>({maj:'',min:'m',M:'',m:'m',d:'°',dim:'°',aug:'+','7':'7',m7:'m
 const daName=c=>(FLATK.includes(DA.key)||c.fl?FLP:SHP)[c.r]+daLab(c.f);
 function daSets(){const t=DA_ST[DA.st][2];return t==='adj'?[[0,1],[1,2],[2,3],[3,4],[4,5]]:t==='skip'?[[0,2],[1,3],[2,4],[3,5]]:[[0,1,2],[1,2,3],[2,3,4],[3,4,5]]}
 const daSetLab=st=>st.map(s=>6-s).join('‑');
+const DQ={3:['3ce m','#2ee6ff'],4:['3ce M','#ffd23f'],5:['4te juste','#9a9fb8'],6:['triton','#ff3b5c'],7:['5te juste','#9a9fb8'],8:['6te m','#2ee6ff'],9:['6te M','#ffd23f']};
+function daQual(e){const ms=e.notes.map(x=>x.m).sort((a,b)=>a-b);if(ms.length===2){const d=(ms[1]-ms[0])%12;return DQ[d]||[String(d),'#fff']}
+if(ms.length===3){const pcs=[...new Set(ms.map(m=>m%12))];for(const r of pcs){const iv=pcs.map(p=>(p-r+12)%12).sort((a,b)=>a-b).join();const q={'0,4,7':['majeur','#ffd23f'],'0,3,7':['mineur','#2ee6ff'],'0,3,6':['diminué','#ff3b5c'],'0,4,8':['augmenté','#a06bff']}[iv];if(q)return q}}return['','#fff']}
 /* --- gamme harmonisée --- */
 function daScale(){const set=SCALES[DA.sc][2],n=set.length,k=PC[DA.key],sets=daSets();if(DA.set>=sets.length)DA.set=sets.length-1;const strs=sets[DA.set];
 let off=DA_ST[DA.st][1];if(!off){off=[[0,2,4],[2,4,n],[4,n,n+2]][DA.inv]}
@@ -1445,23 +1450,31 @@ if(DA.mode==='pg'&&e&&e.ch){const c=e.ch,pcs=daPcs(c.f).map(x=>(c.r+x)%12);const
 h+=`<rect x="34" y="${YL(a)-(a===0?14:0)}" width="296" height="${YL(b)-YL(a)+(a===0?14:0)}" rx="10" fill="#2ee6ff" opacity=".04" stroke="#2ee6ff" stroke-opacity=".35" stroke-dasharray="4 4"/>`;
 for(let s2=0;s2<6;s2++)for(let f=a;f<=b;f++){const pc=(TUNE[s2]+f)%12;if(pcs.includes(pc)&&!e.notes.some(x=>x.s===s2&&x.f===f))h+=`<circle cx="${X(s2)}" cy="${YN(f)}" r="9" fill="${NC[(pc-c.r+12)%12]}" opacity=".28"/>`}}
 // ombre de toute la ligne (gamme harmonisée)
-if(DA.mode==='sc')DA.ev.forEach((ev,i)=>{if(i===DA.i)return;ev.notes.forEach(x=>h+=`<circle cx="${X(x.s)}" cy="${YN(x.f)}" r="10" fill="${NC[(x.m-k+120)%12]}" opacity="${i<DA.i?.12:.3}"/>`)});
+if(DA.mode==='sc')DA.ev.forEach((ev,i)=>{if(i===DA.i)return;if(ev.notes.length>1)h+=`<polyline points="${ev.notes.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="${daQual(ev)[1]}" stroke-width="2.5" stroke-opacity="${i<DA.i?.15:.45}"/>`;ev.notes.forEach(x=>h+=`<circle cx="${X(x.s)}" cy="${YN(x.f)}" r="10" fill="${NC[(x.m-k+120)%12]}" opacity="${i<DA.i?.12:.3}"/>`)});
 // suivantes en pointillé
 const nx=DA.ev[DA.i+1];if(nx&&nx.notes.length>1){nx.notes.forEach(x=>h+=`<circle cx="${X(x.s)}" cy="${YN(x.f)}" r="15" fill="none" stroke="#ffd23f" stroke-dasharray="3 3" stroke-width="1.6"/>`);if(nx.notes.length>1)h+=`<polyline points="${nx.notes.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="#ffd23f" stroke-opacity=".35" stroke-width="2"/>`}
-if(e){if(e.notes.length>1)h+=`<polyline points="${e.notes.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3"/>`;
+if(e){if(e.notes.length>1)h+=`<polyline points="${e.notes.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="${daQual(e)[1]}" stroke-opacity=".9" stroke-width="4"/>`;
 const ref=DA.mode==='pg'&&e.ch?e.ch.r:k;e.notes.forEach(x=>{const iv=(x.m-ref+120)%12;h+=dot(x.s,x.f,NC[iv],DA.got.includes(x.m)?'✓':IVN[iv],{target:!DA.got.includes(x.m),r:15})});
 if(e.notes.length===1)h+=pathAhead(DA.ev.slice(DA.i).map(x=>({s:x.notes[0].s,f:x.notes[0].f})),0,3)}
 for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;
 setSvg('tSvg',h);
 if(!DA.ev.length){big.textContent=DA.title||'—';sub.textContent=DA.mode==='pg'?'Choisis une grille (ou un standard).':'';return}
 const nxt=DA.ev.slice(DA.i+1).find(x=>x.ci!==e.ci&&x.ch);
-big.textContent=DA.mode==='pg'&&e.ch?(e.tag+(nxt&&nxt.ch?' → '+daName(nxt.ch):'')):`${e.tag} · ${e.notes.map(x=>IVN[(x.m-k+120)%12]).join(' + ')}`;
-sub.textContent=`${DA.title} · ${DA.i+1}/${DA.ev.length}`;
+big.textContent=DA.mode==='pg'&&e.ch?(e.tag+(nxt&&nxt.ch?' → '+daName(nxt.ch):'')):`${e.tag} · ${e.notes.map(x=>IVN[(x.m-k+120)%12]).join(' + ')}${e.notes.length>1?' · '+daQual(e)[0]:''}`;
+sub.innerHTML=`${DA.title} · ${DA.i+1}/${DA.ev.length}`+(DA.mode==='sc'&&e.notes.length>1?'<br>'+DA.ev.slice(0,Math.ceil(DA.ev.length/2)).map((x,i)=>{const q=daQual(x);return`<b style="color:${q[1]};${i===DA.i?'text-decoration:underline':''}">${q[0].replace(/^(3ce|6te) /,'').replace('4te juste','J').replace('5te juste','J').replace('triton','T').replace('majeur','M').replace('mineur','m').replace('diminué','°').replace('augmenté','+')}</b>`}).join(' '):'');
 document.getElementById('daFrame').title=DA.mode==='sc'?'Joue chaque forme (touche toutes ses notes, ou au micro une seule suffit). Les ombres montrent toute la gamme harmonisée sur ces cordes : vois la forme glisser.':'Reste dans la zone : les petites pastilles sont les notes de l\'accord en cours, les pointillés jaunes la forme suivante. Le jeu « continu » enchaîne chaque accord par la note la plus proche.'}
 document.getElementById('daPlay').onclick=()=>{if(DAT){daStop();DA.i=0;daDraw();return}ac();daPlay()};
 document.getElementById('daGo').onclick=()=>{daStop();DA.streak=DA.streak;daBuild()};
 document.getElementById('daTempo').oninput=e=>{DA.tempo=+e.target.value;document.getElementById('daTempoV').textContent=DA.tempo};
 
+/* Rangement commun : réglages à gauche, suivi + actions à droite (le manche garde la place) */
+function sideReflow(){document.querySelectorAll('section.tab.land .side').forEach(sd=>{if(sd.classList.contains('g2')||sd.closest('#t-sg'))return;
+const L=document.createElement('div'),R=document.createElement('div');L.className='gL';R.className='gR';let cof=null,fr=null;
+[...sd.children].forEach(c=>{const right=c.classList.contains('frame')||c.classList.contains('info')||c.classList.contains('cof')||(c.classList.contains('row')&&/justify-content:\s*center/.test(c.getAttribute('style')||''));
+if(c.classList.contains('cof'))cof=c;if(c.classList.contains('frame')&&!fr)fr=c;(right?R:L).appendChild(c)});
+if(cof&&fr){const w=document.createElement('div');w.style.cssText='display:flex;gap:8px;align-items:center';R.insertBefore(w,cof);w.appendChild(cof);w.appendChild(fr);fr.style.flex='1'}
+sd.appendChild(L);sd.appendChild(R);sd.classList.remove('g3');sd.classList.add('g2')})}
+sideReflow();
 let DRM='tri';document.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>drillMode(b.dataset.dm));
 /* ================= GARDEN : progressions gospel (Scène) + lignes de Ligon (Impro) ================= */
 const GQ={maj:'',min:'m','7':'7',maj7:'△',m7:'m7',dim7:'°7',dim:'°'};

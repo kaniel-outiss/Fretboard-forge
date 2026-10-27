@@ -298,7 +298,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="side">
     <div class="row"><span class="lbl">Gamme</span><select id="sSel" style="max-width:200px"></select><select id="sKey"></select></div>
     <div class="row" id="sPos"></div>
-    <div class="row"><span class="lbl">Motif</span><select id="sMot" style="max-width:210px"><option value="">— aucun (gamme seule)</option><option value="g3">Groupes de 3 (1‑2‑3, 2‑3‑4…)</option><option value="g4">Groupes de 4 (1‑2‑3‑4…)</option><option value="t3">Tierces (1‑3, 2‑4…)</option><option value="t4">Quartes (1‑4, 2‑5…)</option><option value="tr">Triades diatoniques (1‑3‑5)</option><option value="s7">Arpèges 7e diatoniques (1‑3‑5‑7)</option><option value="b1235">Bergonzi 1‑2‑3‑5</option><option value="b1345">Bergonzi 1‑3‑4‑5</option><option value="b5321">Bergonzi 5‑3‑2‑1</option><option value="b3215">Bergonzi 3‑2‑1‑5</option><option value="lpG">Diagonale le long du manche — depuis la R</option><option value="lpC">Diagonale le long du manche — depuis la 5te</option></select><span id="sMotN" class="lbl"></span></div>
+    <div class="row"><span class="lbl">Motif</span><select id="sMot" style="max-width:210px"><option value="">— aucun (gamme seule)</option><option value="g3">Groupes de 3 (1‑2‑3, 2‑3‑4…)</option><option value="g4">Groupes de 4 (1‑2‑3‑4…)</option><option value="t3">Tierces (1‑3, 2‑4…)</option><option value="t4">Quartes (1‑4, 2‑5…)</option><option value="tr">Triades diatoniques (1‑3‑5)</option><option value="s7">Arpèges 7e diatoniques (1‑3‑5‑7)</option><option value="b1235">Bergonzi 1‑2‑3‑5</option><option value="b1345">Bergonzi 1‑3‑4‑5</option><option value="b5321">Bergonzi 5‑3‑2‑1</option><option value="b3215">Bergonzi 3‑2‑1‑5</option><option value="a111">Approche 1‑1‑1</option><option value="a1111">Approche 1‑1‑1‑1</option><option value="a321">Approche 3‑2‑1</option><option value="a4321">Approche 4‑3‑2‑1</option><option value="a1123">Approche 1‑1‑2‑3</option><option value="amix">Approche mixte 1‑2‑3 + 1‑1‑1</option><option value="lpG">Diagonale le long du manche — depuis la R</option><option value="lpC">Diagonale le long du manche — depuis la 5te</option></select><span id="sMotN" class="lbl"></span></div>
     <div class="row" style="align-items:flex-start"><span class="lbl">Formule</span><span id="sFrm" class="chips" style="gap:3px"></span></div>
     <div class="info" id="sMood"></div>
     <div class="info" id="sUse"></div>
@@ -338,7 +338,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.6 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v2.7 — Boss</div>
 </section>
 
 </main>
@@ -429,7 +429,22 @@ const SCALES=[
 ['Hirajoshi','X',[0,2,3,7,8],8,'Japon, épuré','m'],
 ['Hongroise tzigane','X',[0,2,3,6,7,8,10],6,'Tzigane, ardent','m, m7'],
 ['Napolitaine mineure','X',[0,1,3,5,7,8,11],1,'Baroque, tragique','m'],
-['Persane','X',[0,1,4,5,7,8,11],1,'Oriental, mystique','maj']];
+['Persane','X',[0,1,4,5,7,8,11],1,'Oriental, mystique','maj'],
+['Balinaise / Pelog','X',[0,1,3,7,8],1,'Gamelan, suspendu','m'],
+['Chinoise','X',[0,4,6,7,11],6,'Lumineux, lointain','maj7#11'],
+['Composite','X',[0,1,3,4,6,7,8,10],4,'Tendu, chromatique','7alt'],
+['Égyptienne','X',[0,2,5,7,10],null,'Ancien, ouvert','sus, 7sus4'],
+['Énigmatique','X',[0,1,4,6,8,10,11],8,'Étrange, verdien','maj7#5'],
+['Hindoustan','X',[0,2,4,5,7,8,10],8,'Mélancolie majeure','7, 7b13'],
+['Hongroise majeure','X',[0,3,4,6,7,9,10],3,'Ardent, dansant','7#9'],
+['Japonaise (in)','X',[0,1,5,7,8],1,'Koto, austère','sus'],
+['Kumoi','X',[0,2,3,7,9],9,'Japon, doux','m6'],
+['Napolitaine majeure','X',[0,1,3,5,7,9,11],1,'Lumineux et sombre','mMaj7'],
+['Orientale','X',[0,1,4,5,6,9,10],6,'Moyen-Orient','7b5'],
+['Overtone (lydien ♭7)','X',[0,2,4,6,7,9,10],6,'Jazz, brillant','7#11'],
+['Roumaine','X',[0,2,3,6,7,9,10],6,'Klezmer, mineur dorien #4','m7'],
+['Scriabine','X',[0,1,4,7,9],1,'Mystique','maj'],
+['Symétrique (½T‑T)','Y',[0,1,3,4,6,7,9,10],1,'Diminuée dominante','7b9']];
 const QUAL={maj:[0,4,7],min:[0,3,7],dim:[0,3,6],aug:[0,4,8]};
 const QN={maj:'',min:'m',dim:'°',aug:'+'};
 const SSETS=[[3,4,5],[2,3,4],[1,2,3],[0,1,2]]; // groupes de cordes (index graves→aigu)
@@ -714,7 +729,7 @@ setSvg('sSvg',h);
 document.getElementById('sDrill').classList.toggle('on',S.drill);document.getElementById('sTgt').textContent=S.tgt?lab(S.tgt[3],set):'—';
 document.getElementById('sStreak').textContent=S.streak;document.getElementById('sOk').textContent=ST.sc.ok}
 /* Motifs : cellules appliquées à chaque degré de la position, montée puis descente */
-const MOTS={g3:[0,1,2],g4:[0,1,2,3],t3:[0,2],t4:[0,3],tr:[0,2,4],s7:[0,2,4,6],b1235:[0,1,2,4],b1345:[0,2,3,4],b5321:[4,2,1,0],b3215:[2,1,0,4]};
+const MOTS={g3:[0,1,2],g4:[0,1,2,3],t3:[0,2],t4:[0,3],tr:[0,2,4],s7:[0,2,4,6],b1235:[0,1,2,4],b1345:[0,2,3,4],b5321:[4,2,1,0],b3215:[2,1,0,4],a111:[0,0,0],a1111:[0,0,0,0],a321:[2,1,0],a4321:[3,2,1,0],a1123:[0,0,1,2],amix:[0,1,2,0,0,0]};
 S.mo='';S.mi=0;S.mseq=[];
 function scLine(){const sp=S.p;if(S.p<0)S.p=0;const N2=notesIn();S.p=sp;const m=[...new Set(N2.map(x=>x[2]))].sort((a,b)=>a-b);return m.map(x=>{const n=N2.find(y=>y[2]===x);return{s:n[0],f:n[1],m:x,iv:n[3]}})}
 function lpLine(){const set=SCALES[S.s][2],n=set.length>=7?3:2,st=S.mo==='lpG'?0:(set.includes(7)?7:set[Math.floor(set.length/2)]),tot=6*n+n;
@@ -1376,6 +1391,22 @@ function daQual(e){const ms=e.notes.map(x=>x.m).sort((a,b)=>a-b);if(ms.length===
 if(ms.length===3){const pcs=[...new Set(ms.map(m=>m%12))];for(const r of pcs){const iv=pcs.map(p=>(p-r+12)%12).sort((a,b)=>a-b).join();const q={'0,4,7':['majeur','#ffd23f'],'0,3,7':['mineur','#2ee6ff'],'0,3,6':['diminué','#ff3b5c'],'0,4,8':['augmenté','#a06bff']}[iv];if(q)return q.concat([r])}}
 if(ms.length===4){const pcs=[...new Set(ms.map(m=>m%12))];for(const r of pcs){const iv=pcs.map(p=>(p-r+12)%12).sort((a,b)=>a-b).join();const q={'0,4,7,11':['M7','#ffd23f'],'0,4,7,10':['7','#ff9f1a'],'0,3,7,10':['m7','#2ee6ff'],'0,3,6,10':['ø7','#ff3b5c'],'0,3,6,9':['°7','#ff3b5c'],'0,3,7,11':['mM7','#39ff88'],'0,4,8,11':['M7+','#a06bff']}[iv];if(q)return q.concat([r])}}return['','#fff']}
 function daChName(e){const q=daQual(e);if(q[2]==null||e.notes.length<3)return'';const nm2=(FLATK.includes(DA.key)?FLP:SHP)[q[2]];return nm2+({majeur:'',mineur:'m',diminué:'°',augmenté:'+'}[q[0]]??q[0])}
+/* --- Arpèges à la formule (All Scales and Arpeggios) : formule, degrés essentiels, modes relatifs, approches --- */
+const DEGS={'1':0,'b2':1,'2':2,'#2':3,'b3':3,'3':4,'b4':4,'4':5,'#4':6,'b5':6,'5':7,'#5':8,'b6':8,'6':9,'bb7':9,'b7':10,'7':11,'b9':13,'9':14,'11':17,'#11':18,'13':21};
+const ARPF=[['Majeur',[['Majeur','1,3,5','1,3','1,4,5'],['Majeur 6','1,3,5,6','1,3,6','1,2,4,5'],['Majeur 6/9','1,3,5,6,9','1,3,6,9','1,4,5'],['Majeur 7','1,3,5,7','1,3,7','1,4'],['Majeur add 9','1,3,5,9','1,3,9','1,4,5'],['Majeur 9','1,3,5,7,9','3,7,9','1,4'],['Majeur 13','1,3,5,7,9,11,13','3,7,13','1']]],
+['Mineur',[['Mineur','1,b3,5','1,b3','2,3,6'],['Diminué','1,b3,b5','1,b3,b5','7'],['Mineur 6','1,b3,5,6','1,b3,6','2'],['Mineur 6/9','1,b3,5,6,9','1,b3,6,9','2'],['Mineur 7','1,b3,5,b7','1,b3,b7','2,3,6'],['Mineur 7 ♭5','1,b3,b5,b7','b3,b5,b7','7'],['Mineur add 9','1,b3,5,9','1,b3,9','2,6'],['Mineur 9','1,b3,5,b7,9','b3,b7,9','2,6'],['Mineur 11','1,b3,5,b7,9,11','b3,b7,11','2,6'],['Mineur 13','1,b3,5,b7,9,11,13','b3,b7,13','2']]],
+['Dominant',[['Dominante 7','1,3,5,b7','1,3,b7','5'],['7 sus 4','1,4,5,b7','4,5,b7','2,3,5,6'],['Dominante 9','1,3,5,b7,9','3,b7,9','5'],['Dominante 11','1,3,5,b7,9,11','3,b7,11','5'],['Dominante 13','1,3,5,b7,9,11,13','3,b7,13','5'],['Sus 2','1,2,5','1,2,5','1,2,4,5,6'],['Sus 4','1,4,5','1,4,5','1,2,5,6'],['Sus 9','1,4,5,b7,9','4,b7,9','2,5,6']]],
+['Altéré',[['Augmenté','1,3,#5','1,3,#5','1,4,5 (altérés)'],['Augmenté 7','1,3,#5,b7','3,#5,b7','1,4,5 (altérés)'],['Diminué 7','1,b3,b5,bb7','1,b3,b5,bb7','2,4,6,7 (altérés)'],['Dominante 7 ♭5','1,3,b5,b7','3,b5,b7','1,4,5 (altérés)'],['Majeur 7 ♭5','1,3,b5,7','3,b5,7','1,4,5 (altérés)'],['Mineur/majeur 7','1,b3,5,7','1,b3,7','2,4,6 (altérés)']]]];
+const APPR={'1-2-3-4':null,'1-1-1':[0,0,0],'1-2-3':[0,1,2],'3-2-1':[2,1,0],'1-1-1-1':[0,0,0,0],'4-3-2-1':[3,2,1,0],'1-1-2-3':[0,0,1,2],'1-2-3 + 1-1-1':[0,1,2,0,0,0]};
+const MODN=['','ionien','dorien','phrygien','lydien','mixolydien','éolien','locrien'];
+DA.af=DA.af||'0:3';DA.ap='1-2-3-4';
+function daArpF(){const [g,i]=DA.af.split(':').map(Number);return ARPF[g][1][i]}
+function daArp(){const F=daArpF(),k=PC[DA.key],degs=F[1].split(','),pcs=[...new Set(degs.map(d=>(k+DEGS[d])%12))],Z=daZonePts(pcs),ms=[...new Set(Z.map(x=>x.m))].sort((a,b)=>a-b);
+DA.arp={k,pcs,ess:F[2].split(',').map(d=>(k+DEGS[d])%12),lab:Object.fromEntries(degs.map(d=>[(k+DEGS[d])%12,d]))};
+if(!ms.length){DA.ev=[];DA.title='Aucune note dans la zone';return}let i0=ms.findIndex(m=>m%12===k);if(i0<0)i0=0;const up=ms.slice(i0),L=[...up,...up.slice(0,-1).reverse()];
+const o=APPR[DA.ap];let seq=[];if(!o)seq=L;else{const R=[...up].reverse(),top=Math.max(...o);for(let i=0;i+top<up.length;i++)o.forEach(q=>seq.push(up[i+q]));for(let i=0;i+top<R.length;i++)o.forEach(q=>seq.push(R[i+q]))}
+let anc=DA.zone;const ev=[];seq.forEach(m=>{const p=daPos(m,anc);if(p){ev.push({notes:[p],tag:DA.arp.lab[m%12]||'',ch:{r:k,f:'_',pcs}});anc=p.f}});
+DA.ev=ev;DA.title=`${DA.key} ${F[0]} · ${degs.join('‑')} · approche ${DA.ap}`}
 /* --- gamme harmonisée --- */
 function daScale(){const set=SCALES[DA.sc][2],n=set.length,k=PC[DA.key],sets=daSets();if(DA.set>=sets.length)DA.set=sets.length-1;const strs=sets[DA.set];
 let off=DA_ST[DA.st][1];if(off==='q7')off=[0,2,4,6];else if(off==='d2')off=[4-n,0,2,6];if(!off){off=[[0,2,4],[2,4,n],[4,n,n+2]][DA.inv]}
@@ -1414,7 +1445,7 @@ let j=0;if(last){j=ms.reduce((bi,m,ii)=>Math.abs(m-last.m)<Math.abs(ms[bi]-last.
 let seq=[];if(dir>0){if(j+3>=ms.length){dir=-1}}else{if(j-3<0){dir=1}}
 for(let q=0;q<4;q++){const ii=j+q*dir;if(ii<0||ii>=ms.length)break;seq.push(ms[ii])}push(seq);dir=-dir});
 DA.ev=ev;DA.title=P.name}
-function daBuild(){DA.i=0;DA.got=[];if(DA.mode==='sc')daScale();else daProg();daDraw()}
+function daBuild(){DA.i=0;DA.got=[];if(DA.mode==='sc')daScale();else if(DA.mode==='ar')daArp();else daProg();daDraw()}
 async function daStd(q){if(!STD){document.getElementById('daSub').textContent='Chargement des standards…';await stdLoad()}
 let idx=-1;if(q){const ql=q.toLowerCase();idx=STD.findIndex(r=>r[1].toLowerCase().includes(ql))}if(idx<0)idx=Math.floor(Math.random()*STD.length);
 const bars=stdBars(STD[idx]),ch=[];let prev=null;bars.forEach(b=>b.ch.forEach(c=>{if(!c.p||c.cont)return;const key=c.p.r+c.p.f;if(prev===key)return;prev=key;ch.push({r:c.p.r,f:c.p.f,rn:c.fn||''})}));
@@ -1433,8 +1464,11 @@ function daSetMode(){const M=NMODES[DA.mi||0],pc=(PC[NKEY[DA.sig]]+M[0])%12;DA.k
 function daCtl(){const box=document.getElementById('daCtl');let h='';
 const sel=(id,opts,cur,w)=>`<select id="${id}" ${w?`style="max-width:${w}px"`:''}>${opts.map(([v,t])=>`<option value="${v}" ${String(v)===String(cur)?'selected':''}>${t}</option>`).join('')}</select>`;
 const keySel=sel('daKey',KEYS.map(x=>[x,x]),DA.key);
-const modeSel=sel('daMode',[['sc','Gamme harmonisée'],['pg','Sur une grille']],DA.mode);
-if(DA.mode==='sc'){h+=`<div class="row">${modeSel}${sel('daSc',SCALES.map((x,i)=>[i,x[0]]).filter(([i])=>SCALES[i][2].length>=6),DA.sc,170)}${keySel}</div>`;
+const modeSel=sel('daMode',[['sc','Gamme harmonisée'],['pg','Sur une grille'],['ar','Arpège (formule)']],DA.mode);
+if(DA.mode==='ar'){h+=`<div class="row">${modeSel}<select id="daAf" style="max-width:170px">${ARPF.map((g,gi)=>`<optgroup label="${g[0]}">${g[1].map((f,fi)=>`<option value="${gi}:${fi}" ${DA.af===gi+':'+fi?'selected':''}>${f[0]}</option>`).join('')}</optgroup>`).join('')}</select>${keySel}</div>`;
+h+=`<div class="row">${sel('daAp',Object.keys(APPR).map(x=>[x,x==='1-2-3-4'?'Arpège simple':'Approche '+x]),DA.ap)}<span class="lbl" style="min-width:0">Zone</span><input type="range" id="daZone" min="2" max="15" value="${DA.zone}" style="width:90px"><span style="font-size:11px">c.${DA.zone}</span></div>`;
+const F=daArpF();h+=`<div class="info" style="font-size:11px">Formule ${F[1].replace(/,/g,'‑')} · essentiels ${F[2].replace(/,/g,'‑')} · se joue sur les modes ${F[3].replace(/\d/g,d=>MODN[d]||d).replace(/,/g,', ')}</div>`}
+else if(DA.mode==='sc'){h+=`<div class="row">${modeSel}${sel('daSc',SCALES.map((x,i)=>[i,x[0]]).filter(([i])=>SCALES[i][2].length>=6),DA.sc,170)}${keySel}</div>`;
 h+=`<div class="row"><button class="b" id="daDay" title="Nelson : toutes les gammes d'une armure par jour, cycle de 12 jours">📅 Armure du jour</button><button class="b" id="daNextMode">Mode suivant ▸</button><span class="lbl" style="min-width:0" id="daSig">${DA.sig!=null?NELS[DA.sig]+' · '+NMODES[DA.mi||0][1]:''}</span></div>`;h+=`<div class="row">${sel('daSt',Object.keys(DA_ST).map(x=>[x,DA_ST[x][0]]),DA.st)}${sel('daSet',daSets().map((st,i)=>[i,'Cordes '+daSetLab(st)]),DA.set)}${DA_ST[DA.st][1]?'':sel('daInv',[[0,'Fondamentale'],[1,'1er renversement'],[2,'2e renversement']],DA.inv)}</div>`}
 else{const og=`<optgroup label="Toolbox (Sharp)">${PROGS.map((g,i)=>`<option value="tb:${i}">${g.g} · ${g.n}</option>`).join('')}</optgroup><optgroup label="Gospel">${Object.keys(GOSP_PROGS).map(x=>`<option value="gp:${x}">${GOSP_PROGS[x].lb}</option>`).join('')}</optgroup>${DA.std?`<optgroup label="Standard"><option value="std:0">${DA.stdName}</option></optgroup>`:''}`;
 h+=`<div class="row">${modeSel}<select id="daSrc" style="max-width:210px">${og}</select>${DA.src.startsWith('std')?'':keySel}</div>`;
@@ -1442,7 +1476,7 @@ h+=`<div class="row">${sel('daPst',Object.keys(DA_PST).map(x=>[x,DA_PST[x]]),DA.
 h+=`<div class="row"><input id="daQ" placeholder="Standard : titre…" style="width:130px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:3px 6px;font-size:11.5px"><button class="b" id="daQGo">Charger</button><button class="b" id="daRnd">🎲 Au hasard</button></div>`}
 box.innerHTML=h;
 const g=id=>box.querySelector(id),on=(id,fn)=>{const el=g(id);if(el)el.onchange=e=>fn(e.target.value)};
-on('#daMode',v=>{DA.mode=v;daStop();daCtl();daBuild()});
+on('#daMode',v=>{DA.mode=v;daStop();daCtl();daBuild()});on('#daAf',v=>{DA.af=v;daCtl();daBuild()});on('#daAp',v=>{DA.ap=v;daBuild()});
 if(g('#daDay'))g('#daDay').onclick=()=>{const d=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);DA.sig=d%12;DA.mi=0;daSetMode()};
 if(g('#daNextMode'))g('#daNextMode').onclick=()=>{if(DA.sig==null){DA.sig=KEYS.indexOf(KEYS.find(x=>PC[x]===PC[DA.key]))%12;if(DA.sig<0)DA.sig=0;DA.mi=0}else DA.mi=((DA.mi||0)+1)%NMODES.length;daSetMode()};on('#daKey',v=>{DA.key=v;daBuild()});on('#daSc',v=>{DA.sc=+v;daBuild()});
 on('#daSt',v=>{DA.st=v;daCtl();daBuild()});on('#daSet',v=>{DA.set=+v;daBuild()});on('#daInv',v=>{DA.inv=+v;daBuild()});
@@ -1453,6 +1487,10 @@ if(g('#daQGo'))g('#daQGo').onclick=()=>daStd(g('#daQ').value.trim());if(g('#daRn
 function daDraw(){const e=DA.ev[DA.i],big=document.getElementById('daBig'),sub=document.getElementById('daSub');
 document.getElementById('daStreak').textContent=DA.streak;document.getElementById('daOk').textContent=ST.da||0;
 let h=neckBase();const k=PC[DA.key];
+if(DA.mode==='ar'&&DA.arp){const A=DA.arp;const a=Math.max(0,DA.zone-2),b=Math.min(NF,DA.zone+3);
+h+=`<rect x="34" y="${YL(a)-(a===0?14:0)}" width="296" height="${YL(b)-YL(a)+(a===0?14:0)}" rx="10" fill="#2ee6ff" opacity=".04" stroke="#2ee6ff" stroke-opacity=".35" stroke-dasharray="4 4"/>`;
+for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const pc=(TUNE[s2]+f)%12;if(!A.pcs.includes(pc)||(e&&e.notes.some(x=>x.s===s2&&x.f===f)))continue;const inZ=f>=a&&f<=b;
+h+=`<circle cx="${X(s2)}" cy="${YN(f)}" r="${inZ?11:8}" fill="${NC[(pc-A.k+12)%12]}" opacity="${inZ?.55:.22}"/>`+(A.ess.includes(pc)?`<circle cx="${X(s2)}" cy="${YN(f)}" r="${inZ?14:10}" fill="none" stroke="#fff" stroke-opacity="${inZ?.7:.3}" stroke-width="1.5"/>`:'')+(inZ?`<text x="${X(s2)}" y="${YN(f)+3.5}" text-anchor="middle" font-size="9" fill="#05060b">${A.lab[pc]}</text>`:'')}}
 if(DA.mode==='pg'&&e&&e.ch){const c=e.ch,pcs=daPcs(c.f).map(x=>(c.r+x)%12);const a=Math.max(0,DA.zone-2),b=Math.min(NF,DA.zone+3);
 h+=`<rect x="34" y="${YL(a)-(a===0?14:0)}" width="296" height="${YL(b)-YL(a)+(a===0?14:0)}" rx="10" fill="#2ee6ff" opacity=".04" stroke="#2ee6ff" stroke-opacity=".35" stroke-dasharray="4 4"/>`;
 for(let s2=0;s2<6;s2++)for(let f=a;f<=b;f++){const pc=(TUNE[s2]+f)%12;if(pcs.includes(pc)&&!e.notes.some(x=>x.s===s2&&x.f===f))h+=`<circle cx="${X(s2)}" cy="${YN(f)}" r="9" fill="${NC[(pc-c.r+12)%12]}" opacity=".28"/>`}}
@@ -1461,13 +1499,13 @@ if(DA.mode==='sc')DA.ev.forEach((ev,i)=>{if(i===DA.i)return;if(ev.notes.length>1
 // suivantes en pointillé
 const nx=DA.ev[DA.i+1];if(nx&&nx.notes.length>1){nx.notes.forEach(x=>h+=`<circle cx="${X(x.s)}" cy="${YN(x.f)}" r="15" fill="none" stroke="#ffd23f" stroke-dasharray="3 3" stroke-width="1.6"/>`);if(nx.notes.length>1)h+=`<polyline points="${nx.notes.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="#ffd23f" stroke-opacity=".35" stroke-width="2"/>`}
 if(e){if(e.notes.length>1)h+=`<polyline points="${e.notes.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="${daQual(e)[1]}" stroke-opacity=".9" stroke-width="4"/>`;
-const ref=DA.mode==='pg'&&e.ch?e.ch.r:k;e.notes.forEach(x=>{const iv=(x.m-ref+120)%12;h+=dot(x.s,x.f,NC[iv],DA.got.includes(x.m)?'✓':IVN[iv],{target:!DA.got.includes(x.m),r:15})});
+const ref=DA.mode==='pg'&&e.ch?e.ch.r:k;e.notes.forEach(x=>{const iv=(x.m-ref+120)%12;h+=dot(x.s,x.f,NC[iv],DA.got.includes(x.m)?'✓':(DA.mode==='ar'&&DA.arp?DA.arp.lab[x.m%12]:IVN[iv]),{target:!DA.got.includes(x.m),r:15})});
 if(e.notes.length===1)h+=pathAhead(DA.ev.slice(DA.i).map(x=>({s:x.notes[0].s,f:x.notes[0].f})),0,3)}
 for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++)h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="15" fill="#fff" opacity="0.01"/></g>`;
 setSvg('tSvg',h);
 if(!DA.ev.length){big.textContent=DA.title||'—';sub.textContent=DA.mode==='pg'?'Choisis une grille (ou un standard).':'';return}
 const nxt=DA.ev.slice(DA.i+1).find(x=>x.ci!==e.ci&&x.ch);
-big.textContent=DA.mode==='pg'&&e.ch?(e.tag+(nxt&&nxt.ch?' → '+daName(nxt.ch):'')):(e.notes.length>2&&daChName(e)?`${e.tag} · ${daChName(e)}`:`${e.tag} · ${e.notes.map(x=>IVN[(x.m-k+120)%12]).join(' + ')}${e.notes.length>1?' · '+daQual(e)[0]:''}`);
+big.textContent=DA.mode==='ar'?`${DA.key} ${daArpF()[0]} · ${e.tag}`:DA.mode==='pg'&&e.ch?(e.tag+(nxt&&nxt.ch?' → '+daName(nxt.ch):'')):(e.notes.length>2&&daChName(e)?`${e.tag} · ${daChName(e)}`:`${e.tag} · ${e.notes.map(x=>IVN[(x.m-k+120)%12]).join(' + ')}${e.notes.length>1?' · '+daQual(e)[0]:''}`);
 sub.innerHTML=`${DA.title} · ${DA.i+1}/${DA.ev.length}`+(DA.mode==='sc'&&e.notes.length>1?'<br>'+DA.ev.slice(0,Math.ceil(DA.ev.length/2)).map((x,i)=>{const q=daQual(x);return`<b style="color:${q[1]};${i===DA.i?'text-decoration:underline':''}">${x.notes.length>2?(daChName(x)||'·'):q[0].replace(/^(3ce|6te) /,'').replace('4te juste','J').replace('5te juste','J').replace('triton','T').replace('majeur','M').replace('mineur','m').replace('diminué','°').replace('augmenté','+')}</b>`}).join(' '):'');
 document.getElementById('daFrame').title=DA.mode==='sc'?'Joue chaque forme (touche toutes ses notes, ou au micro une seule suffit). Les ombres montrent toute la gamme harmonisée sur ces cordes : vois la forme glisser.':'Reste dans la zone : les petites pastilles sont les notes de l\'accord en cours, les pointillés jaunes la forme suivante. Le jeu « continu » enchaîne chaque accord par la note la plus proche.'}
 document.getElementById('daPlay').onclick=()=>{if(DAT){daStop();DA.i=0;daDraw();return}ac();daPlay()};

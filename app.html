@@ -366,7 +366,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v5.3 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v5.4 — Boss</div>
 </section>
 
 </main>
@@ -1904,6 +1904,34 @@ sub.querySelectorAll('[data-psong]').forEach(b=>b.onclick=e=>{const i=+b.dataset
 document.getElementById('pFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{songLoad(String(r.result));e.target.value=''};r.readAsText(f)};
 /* basse des accords slash */
 function slashBass(c,v){if(!c||c.b==null||!v)return null;const lo=Math.min(...v.n.map(x=>x.s));let best=null;for(let s2=0;s2<Math.max(1,lo);s2++)for(let f=0;f<=NF;f++){if((TUNE[s2]+f)%12!==c.b)continue;const d=Math.abs(f-(v.avg||5));if(!best||d<best.d)best={s:s2,f,m:MIDI[s2]+f,d}}return best}
+
+/* ================= PAS À PAS GÉNÉRIQUE (◀ ▶) ================= */
+const P3=(s2,f)=>({s:s2,f,m:MIDI[s2]+f});
+const vN=v=>v.fr.map((f,i)=>P3(v.strs[i],f));
+function jzSteps(){if(J.mode==='cm'){return cmSeq().map(x=>({n:[P3(x.bs,x.bf),P3(x.ts,x.tf)]}))}
+if(J.mode==='im'){if(IM.sub==='lg')return lgLine().filter(n=>n.pos).map(n=>({n:[P3(n.pos[0],n.pos[1])],lab:n.desc}));if(IM.sub==='ap')return(AP.seq||[]).map(x=>({n:[P3(x.s,x.f)]}));return[]}
+const strs=DSETS[J.type][J.ss];if(J.seq&&J.seq.length){let prev=null;return J.seq.map(c=>{const vs=voicings(c.r,c.q,J.type,strs);if(!vs.length)return null;const v=prev?vs.reduce((a,b)=>dist(a.fr,prev)<dist(b.fr,prev)?a:b):vs.reduce((a,b)=>Math.abs(avg(a.fr)-5)<Math.abs(avg(b.fr)-5)?a:b);prev=v.fr;return{n:vN(v),lab:(c.fn?c.fn+' · ':'')+c.name+Q7N[c.q]}}).filter(Boolean)}
+return voicings(PC[J.key],J.q,J.type,strs).sort((a,b)=>avg(a.fr)-avg(b.fr)).map(v=>({n:vN(v),lab:J.key+Q7N[J.q]}))}
+function blSteps(){if(BL.mode==='dbl')return turnSeq().map(st=>({n:vN(st)}));if(BL.mode==='fda')return fdaChain(PC[BL.key],BL.fda7).map(c=>({n:vN(c),lab:'forme '+c.nm}));
+if(BL.mode==='boogie'){const bp=boogiePos(),L=pentaMaj(bp.root,bp.str,bp.f);const u=[...new Set(L.map(n=>MIDI[n.s]+n.f))].sort((a,b)=>a-b);return u.map(m=>{const n=L.find(x=>MIDI[x.s]+x.f===m);return{n:[P3(n.s,n.f)]}})}
+const bi=BL.mode==='box'?BL.box:0,L=boxNotes(bi);return boxSeq(bi).map(m=>L.find(n=>MIDI[n.s]+n.f===m)).filter(Boolean).map(n=>({n:[P3(n.s,n.f)]}))}
+function sgSteps(){const o=[];(SG.bars||[]).forEach((b,bi)=>b.ch.forEach((c,ci)=>{const v=SG.path[bi]&&SG.path[bi][ci];if(v&&!c.cont)o.push({n:vN(v),lab:`mesure ${bi+1} · ${c.cs}`,bi,beat:c.beat})}));return o}
+const STEPSRC={tk:{svg:'tSvg',info:'tkInfo',get:()=>TK.ex==='find'||TK.ex==='bend'?[]:TK.seq.map(n=>({n:[P3(n.s,n.f)],lab:n.fg!=null?'doigt '+n.fg:''})),redraw:()=>tkDraw()},
+jz:{svg:'jSvg',info:()=>J.mode==='cm'?'cmInfo':J.mode==='im'?'imInfo':'jInfo',get:jzSteps,redraw:()=>jzDraw()},
+bl:{svg:'bSvg',info:'blInfo',get:blSteps,redraw:()=>blDraw()},
+sg:{svg:'gSvg',info:'sgInfo',get:sgSteps,redraw:(st)=>{if(st&&st.bi!=null){SG.bar=st.bi;SG.beat=st.beat||0}sgDraw()}}};
+const STP={k:'',i:-1};
+function stepGo(key,d){const src=STEPSRC[key];if(!src)return;DEMO++;const L=src.get();if(!L.length)return;const sig=key+L.length+':'+L[0].n.map(x=>x.m).join(',');if(STP.k!==sig){STP.k=sig;STP.i=-1}
+STP.i=((STP.i<0&&d<0?0:STP.i)+d+L.length)%L.length;const st=L[STP.i];src.redraw(st);const svg=typeof src.svg==='function'?src.svg():src.svg,lay=svgLayer(svg);if(!lay)return;
+const gg=document.createElementNS('http://www.w3.org/2000/svg','g');gg.setAttribute('pointer-events','none');let h=st.n.length>1?`<polyline points="${st.n.map(p=>X(p.s)+','+YN(p.f)).join(' ')}" fill="none" stroke="#ffd23f" stroke-width="3" stroke-opacity=".7"/>`:'';
+st.n.forEach(p=>h+=`<circle cx="${X(p.s)}" cy="${YN(p.f)}" r="20" fill="none" stroke="#ffd23f" stroke-width="4" filter="url(#glow)"/>`);gg.innerHTML=h;lay.appendChild(gg);
+ac();st.n.forEach(p=>tone(p.m,0,1.1,st.n.length>1?.16:.22));
+const nm2=st.n.length>1?hmLab([...st.n].sort((a,b)=>a.m-b.m)):JN[st.n[0].m%12]+` (corde ${6-st.n[0].s}, case ${st.n[0].f})`;
+const el=document.getElementById(typeof src.info==='function'?src.info():src.info);if(el)el.textContent=`Étape ${STP.i+1}/${L.length} : ${st.lab?st.lab+' — ':''}${nm2}`}
+function daStep(d){if(!DA.ev.length)return;daStop();DA.i=(DA.i+d+DA.ev.length)%DA.ev.length;DA.got=[];daDraw();const e=DA.ev[DA.i];ac();e.notes.forEach(x=>tone(x.m,0,1.1,e.notes.length>1?.16:.22))}
+[['tkPlay','tk'],['jPlay','jz'],['cmPlay','jz'],['imPlay','jz'],['blPlay','bl'],['daPlay','da'],['sgGo','sg']].forEach(([id,k])=>{const b=document.getElementById(id);if(!b)return;
+const mk=(d,t)=>{const x=document.createElement('button');x.className='b';x.textContent=t;x.title=d<0?'étape précédente':'étape suivante';x.style.minWidth='38px';x.onclick=()=>k==='da'?daStep(d):stepGo(k,d);return x};
+b.before(mk(-1,'◀'));b.after(mk(1,'▶'))});
 
 sideReflow();
 let DRM='tri';document.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>drillMode(b.dataset.dm));

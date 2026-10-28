@@ -357,7 +357,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.1 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.2 — Boss</div>
 </section>
 
 </main>
@@ -1650,7 +1650,7 @@ function progDraw(sub){const k=PC[N.key];
 let h='<div class="row brow pchips">';if(!P.ch.length)h+='<span class="lbl" style="min-width:0">Touche les accords à droite pour construire ta progression →</span>';
 P.ch.forEach((c,i)=>{h+=`${i?'<span class="par">→</span>':''}<button class="b pc ${i===P.i?'on':''} ${i===P.rep?'rep':''}" data-pi="${i}">${pName(c)} <small>${c.rn||''}</small><i data-px="${i}">×</i></button>`});
 if(P.ch.length)h+='<button class="b" id="pClr">✕ effacer</button>';h+='</div>';
-h+='<div class="row brow"><span class="lbl">Raccourcis</span>'+PPRE[P.minor?'min':'maj'].map((p,i)=>`<button class="b" data-pp="${i}">${p[0]}</button>`).join('')+`<button class="b ${P.stdQ?'on':''}" id="pStdB">📚 Standard</button>${P.stdQ?'<input id="pStdQ" placeholder="titre… (vide = hasard)" style="width:120px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:3px 6px;font-size:11.5px"><button class="b go" id="pStdGo">Charger</button>':''}</div>`;
+h+='<div class="row brow"><span class="lbl">Raccourcis</span>'+PPRE[P.minor?'min':'maj'].map((p,i)=>`<button class="b" data-pp="${i}">${p[0]}</button>`).join('')+`<button class="b ${P.stdQ?'on':''}" id="pStdB">📚 Standard</button>${P.stdQ?'<input id="pStdQ" enterkeyhint="go" placeholder="titre… (vide = hasard)" style="width:120px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:3px 6px;font-size:11.5px"><button class="b go" id="pStdGo">Charger</button>':''}</div>`;
 h+='<div class="row brow"><button class="b go" id="pGo">'+(P.timer?'■ Stop':'▶ Jouer')+'</button><button class="b" id="pPrev">◀</button><button class="b" id="pNext">▶</button><span class="lbl" style="min-width:0">Tempo</span><button class="b" id="pTm">−</button><span style="font-size:12px">'+P.tempo+'</span><button class="b" id="pTp">+</button>'+
 `<button class="b ${P.lock?'on':''}" id="pLock">${P.lock?'🔒 Zone '+Math.max(0,Math.round(P.zc-2))+'‑'+Math.round(P.zc+2):'🔓 Zone libre'}</button></div>`;
 h+=chipRow('Grips',GRIPS,P.grip,'pg');
@@ -1658,7 +1658,8 @@ sub.innerHTML=h;
 sub.querySelectorAll('[data-pi]').forEach(b=>{let t=null,long=false;b.onpointerdown=()=>{long=false;t=setTimeout(()=>{long=true;P.rep=+b.dataset.pi;drawNeck()},500)};b.onpointerup=b.onpointerleave=()=>clearTimeout(t);b.onclick=e=>{if(e.target.dataset.px!=null){P.ch.splice(+e.target.dataset.px,1);P.i=Math.min(P.i,P.ch.length-1);P.i=Math.max(0,P.i);P.rep=-1;P.path=null;drawNeck();return}if(long)return;P.i=+b.dataset.pi;P.got=[];drawNeck();pPlayCur()}});
 const g=id=>sub.querySelector(id);if(g('#pClr'))g('#pClr').onclick=()=>{pStop();P.ch=[];P.i=0;P.rep=-1;P.path=null;drawNeck()};
 sub.querySelectorAll('[data-pp]').forEach(b=>b.onclick=()=>pPreset(PPRE[P.minor?'min':'maj'][+b.dataset.pp][1]));
-g('#pStdB').onclick=()=>{P.stdQ=!P.stdQ;drawNeck()};if(g('#pStdGo'))g('#pStdGo').onclick=pStd;
+if(g('#pStdQ')){const i=g('#pStdQ');i.value=P.qv||'';i.oninput=()=>P.qv=i.value;i.onkeydown=e=>{if(e.key==='Enter'){i.blur();pStd()}}}
+g('#pStdB').onclick=()=>{P.stdQ=!P.stdQ;drawNeck();if(P.stdQ)setTimeout(()=>{const i=document.getElementById('pStdQ');if(i)i.focus()},50)};if(g('#pStdGo'))g('#pStdGo').onclick=pStd;
 g('#pGo').onclick=pToggle;g('#pPrev').onclick=()=>pStep(-1);g('#pNext').onclick=()=>pStep(1);
 g('#pTm').onclick=()=>{P.tempo=Math.max(40,P.tempo-8);if(P.timer){pStop();pToggle()}else drawNeck()};g('#pTp').onclick=()=>{P.tempo=Math.min(200,P.tempo+8);if(P.timer){pStop();pToggle()}else drawNeck()};
 g('#pLock').onclick=()=>{P.lock=!P.lock;if(P.lock){const v=(progPath()||[])[P.i];P.zc=v&&v.avg?v.avg:6}P.path=null;drawNeck()};
@@ -1964,7 +1965,7 @@ document.getElementById('pReset').onclick=()=>{if(confirm('Effacer toute la prog
 
 /* ================= INIT ================= */
 drawNeck();newTarget(true);drawTri();drawSc();drNew();jzReset();
-let rz=null;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(redrawAll,150)});
+let rz=null,LW=window.innerWidth;window.addEventListener('resize',()=>{const ae=document.activeElement;if(ae&&ae.tagName==='INPUT'&&ae.type!=='range'&&window.innerWidth===LW)return;LW=window.innerWidth;clearTimeout(rz);rz=setTimeout(redrawAll,150)});
 </script>
 </body>
 </html>

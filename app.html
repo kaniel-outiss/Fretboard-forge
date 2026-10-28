@@ -357,7 +357,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.2 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.3 — Boss</div>
 </section>
 
 </main>
@@ -1620,7 +1620,7 @@ const PMINB=[[11,'dim','dim7','vii°7'],[0,'maj','maj7','I picarde'],[5,'maj','7
 const PPRE={maj:[['ii‑V‑I',[[2,'m7','min','ii'],[7,'7','maj','V'],[0,'maj7','maj','I']]],['I‑vi‑ii‑V',[[0,'maj7','maj','I'],[9,'m7','min','vi'],[2,'m7','min','ii'],[7,'7','maj','V']]],['I‑IV‑V',[[0,'maj7','maj','I'],[5,'maj7','maj','IV'],[7,'7','maj','V'],[0,'maj7','maj','I']]],
 ['iii‑vi‑ii‑V‑I',[[4,'m7','min','iii'],[9,'m7','min','vi'],[2,'m7','min','ii'],[7,'7','maj','V'],[0,'maj7','maj','I']]],['Blues 12',[0,5,0,0,5,5,0,0,7,5,0,7].map((o,i)=>[o,'7','7',['I7','IV7','I7','I7','IV7','IV7','I7','I7','V7','IV7','I7','V7'][i]])],['Gospel I‑VI7‑ii‑V',[[0,'maj7','maj','I'],[9,'7','7','VI7'],[2,'m7','min','ii'],[7,'7','7','V']]]],
 min:[['ii°‑V‑i',[[2,'m7b5','dim','ii°'],[7,'7','maj','V'],[0,'m7','min','i']]],['i‑iv‑V',[[0,'m7','min','i'],[5,'m7','min','iv'],[7,'7','maj','V'],[0,'m7','min','i']]],['i‑♭VII‑♭VI‑V',[[0,'m7','min','i'],[10,'7','maj','♭VII',1],[8,'maj7','maj','♭VI',1],[7,'7','maj','V']]],['i‑♭VI‑♭III‑♭VII',[[0,'m7','min','i'],[8,'maj7','maj','♭VI',1],[3,'maj7','maj','♭III',1],[10,'7','maj','♭VII',1]]],['Blues mineur',[0,5,0,0,5,5,0,0,8,7,0,7].map((o,i)=>[o,o===8?'7':o===7?'7':'m7',o===8||o===7?'maj':'min',['i','iv','i','i','iv','iv','i','i','♭VI7','V7','i','V7'][i],o===8?1:0])]]};
-const P={ch:[],i:0,grip:'d2',four:true,minor:false,lock:false,zc:6,rep:-1,timer:null,tempo:96,got:[],path:null,sig:'',stdQ:false};
+const P={za:5,zw:5,tr:'0',scl:true,ch:[],i:0,grip:'d2',four:true,minor:false,lock:false,zc:6,rep:-1,timer:null,tempo:96,got:[],path:null,sig:'',stdQ:false};
 const GRIPS=[['tri','Triades'],['d2','Drop 2'],['d3','Drop 3'],['sh','Shells'],['q4','Quartes'],['full','Complets']];
 const pName=c=>(c.fl||(FLATK.includes(N.key)&&!P.minor)?FLP:SHP)[c.r]+(QS[c.q]??c.q);
 function pvCands(c){const out=[],push=(strs,fr)=>{if(fr.some(f=>f<0||f>NF))return;const n=strs.map((s,i)=>({s,f:fr[i],m:MIDI[s]+fr[i]})).sort((a,b)=>a.s-b.s);const fz=n.map(x=>x.f).filter(f=>f>0);out.push({n,avg:fz.length?avg(fz):0})};
@@ -1628,21 +1628,31 @@ if(P.grip==='tri'){for(let ss=0;ss<4;ss++)triadVoicings(FLP[c.r],TRI3[c.q]||'maj
 else if(P.grip==='full'){const id=DICT.find(d=>d[0]===c.q)?c.q:(TRI3[c.q]==='min'?'min':'maj');dictVoicings(c.r,id).forEach(v=>{const st=[],fr=[];v.fr.forEach((f,s)=>{if(f>=0){st.push(s);fr.push(f)}});push(st,fr)})}
 else{const q=sevQ(c.q),gt=shellIv(q);DSETS[P.grip].forEach(st=>voicings(c.r,q,P.grip,st).forEach(v=>{if(P.grip==='q4'&&!v.ivs.some(iv=>gt.includes(iv)))return;push(v.strs,v.fr)}))}
 const seen=new Set();return out.filter(v=>{const k=v.n.map(x=>x.s+':'+x.f).join();if(seen.has(k))return false;seen.add(k);return true})}
+const inZone=v=>v.n.every(x=>(x.f===0&&P.za<=1)||(x.f>=P.za&&x.f<=P.za+P.zw-1));
+const ZVC={};
+function zoneVoicings(c){const k=c.r+'|'+c.q+'|'+P.za+'|'+P.zw+'|'+P.grip;if(ZVC[k])return ZVC[k];const iv=daPcs(c.q),pcs=iv.map(x=>(c.r+x)%12),need=[(c.r+(iv.includes(4)?4:iv.includes(3)?3:5))%12];if(iv.length>3)need.push((c.r+iv[3])%12);
+const want=P.grip==='tri'?3:Math.min(4,pcs.length),opts=[];for(let s2=0;s2<6;s2++){const o=[-1];if(P.za<=1&&pcs.includes(TUNE[s2]%12))o.push(0);for(let f=Math.max(1,P.za);f<=Math.min(NF,P.za+P.zw-1);f++)if(pcs.includes((TUNE[s2]+f)%12))o.push(f);opts.push(o)}
+const out=[];const rec=(s2,cur)=>{if(s2===6){const pl=cur.map((f,i)=>f>=0?i:-1).filter(i=>i>=0);if(pl.length<want||pl.length>Math.max(want,4))return;if(pl[pl.length-1]-pl[0]+1-pl.length>1)return;
+const got=new Set(pl.map(i=>(TUNE[i]+cur[i])%12));if(!need.every(x=>got.has(x)))return;if(got.size<Math.min(want,pcs.length)-(pcs.length>3?1:0))return;const fz=pl.map(i=>cur[i]).filter(f=>f>0);if(fz.length&&Math.max(...fz)-Math.min(...fz)>3)return;if(fz.length>4)return;
+const n=pl.map(i=>({s:i,f:cur[i],m:MIDI[i]+cur[i]}));out.push({n,avg:fz.length?avg(fz):0,sc:(((TUNE[pl[0]]+cur[pl[0]])%12===c.r)?2:0)+got.size});return}for(const f of opts[s2])rec(s2+1,cur.concat([f]))};rec(0,[]);
+out.sort((a,b)=>b.sc-a.sc);return ZVC[k]=out.slice(0,24)}
 function pvCost(a,b){let c=0;const mb={};b.n.forEach(x=>mb[x.s]=x.f);const ma={};a.n.forEach(x=>ma[x.s]=x.f);
 a.n.forEach(x=>{if(mb[x.s]!=null)c+=Math.abs(mb[x.s]-x.f);else c+=1.5});b.n.forEach(x=>{if(ma[x.s]==null)c+=1.5});return c+Math.abs(a.avg-b.avg)*.5}
-function zonePen(v){return P.lock?Math.max(0,Math.abs(v.avg-P.zc)-2.5)*4:0}
-function progPath(){const sig=P.grip+'|'+P.lock+P.zc+'|'+P.ch.map(c=>c.r+c.q).join(',');if(P.path&&P.sig===sig)return P.path;P.sig=sig;
-const C=P.ch.map(pvCands);if(!C.length||C.some(x=>!x.length)){P.path=C.map(x=>x[0]||null);return P.path}
-let D=C[0].map(v=>({c:zonePen(v)+Math.abs(v.avg-(P.lock?P.zc:6))*.3,p:-1}));const BK=[D];
+function zonePen(v){return 0}
+function progPath(){const sig=P.grip+'|'+P.lock+P.za+'/'+P.zw+'|'+P.ch.map(c=>c.r+c.q).join(',');if(P.path&&P.sig===sig)return P.path;P.sig=sig;
+const C=P.ch.map(c=>{const all=pvCands(c);if(!P.lock)return all;const z=all.filter(inZone);if(z.length){z.forEach(v=>v.zf=0);return z}const g=zoneVoicings(c);g.forEach(v=>v.zf=1);return g});if(!C.length||C.some(x=>!x.length)){P.path=C.map(x=>x[0]||null);return P.path}
+let D=C[0].map(v=>({c:Math.abs(v.avg-(P.lock?P.za+P.zw/2:6))*.3,p:-1}));const BK=[D];
 for(let i=1;i<C.length;i++){const ND=C[i].map(v=>{let best=1e9,bp=0;D.forEach((d,j)=>{const x=d.c+pvCost(C[i-1][j],v);if(x<best){best=x;bp=j}});return{c:best+zonePen(v),p:bp}});BK.push(ND);D=ND}
 let j=D.reduce((bi,d,k)=>d.c<D[bi].c?k:bi,0);const path=[];for(let i=C.length-1;i>=0;i--){path[i]=C[i][j];j=BK[i][j].p}P.path=path;return path}
 function pvMove(a,b){const mb={};b.n.forEach(x=>mb[x.s]=x.f);let piv=0,mv=0,cases=0,neu=0;a.n.forEach(x=>{if(mb[x.s]===x.f)piv++;else if(mb[x.s]!=null){mv++;cases+=Math.abs(mb[x.s]-x.f)}});b.n.forEach(x=>{if(!a.n.some(y=>y.s===x.s))neu++});return{piv,mv,cases,neu,jump:Math.abs(a.avg-b.avg)>=3}}
 function pAdd(t){const c={r:(PC[N.key]+t[0])%12,q:P.four?t[2]:t[1],rn:t[3],fl:!!t[4]};if(P.rep>=0&&P.rep<P.ch.length){P.ch[P.rep]=c;P.i=P.rep;P.rep=-1}else{P.ch.push(c);P.i=P.ch.length-1}P.path=null;drawNeck();const v=progPath()[P.i];if(v)chord(v.n.map(x=>x.m))}
 function pPreset(t){P.ch=t.map(x=>({r:(PC[N.key]+x[0])%12,q:P.four?x[1]:x[2],rn:x[3],fl:!!x[4]}));P.i=0;P.rep=-1;P.path=null;drawNeck()}
+function pTranspose(d){const k2=KEYS.find(x=>PC[x]===(PC[N.key]+d)%12);N.key=k2;document.getElementById('nKey').value=k2;P.ch=P.ch.map(c=>({...c,r:(c.r+d)%12}));P.path=null}
+const TRD={'4':5,'5':7,'1':1};
 function pStop(){if(P.timer){clearInterval(P.timer);P.timer=null}}
 function pPlayCur(){const v=progPath()[P.i];if(v)chord(v.n.map(x=>x.m),0,60/P.tempo*3.6)}
 function pStep(d){if(!P.ch.length)return;P.i=(P.i+d+P.ch.length)%P.ch.length;P.got=[];drawNeck();pPlayCur()}
-function pToggle(){if(P.timer){pStop();drawNeck();return}if(!P.ch.length)return;ac();pPlayCur();drawNeck();P.timer=setInterval(()=>{if(N.view!=='prog'||!document.getElementById('t-neck').classList.contains('on')){pStop();return}P.i=(P.i+1)%P.ch.length;P.got=[];drawNeck();pPlayCur()},60/P.tempo*4*1000)}
+function pToggle(){if(P.timer){pStop();drawNeck();return}if(!P.ch.length)return;ac();pPlayCur();drawNeck();P.timer=setInterval(()=>{if(N.view!=='prog'||!document.getElementById('t-neck').classList.contains('on')){pStop();return}P.i=(P.i+1)%P.ch.length;if(P.i===0&&P.tr!=='0')pTranspose(TRD[P.tr]);P.got=[];drawNeck();pPlayCur()},60/P.tempo*4*1000)}
 async function pStd(){if(!STD){document.getElementById('nInfo').textContent='Chargement des standards…';await stdLoad()}const q=(document.getElementById('pStdQ')||{}).value||'';let idx=-1;if(q.trim()){const ql=q.trim().toLowerCase();idx=STD.findIndex(r=>r[1].toLowerCase().includes(ql))}if(idx<0)idx=Math.floor(Math.random()*STD.length);
 const ch=[];let prev=null;stdBars(STD[idx]).forEach(b=>b.ch.forEach(c=>{if(!c.p||c.cont)return;const k=c.p.r+c.p.f;if(k===prev)return;prev=k;ch.push({r:c.p.r,q:c.p.f,rn:c.fn||'',fl:/b|♭/.test(c.cs.slice(1,2))})}));
 P.ch=ch.slice(0,32);P.i=0;P.path=null;P.stdName=STD[idx][1];P.stdQ=false;drawNeck()}
@@ -1652,7 +1662,7 @@ P.ch.forEach((c,i)=>{h+=`${i?'<span class="par">→</span>':''}<button class="b 
 if(P.ch.length)h+='<button class="b" id="pClr">✕ effacer</button>';h+='</div>';
 h+='<div class="row brow"><span class="lbl">Raccourcis</span>'+PPRE[P.minor?'min':'maj'].map((p,i)=>`<button class="b" data-pp="${i}">${p[0]}</button>`).join('')+`<button class="b ${P.stdQ?'on':''}" id="pStdB">📚 Standard</button>${P.stdQ?'<input id="pStdQ" enterkeyhint="go" placeholder="titre… (vide = hasard)" style="width:120px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:3px 6px;font-size:11.5px"><button class="b go" id="pStdGo">Charger</button>':''}</div>`;
 h+='<div class="row brow"><button class="b go" id="pGo">'+(P.timer?'■ Stop':'▶ Jouer')+'</button><button class="b" id="pPrev">◀</button><button class="b" id="pNext">▶</button><span class="lbl" style="min-width:0">Tempo</span><button class="b" id="pTm">−</button><span style="font-size:12px">'+P.tempo+'</span><button class="b" id="pTp">+</button>'+
-`<button class="b ${P.lock?'on':''}" id="pLock">${P.lock?'🔒 Zone '+Math.max(0,Math.round(P.zc-2))+'‑'+Math.round(P.zc+2):'🔓 Zone libre'}</button></div>`;
+`<button class="b ${P.scl?'on':''}" id="pScl">🎼 Gamme</button></div>`+`<div class="row brow"><span class="lbl">Zone</span><button class="b ${P.lock?'':'on'}" id="pFree">Libre</button><button class="b ${P.lock?'on':''}" id="pLock">🔒 Cases ${P.za}‑${P.za+P.zw-1}</button><button class="b" id="pZl">◀</button><button class="b" id="pZr">▶</button>${[4,5,6].map(w=>`<button class="b ${P.zw===w?'on':''}" data-zw="${w}">${w} c.</button>`).join('')}</div>`+`<div class="row brow"><span class="lbl">Transpo</span>${[['0','Fixe'],['4','↻ 4tes'],['5','↻ 5tes'],['1','↻ ½ ton']].map(([v,t])=>`<button class="b ${P.tr===v?'on':''}" data-tr="${v}">${t}</button>`).join('')}<button class="b" id="pTrN">⏭ tonalité suivante</button></div>`;
 h+=chipRow('Grips',GRIPS,P.grip,'pg');
 sub.innerHTML=h;
 sub.querySelectorAll('[data-pi]').forEach(b=>{let t=null,long=false;b.onpointerdown=()=>{long=false;t=setTimeout(()=>{long=true;P.rep=+b.dataset.pi;drawNeck()},500)};b.onpointerup=b.onpointerleave=()=>clearTimeout(t);b.onclick=e=>{if(e.target.dataset.px!=null){P.ch.splice(+e.target.dataset.px,1);P.i=Math.min(P.i,P.ch.length-1);P.i=Math.max(0,P.i);P.rep=-1;P.path=null;drawNeck();return}if(long)return;P.i=+b.dataset.pi;P.got=[];drawNeck();pPlayCur()}});
@@ -1662,7 +1672,10 @@ if(g('#pStdQ')){const i=g('#pStdQ');i.value=P.qv||'';i.oninput=()=>P.qv=i.value;
 g('#pStdB').onclick=()=>{P.stdQ=!P.stdQ;drawNeck();if(P.stdQ)setTimeout(()=>{const i=document.getElementById('pStdQ');if(i)i.focus()},50)};if(g('#pStdGo'))g('#pStdGo').onclick=pStd;
 g('#pGo').onclick=pToggle;g('#pPrev').onclick=()=>pStep(-1);g('#pNext').onclick=()=>pStep(1);
 g('#pTm').onclick=()=>{P.tempo=Math.max(40,P.tempo-8);if(P.timer){pStop();pToggle()}else drawNeck()};g('#pTp').onclick=()=>{P.tempo=Math.min(200,P.tempo+8);if(P.timer){pStop();pToggle()}else drawNeck()};
-g('#pLock').onclick=()=>{P.lock=!P.lock;if(P.lock){const v=(progPath()||[])[P.i];P.zc=v&&v.avg?v.avg:6}P.path=null;drawNeck()};
+g('#pFree').onclick=()=>{P.lock=false;P.path=null;drawNeck()};g('#pLock').onclick=()=>{if(!P.lock&&!P.zset){const v=(progPath()||[])[P.i];if(v&&v.avg)P.za=Math.max(0,Math.round(v.avg-P.zw/2+.5))}P.zset=1;P.lock=true;P.path=null;drawNeck()};
+const zmv=d=>{P.za=Math.max(0,Math.min(NF-P.zw+1,P.za+d));P.lock=true;P.zset=1;P.path=null;drawNeck()};g('#pZl').onclick=()=>zmv(-1);g('#pZr').onclick=()=>zmv(1);
+sub.querySelectorAll('[data-zw]').forEach(b=>b.onclick=()=>{P.zw=+b.dataset.zw;P.lock=true;P.zset=1;P.path=null;drawNeck()});
+sub.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{P.tr=b.dataset.tr;drawNeck()});g('#pTrN').onclick=()=>{pTranspose(TRD[P.tr==='0'?'4':P.tr]);drawNeck();pPlayCur()};g('#pScl').onclick=()=>{P.scl=!P.scl;drawNeck()};
 sub.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{P.grip=b.dataset.pg;P.path=null;drawNeck();pPlayCur()});
 // rail droit
 const R=document.getElementById('nRailR');R.classList.add('wide');const dia=P.minor?PMIN:PMAJ,bor=P.minor?PMINB:PMAJB;
@@ -1674,7 +1687,8 @@ R.querySelector('#pFour').onclick=()=>{P.four=!P.four;P.ch=P.ch.map(c=>{const t=
 let s='',info='';const path=progPath();const cur=path[P.i];
 if(!P.ch.length){info='Choisis une tonalité à gauche, touche des accords à droite (ou un raccourci) : l\'appli calcule l\'enchaînement le plus court sur tout le manche. Appui long sur un accord de la progression = le remplacer.';return{h:s,info}}
 if(!cur){info=`Aucun grip « ${GRIPS.find(x=>x[0]===P.grip)[1]} » trouvé pour ${pName(P.ch[P.i])} — essaie un autre grip.`;return{h:s,info}}
-if(P.lock)s+=`<rect x="34" y="${YL(Math.max(0,Math.round(P.zc-2.5)))}" width="296" height="${YL(Math.min(NF,Math.round(P.zc+2.5)))-YL(Math.max(0,Math.round(P.zc-2.5)))}" rx="10" fill="#2ee6ff" opacity=".05" stroke="#2ee6ff" stroke-opacity=".45" stroke-dasharray="4 4"/>`;
+const za=P.lock?P.za:0,zb=P.lock?P.za+P.zw-1:NF;if(P.lock)s+=`<rect x="34" y="${YL(Math.max(0,za-1))-(za<=1?14:0)}" width="296" height="${YL(zb)-YL(Math.max(0,za-1))+(za<=1?14:0)}" rx="10" fill="#2ee6ff" opacity=".06" stroke="#2ee6ff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="5 4"/>`;
+const csc=chordScale(P.ch[P.i]);if(P.scl&&csc){const ca=P.lock?za:Math.max(0,Math.round(cur.avg)-2),cb=P.lock?zb:Math.min(NF,Math.round(cur.avg)+3);for(let s2=0;s2<6;s2++)for(let f=ca;f<=cb;f++){const pc=(TUNE[s2]+f)%12,iv=(pc-P.ch[P.i].r+12)%12;if(!csc.set.includes((pc-csc.r+12)%12)||cur.n.some(x=>x.s===s2&&x.f===f))continue;s+=`<circle cx="${X(s2)}" cy="${YN(f)}" r="9" fill="${NC[iv]}" opacity=".35"/><text x="${X(s2)}" y="${YN(f)+3}" text-anchor="middle" font-size="8" fill="#05060b">${IVN[iv]}</text>`}}
 const n=P.ch.length,nxt=n>1?path[(P.i+1)%n]:null,c=P.ch[P.i],cn=n>1?P.ch[(P.i+1)%n]:null;
 const gt=(v,ch)=>v?v.n.filter(x=>{const iv=(x.m-ch.r+120)%12;return[3,4,10,11,9].includes(iv)&&!(iv===9&&!/6|dim7|°/.test(QS[ch.q]))}):[];
 if(nxt){const mc={};cur.n.forEach(x=>mc[x.s]=x.f);
@@ -1686,10 +1700,15 @@ const g1=gt(cur,c),g2=gt(nxt,cn);g1.forEach(a=>{if(!g2.length)return;const b=g2.
 const piv=nxt?cur.n.filter(x=>nxt.n.some(y=>y.s===x.s&&y.f===x.f)):[];
 cur.n.forEach(x=>{const iv=(x.m-c.r+120)%12,isP=piv.some(y=>y.s===x.s&&y.f===x.f);if(isP)s+=`<circle cx="${X(x.s)}" cy="${YN(x.f)}" r="21" fill="none" stroke="#2ee6ff" stroke-width="3" filter="url(#glow)"/>`;s+=dot(x.s,x.f,NC[iv],P.got.includes(x.m)?'✓':(N.mode==='nt'?JN[x.m%12]:lab7(iv,sevQ(c.q))),{r:15,target:P.got.length&&!P.got.includes(x.m)})});
 let tot=0,jumps=0;for(let i=0;i+1<n;i++){if(!path[i]||!path[i+1])continue;const m=pvMove(path[i],path[i+1]);tot+=m.cases;if(m.jump)jumps++}
-const zs=path.filter(Boolean).map(v=>v.avg).filter(x=>x>0),za=zs.length?Math.round(Math.min(...zs)):0,zb=zs.length?Math.round(Math.max(...zs)):0;
-info=`${pName(c)}${cn?' → '+pName(cn):''}`;if(nxt){const m=pvMove(cur,nxt);info+=` · ◎ ${m.piv} doigt${m.piv>1?'s':''} reste${m.piv>1?'nt':''} · ↕ ${m.mv} bouge${m.mv>1?'nt':''} (${m.cases} case${m.cases>1?'s':''})${m.neu?' · +'+m.neu+' nouvelle(s) corde(s)':''}${m.jump?' · ⚠ saut de position':''}`}
-info+=`  ‖  Grille : ${tot} cases · zone ${za}‑${zb} · ${jumps} saut${jumps>1?'s':''}${P.stdName&&P.ch.length>8?' · '+P.stdName:''}. Pointillé jaune = accord suivant · anneau cyan = doigt qui reste · flèche verte 1 case / jaune 2 / rouge saut · violet = notes guides 3‑7.`;
+const zs=path.filter(Boolean).map(v=>v.avg).filter(x=>x>0),z1=zs.length?Math.round(Math.min(...zs)):0,z2=zs.length?Math.round(Math.max(...zs)):0;
+info=`${pName(c)}${csc&&P.scl?' ('+csc.name+')':''}${cn?' → '+pName(cn):''}`;if(cur.zf)info+=' · forme trouvée dans la zone';if(nxt){const m=pvMove(cur,nxt);info+=` · ◎ ${m.piv} doigt${m.piv>1?'s':''} reste${m.piv>1?'nt':''} · ↕ ${m.mv} bouge${m.mv>1?'nt':''} (${m.cases} case${m.cases>1?'s':''})${m.neu?' · +'+m.neu+' nouvelle(s) corde(s)':''}${m.jump?' · ⚠ saut de position':''}`}
+info+=`  ‖  Grille : ${tot} cases · zone ${z1}‑${z2} · ${jumps} saut${jumps>1?'s':''}${P.stdName&&P.ch.length>8?' · '+P.stdName:''}. Pointillé jaune = accord suivant · anneau cyan = doigt qui reste · flèche verte 1 case / jaune 2 / rouge saut · violet = notes guides 3‑7.`;
 return{h:s,info}}
+const CSC={maj:[0,2,4,5,7,9,11,'ionien'],maj7:[0,2,4,5,7,9,11,'ionien'],'6':[0,2,4,5,7,9,11,'ionien'],'7':[0,2,4,5,7,9,10,'mixolydien'],sus4:[0,2,4,5,7,9,10,'mixolydien'],'7sus4':[0,2,4,5,7,9,10,'mixolydien'],min:[0,2,3,5,7,9,10,'dorien'],m7:[0,2,3,5,7,9,10,'dorien'],m6:[0,2,3,5,7,9,10,'dorien'],mMaj7:[0,2,3,5,7,9,11,'mineur mélodique'],m7b5:[0,1,3,5,6,8,10,'locrien'],dim:[0,2,3,5,6,8,9,11,'diminuée'],dim7:[0,2,3,5,6,8,9,11,'diminuée'],aug:[0,2,4,6,8,10,'par tons'],'7#5':[0,2,4,6,8,10,'par tons']};
+const MODN7=['ionien','dorien','phrygien','lydien','mixolydien','éolien','locrien'];
+function chordScale(c){if(!c)return null;const k=PC[N.key]+(P.minor?3:0),maj=[0,2,4,5,7,9,11],pcs=daPcs(c.q).map(x=>(c.r+x)%12);
+if(pcs.every(p=>maj.includes((p-k+120)%12))){const d=maj.indexOf((c.r-k+120)%12);if(d>=0)return{r:k%12,set:maj,name:JN[c.r]+' '+MODN7[d]}}
+const t=CSC[c.q]||CSC.maj;return{r:c.r,set:t.slice(0,-1),name:JN[c.r]+' '+t[t.length-1]}}
 function progNote(m,fromMic){const v=(progPath()||[])[P.i];if(!v)return;const ms=v.n.map(x=>x.m);
 if(ms.includes(m)){if(!P.got.includes(m))P.got.push(m);if(fromMic||ms.every(x=>P.got.includes(x))){flash('ok','nFrame');if(fromMic)MIC.mute=performance.now()+300;P.got=[];P.i=(P.i+1)%P.ch.length;drawNeck();pPlayCur();return}drawNeck();return}
 if(ms.some(x=>x%12===m%12)){flash('warn','nFrame');return}flash('ko','nFrame')}

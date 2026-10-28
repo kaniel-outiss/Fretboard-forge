@@ -100,6 +100,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 .brow{gap:4px}.brow .lbl{min-width:46px}
 .pchips .pc{position:relative;padding-right:16px}.pchips .pc small{color:var(--mut);font-size:9.5px}.pchips .pc i{position:absolute;right:4px;top:2px;font-style:normal;font-size:10px;color:var(--mut)}
 .pchips .pc.on{border-color:#ffd23f;color:#ffd23f;box-shadow:0 0 8px #ffd23f88}.pchips .pc.rep{border-color:#ff3b5c;animation:breathe .6s infinite}.par{color:#5c6180;font-size:11px}
+.lyr{font-size:13px;line-height:1.7;padding:2px 8px;background:#0d0f18;border:1px solid #1c2033;border-radius:8px}.lyr .lc{color:#ffd23f;font-size:11px;font-weight:600;vertical-align:super;margin:0 2px}.lyr .lc.on{background:#ffd23f;color:#05060b;border-radius:4px;padding:0 4px}.lyr.nx{opacity:.45}
 @media (orientation:landscape){.rail.wide{width:112px!important}.rail.wide .g2c .rc{font-size:12px;padding:5px 1px}#t-neck.on,#t-sc.on{flex-direction:row;align-items:stretch}#t-neck .side,#t-sc .side{flex:0 0 34%;max-width:400px;overflow-y:auto;display:flex!important;flex-direction:column;gap:5px}#t-neck .side .gL,#t-neck .side .gR,#t-sc .side .gL,#t-sc .side .gR{width:100%}#t-neck .fill,#t-sc .fill{flex:1 1 auto;min-width:0}.fill.rails .rail{align-self:stretch;max-height:100%}
 .rail{width:auto;display:grid;grid-template-columns:1fr;align-content:start}.rail .rgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px}.rail .rk{width:32px;height:30px;border-radius:9px;font-size:11.5px}.rail .rc{width:46px;font-size:10.5px}.rail .rt{width:auto}.rail .rgrid.g2c{grid-template-columns:repeat(2,1fr)}.rail .rc small{font-size:8.5px}}
 .side.g2{display:grid;grid-template-columns:1fr;gap:6px 10px;align-items:start}
@@ -146,7 +147,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
     <div class="frame" id="nFrame" style="padding:4px 8px"><div class="info" id="nInfo"></div></div>
     <div class="row" id="nLayRow" style="display:none;justify-content:center"><button class="b go" id="nGo">🎯 Joue la couche</button><button class="b" id="nReset">↺ Compteur</button></div>
   </div>
-  <div class="fill rails"><div class="rail" id="nRailL"></div><svg class="neck" id="nSvg" viewBox="0 0 372 624"></svg><div class="rail" id="nRailR"></div></div>
+  <input type="file" id="pFile" style="display:none"><div class="fill rails"><div class="rail" id="nRailL"></div><svg class="neck" id="nSvg" viewBox="0 0 372 624"></svg><div class="rail" id="nRailR"></div></div>
 </section>
 
 <!-- ===== DESSINE ===== -->
@@ -357,7 +358,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.3 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.4 — Boss</div>
 </section>
 
 </main>
@@ -1622,7 +1623,8 @@ const PPRE={maj:[['ii‑V‑I',[[2,'m7','min','ii'],[7,'7','maj','V'],[0,'maj7',
 min:[['ii°‑V‑i',[[2,'m7b5','dim','ii°'],[7,'7','maj','V'],[0,'m7','min','i']]],['i‑iv‑V',[[0,'m7','min','i'],[5,'m7','min','iv'],[7,'7','maj','V'],[0,'m7','min','i']]],['i‑♭VII‑♭VI‑V',[[0,'m7','min','i'],[10,'7','maj','♭VII',1],[8,'maj7','maj','♭VI',1],[7,'7','maj','V']]],['i‑♭VI‑♭III‑♭VII',[[0,'m7','min','i'],[8,'maj7','maj','♭VI',1],[3,'maj7','maj','♭III',1],[10,'7','maj','♭VII',1]]],['Blues mineur',[0,5,0,0,5,5,0,0,8,7,0,7].map((o,i)=>[o,o===8?'7':o===7?'7':'m7',o===8||o===7?'maj':'min',['i','iv','i','i','iv','iv','i','i','♭VI7','V7','i','V7'][i],o===8?1:0])]]};
 const P={za:5,zw:5,tr:'0',scl:true,ch:[],i:0,grip:'d2',four:true,minor:false,lock:false,zc:6,rep:-1,timer:null,tempo:96,got:[],path:null,sig:'',stdQ:false};
 const GRIPS=[['tri','Triades'],['d2','Drop 2'],['d3','Drop 3'],['sh','Shells'],['q4','Quartes'],['full','Complets']];
-const pName=c=>(c.fl||(FLATK.includes(N.key)&&!P.minor)?FLP:SHP)[c.r]+(QS[c.q]??c.q);
+const keyFlat=()=>P.minor?['D','G','C','F','Bb','Eb','Ab'].includes(N.key):FLATK.includes(N.key);
+const pName=c=>{const T=(c.fl||keyFlat()?FLP:SHP);return T[c.r]+(QS[c.q]??c.q)+(c.b!=null&&c.b!==c.r?'/'+(c.bs?SHP:c.bfl?FLP:T)[c.b]:'')};
 function pvCands(c){const out=[],push=(strs,fr)=>{if(fr.some(f=>f<0||f>NF))return;const n=strs.map((s,i)=>({s,f:fr[i],m:MIDI[s]+fr[i]})).sort((a,b)=>a.s-b.s);const fz=n.map(x=>x.f).filter(f=>f>0);out.push({n,avg:fz.length?avg(fz):0})};
 if(P.grip==='tri'){for(let ss=0;ss<4;ss++)triadVoicings(FLP[c.r],TRI3[c.q]||'maj',ss).forEach(v=>push(v.strs,v.frets))}
 else if(P.grip==='full'){const id=DICT.find(d=>d[0]===c.q)?c.q:(TRI3[c.q]==='min'?'min':'maj');dictVoicings(c.r,id).forEach(v=>{const st=[],fr=[];v.fr.forEach((f,s)=>{if(f>=0){st.push(s);fr.push(f)}});push(st,fr)})}
@@ -1647,21 +1649,21 @@ let j=D.reduce((bi,d,k)=>d.c<D[bi].c?k:bi,0);const path=[];for(let i=C.length-1;
 function pvMove(a,b){const mb={};b.n.forEach(x=>mb[x.s]=x.f);let piv=0,mv=0,cases=0,neu=0;a.n.forEach(x=>{if(mb[x.s]===x.f)piv++;else if(mb[x.s]!=null){mv++;cases+=Math.abs(mb[x.s]-x.f)}});b.n.forEach(x=>{if(!a.n.some(y=>y.s===x.s))neu++});return{piv,mv,cases,neu,jump:Math.abs(a.avg-b.avg)>=3}}
 function pAdd(t){const c={r:(PC[N.key]+t[0])%12,q:P.four?t[2]:t[1],rn:t[3],fl:!!t[4]};if(P.rep>=0&&P.rep<P.ch.length){P.ch[P.rep]=c;P.i=P.rep;P.rep=-1}else{P.ch.push(c);P.i=P.ch.length-1}P.path=null;drawNeck();const v=progPath()[P.i];if(v)chord(v.n.map(x=>x.m))}
 function pPreset(t){P.ch=t.map(x=>({r:(PC[N.key]+x[0])%12,q:P.four?x[1]:x[2],rn:x[3],fl:!!x[4]}));P.i=0;P.rep=-1;P.path=null;drawNeck()}
-function pTranspose(d){const k2=KEYS.find(x=>PC[x]===(PC[N.key]+d)%12);N.key=k2;document.getElementById('nKey').value=k2;P.ch=P.ch.map(c=>({...c,r:(c.r+d)%12}));P.path=null}
+function pTranspose(d){if(P.song)P.ch.forEach(c=>{c.fl=false;c.bfl=false;c.bs=false});const k2=KEYS.find(x=>PC[x]===(PC[N.key]+d)%12);N.key=k2;document.getElementById('nKey').value=k2;P.ch=P.ch.map(c=>({...c,r:(c.r+d)%12,b:c.b==null?null:(c.b+d)%12}));P.path=null}
 const TRD={'4':5,'5':7,'1':1};
 function pStop(){if(P.timer){clearInterval(P.timer);P.timer=null}}
-function pPlayCur(){const v=progPath()[P.i];if(v)chord(v.n.map(x=>x.m),0,60/P.tempo*3.6)}
+function pPlayCur(){const v=progPath()[P.i];if(v){chord(v.n.map(x=>x.m),0,60/P.tempo*3.6);const bp=bassPos(P.ch[P.i],v);if(bp)tone(bp.m,0,60/P.tempo*3.6,.25)}}
 function pStep(d){if(!P.ch.length)return;P.i=(P.i+d+P.ch.length)%P.ch.length;P.got=[];drawNeck();pPlayCur()}
 function pToggle(){if(P.timer){pStop();drawNeck();return}if(!P.ch.length)return;ac();pPlayCur();drawNeck();P.timer=setInterval(()=>{if(N.view!=='prog'||!document.getElementById('t-neck').classList.contains('on')){pStop();return}P.i=(P.i+1)%P.ch.length;if(P.i===0&&P.tr!=='0')pTranspose(TRD[P.tr]);P.got=[];drawNeck();pPlayCur()},60/P.tempo*4*1000)}
 async function pStd(){if(!STD){document.getElementById('nInfo').textContent='Chargement des standards…';await stdLoad()}const q=(document.getElementById('pStdQ')||{}).value||'';let idx=-1;if(q.trim()){const ql=q.trim().toLowerCase();idx=STD.findIndex(r=>r[1].toLowerCase().includes(ql))}if(idx<0)idx=Math.floor(Math.random()*STD.length);
 const ch=[];let prev=null;stdBars(STD[idx]).forEach(b=>b.ch.forEach(c=>{if(!c.p||c.cont)return;const k=c.p.r+c.p.f;if(k===prev)return;prev=k;ch.push({r:c.p.r,q:c.p.f,rn:c.fn||'',fl:/b|♭/.test(c.cs.slice(1,2))})}));
 P.ch=ch.slice(0,32);P.i=0;P.path=null;P.stdName=STD[idx][1];P.stdQ=false;drawNeck()}
 function progDraw(sub){const k=PC[N.key];
-let h='<div class="row brow pchips">';if(!P.ch.length)h+='<span class="lbl" style="min-width:0">Touche les accords à droite pour construire ta progression →</span>';
-P.ch.forEach((c,i)=>{h+=`${i?'<span class="par">→</span>':''}<button class="b pc ${i===P.i?'on':''} ${i===P.rep?'rep':''}" data-pi="${i}">${pName(c)} <small>${c.rn||''}</small><i data-px="${i}">×</i></button>`});
+let h=P.song?songRows():'';h+='<div class="row brow pchips">';if(!P.ch.length)h+='<span class="lbl" style="min-width:0">Touche les accords à droite pour construire ta progression →</span>';
+let first=1;P.ch.forEach((c,i)=>{if(P.song&&c.si!==P.ch[P.i].si)return;h+=`${first?'':'<span class="par">→</span>'}`;first=0;h+=`<button class="b pc ${i===P.i?'on':''} ${i===P.rep?'rep':''}" data-pi="${i}">${pName(c)} <small>${c.rn||''}</small><i data-px="${i}">×</i></button>`});
 if(P.ch.length)h+='<button class="b" id="pClr">✕ effacer</button>';h+='</div>';
-h+='<div class="row brow"><span class="lbl">Raccourcis</span>'+PPRE[P.minor?'min':'maj'].map((p,i)=>`<button class="b" data-pp="${i}">${p[0]}</button>`).join('')+`<button class="b ${P.stdQ?'on':''}" id="pStdB">📚 Standard</button>${P.stdQ?'<input id="pStdQ" enterkeyhint="go" placeholder="titre… (vide = hasard)" style="width:120px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:3px 6px;font-size:11.5px"><button class="b go" id="pStdGo">Charger</button>':''}</div>`;
-h+='<div class="row brow"><button class="b go" id="pGo">'+(P.timer?'■ Stop':'▶ Jouer')+'</button><button class="b" id="pPrev">◀</button><button class="b" id="pNext">▶</button><span class="lbl" style="min-width:0">Tempo</span><button class="b" id="pTm">−</button><span style="font-size:12px">'+P.tempo+'</span><button class="b" id="pTp">+</button>'+
+if(!P.song)h+='<div class="row brow"><span class="lbl">Raccourcis</span>'+PPRE[P.minor?'min':'maj'].map((p,i)=>`<button class="b" data-pp="${i}">${p[0]}</button>`).join('')+`<button class="b ${P.stdQ?'on':''}" id="pStdB">📚 Standard</button>${P.stdQ?'<input id="pStdQ" enterkeyhint="go" placeholder="titre… (vide = hasard)" style="width:120px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:3px 6px;font-size:11.5px"><button class="b go" id="pStdGo">Charger</button>':''}</div>`;
+if(P.imp)h+=impRows();h+='<div class="row brow"><button class="b go" id="pGo">'+(P.timer?'■ Stop':'▶ Jouer')+'</button><button class="b '+(P.imp?'on':'')+'" id="pImpB">📥 Chansons</button><button class="b" id="pPrev">◀</button><button class="b" id="pNext">▶</button><span class="lbl" style="min-width:0">Tempo</span><button class="b" id="pTm">−</button><span style="font-size:12px">'+P.tempo+'</span><button class="b" id="pTp">+</button>'+
 `<button class="b ${P.scl?'on':''}" id="pScl">🎼 Gamme</button></div>`+`<div class="row brow"><span class="lbl">Zone</span><button class="b ${P.lock?'':'on'}" id="pFree">Libre</button><button class="b ${P.lock?'on':''}" id="pLock">🔒 Cases ${P.za}‑${P.za+P.zw-1}</button><button class="b" id="pZl">◀</button><button class="b" id="pZr">▶</button>${[4,5,6].map(w=>`<button class="b ${P.zw===w?'on':''}" data-zw="${w}">${w} c.</button>`).join('')}</div>`+`<div class="row brow"><span class="lbl">Transpo</span>${[['0','Fixe'],['4','↻ 4tes'],['5','↻ 5tes'],['1','↻ ½ ton']].map(([v,t])=>`<button class="b ${P.tr===v?'on':''}" data-tr="${v}">${t}</button>`).join('')}<button class="b" id="pTrN">⏭ tonalité suivante</button></div>`;
 h+=chipRow('Grips',GRIPS,P.grip,'pg');
 sub.innerHTML=h;
@@ -1669,7 +1671,7 @@ sub.querySelectorAll('[data-pi]').forEach(b=>{let t=null,long=false;b.onpointerd
 const g=id=>sub.querySelector(id);if(g('#pClr'))g('#pClr').onclick=()=>{pStop();P.ch=[];P.i=0;P.rep=-1;P.path=null;drawNeck()};
 sub.querySelectorAll('[data-pp]').forEach(b=>b.onclick=()=>pPreset(PPRE[P.minor?'min':'maj'][+b.dataset.pp][1]));
 if(g('#pStdQ')){const i=g('#pStdQ');i.value=P.qv||'';i.oninput=()=>P.qv=i.value;i.onkeydown=e=>{if(e.key==='Enter'){i.blur();pStd()}}}
-g('#pStdB').onclick=()=>{P.stdQ=!P.stdQ;drawNeck();if(P.stdQ)setTimeout(()=>{const i=document.getElementById('pStdQ');if(i)i.focus()},50)};if(g('#pStdGo'))g('#pStdGo').onclick=pStd;
+songBind(sub);if(g('#pStdB'))g('#pStdB').onclick=()=>{P.stdQ=!P.stdQ;drawNeck();if(P.stdQ)setTimeout(()=>{const i=document.getElementById('pStdQ');if(i)i.focus()},50)};if(g('#pStdGo'))g('#pStdGo').onclick=pStd;
 g('#pGo').onclick=pToggle;g('#pPrev').onclick=()=>pStep(-1);g('#pNext').onclick=()=>pStep(1);
 g('#pTm').onclick=()=>{P.tempo=Math.max(40,P.tempo-8);if(P.timer){pStop();pToggle()}else drawNeck()};g('#pTp').onclick=()=>{P.tempo=Math.min(200,P.tempo+8);if(P.timer){pStop();pToggle()}else drawNeck()};
 g('#pFree').onclick=()=>{P.lock=false;P.path=null;drawNeck()};g('#pLock').onclick=()=>{if(!P.lock&&!P.zset){const v=(progPath()||[])[P.i];if(v&&v.avg)P.za=Math.max(0,Math.round(v.avg-P.zw/2+.5))}P.zset=1;P.lock=true;P.path=null;drawNeck()};
@@ -1679,7 +1681,7 @@ sub.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{P.tr=b.dataset.tr;dr
 sub.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{P.grip=b.dataset.pg;P.path=null;drawNeck();pPlayCur()});
 // rail droit
 const R=document.getElementById('nRailR');R.classList.add('wide');const dia=P.minor?PMIN:PMAJ,bor=P.minor?PMINB:PMAJB;
-const tile=(t,i,b)=>{const q=P.four?t[2]:t[1],qq=TRI3[q]||'maj';return`<button class="rc ${qq==='min'?'m':qq==='dim'?'d':'M'} ${b?'out':''}" data-pa="${b?'b':'d'}${i}">${((t[4]?FLP:(FLATK.includes(N.key)&&!P.minor?FLP:SHP))[(k+t[0])%12])+(QS[q]??q)}<small>${t[3]}</small></button>`};
+const tile=(t,i,b)=>{const q=P.four?t[2]:t[1],qq=TRI3[q]||'maj';return`<button class="rc ${qq==='min'?'m':qq==='dim'?'d':'M'} ${b?'out':''}" data-pa="${b?'b':'d'}${i}">${((t[4]?FLP:(keyFlat()?FLP:SHP))[(k+t[0])%12])+(QS[q]??q)}<small>${t[3]}</small></button>`};
 R.innerHTML=`<div class="rlab">${P.rep>=0?'<b style="color:#ff3b5c">REMPLACER</b>':'ACCORDS DE '+KDISP(N.key)+(P.minor?'m':'')}</div><div class="rgrid g2c">${dia.map((t,i)=>tile(t,i,0)).join('')}</div><div class="rlab">EMPRUNTS</div><div class="rgrid g2c">${bor.map((t,i)=>tile(t,i,1)).join('')}</div><button class="rt" id="pFour">${P.four?'4 sons ⇄ 3':'3 sons ⇄ 4'}</button>`;
 R.querySelectorAll('[data-pa]').forEach(b=>b.onclick=()=>{const t=(b.dataset.pa[0]==='b'?bor:dia)[+b.dataset.pa.slice(1)];pAdd(t)});
 R.querySelector('#pFour').onclick=()=>{P.four=!P.four;P.ch=P.ch.map(c=>{const t=[...dia,...bor].find(x=>(PC[N.key]+x[0])%12===c.r&&x[3]===c.rn);return t?{...c,q:P.four?t[2]:t[1]}:c});P.path=null;drawNeck()};
@@ -1699,6 +1701,7 @@ s+=`<line x1="${X(x.s)}" y1="${y1}" x2="${X(x.s)}" y2="${y2}" stroke="${col}" st
 const g1=gt(cur,c),g2=gt(nxt,cn);g1.forEach(a=>{if(!g2.length)return;const b=g2.reduce((p,q)=>Math.abs(q.m-a.m)<Math.abs(p.m-a.m)?q:p);if(b.s===a.s&&b.f===a.f)return;s+=`<path d="M${X(a.s)} ${YN(a.f)} Q ${(X(a.s)+X(b.s))/2-26} ${(YN(a.f)+YN(b.f))/2} ${X(b.s)} ${YN(b.f)}" fill="none" stroke="#a06bff" stroke-width="2" stroke-dasharray="3 3"/>`})}
 const piv=nxt?cur.n.filter(x=>nxt.n.some(y=>y.s===x.s&&y.f===x.f)):[];
 cur.n.forEach(x=>{const iv=(x.m-c.r+120)%12,isP=piv.some(y=>y.s===x.s&&y.f===x.f);if(isP)s+=`<circle cx="${X(x.s)}" cy="${YN(x.f)}" r="21" fill="none" stroke="#2ee6ff" stroke-width="3" filter="url(#glow)"/>`;s+=dot(x.s,x.f,NC[iv],P.got.includes(x.m)?'✓':(N.mode==='nt'?JN[x.m%12]:lab7(iv,sevQ(c.q))),{r:15,target:P.got.length&&!P.got.includes(x.m)})});
+{const bp=bassPos(c,cur);if(bp){const nb=nxt?bassPos(cn,nxt):null;if(nb&&(nb.s!==bp.s||nb.f!==bp.f))s+=`<line x1="${X(bp.s)}" y1="${YN(bp.f)}" x2="${X(nb.s)}" y2="${YN(nb.f)}" stroke="#a06bff" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#arY)"/>`;s+=`<rect x="${X(bp.s)-14}" y="${YN(bp.f)-14}" width="28" height="28" rx="7" fill="#a06bff"/><text x="${X(bp.s)}" y="${YN(bp.f)+4}" text-anchor="middle" font-size="11" font-weight="700" fill="#05060b">${JN[c.b]}</text>`}}
 let tot=0,jumps=0;for(let i=0;i+1<n;i++){if(!path[i]||!path[i+1])continue;const m=pvMove(path[i],path[i+1]);tot+=m.cases;if(m.jump)jumps++}
 const zs=path.filter(Boolean).map(v=>v.avg).filter(x=>x>0),z1=zs.length?Math.round(Math.min(...zs)):0,z2=zs.length?Math.round(Math.max(...zs)):0;
 info=`${pName(c)}${csc&&P.scl?' ('+csc.name+')':''}${cn?' → '+pName(cn):''}`;if(cur.zf)info+=' · forme trouvée dans la zone';if(nxt){const m=pvMove(cur,nxt);info+=` · ◎ ${m.piv} doigt${m.piv>1?'s':''} reste${m.piv>1?'nt':''} · ↕ ${m.mv} bouge${m.mv>1?'nt':''} (${m.cases} case${m.cases>1?'s':''})${m.neu?' · +'+m.neu+' nouvelle(s) corde(s)':''}${m.jump?' · ⚠ saut de position':''}`}
@@ -1719,7 +1722,7 @@ R.innerHTML='<div class="rlab">FAMILLE</div><div class="rtabs">'+DFAM.map((f,i)=
 R.querySelectorAll('[data-dfm]').forEach(b=>b.onclick=()=>{N.dfam=+b.dataset.dfm;dictRail()});
 R.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>{N.dt=b.dataset.dt;N.dv=0;drawNeck();const v=(N.dvs||[])[0];if(v)chord(v.ms)})}
 function neckRails(){const R=document.getElementById('nRailR');
-keyRail('nRailL',PC[N.key],k=>{const d=(PC[k]-PC[N.key]+12)%12;N.key=k;document.getElementById('nKey').value=k;if(typeof jgStop==='function')jgStop();N.si=0;N.tc=null;if(d&&P.ch.length){P.ch=P.ch.map(c=>({...c,r:(c.r+d)%12}));P.path=null}drawNeck()},
+keyRail('nRailL',PC[N.key],k=>{const d=(PC[k]-PC[N.key]+12)%12;N.key=k;document.getElementById('nKey').value=k;if(typeof jgStop==='function')jgStop();N.si=0;N.tc=null;if(d&&P.ch.length){P.ch=P.ch.map(c=>({...c,r:(c.r+d)%12,b:c.b==null?null:(c.b+d)%12}));P.path=null}drawNeck()},
 N.view==='prog'?`<button class="rt" id="pMin">${P.minor?'Mineur ⇄ Maj':'Maj ⇄ mineur'}</button>`:'');
 bindExtra=()=>{const b=document.getElementById('pMin');if(b)b.onclick=()=>{P.minor=!P.minor;drawNeck()}};bindExtra();
 document.querySelectorAll('#nVw [data-nv]').forEach(b=>b.classList.toggle('on',b.dataset.nv===N.view));
@@ -1774,6 +1777,60 @@ R.querySelectorAll('[data-fm]').forEach(b=>b.onclick=()=>{G.fam=b.dataset.fm;scU
 R.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gs;if(G.work==='harm'&&SCALES[i][2].length<6)return;scStop();const o=MOFF[SCALES[S.s][0]],n=MOFF[SCALES[i][0]];if(G.par&&o!=null&&n!=null)S.k=(S.k-o+n+24)%12;S.s=i;document.getElementById('sSel').value=i;document.getElementById('sKey').value=S.k;S.tgt=null;motBuild();drawSc()});
 R.querySelector('#gPar').onclick=()=>{G.par=!G.par;scUI()}}
 function drawSc(){scUI();if(G.work==='harm'||G.work==='arp'){daSyncSc();daBuild();return}drawSc0();document.getElementById('sBig').textContent=`${KDISP(KEYS.find(x=>PC[x]===S.k)||SHP[S.k])} ${SCALES[S.s][0]}`+(S.mo&&S.mseq.length?` · ${(MOTL.find(x=>x[0]===S.mo)||['',''])[1]} ${S.mi+1}/${S.mseq.length}`:'')+(S.jam?' · Jam':'');document.getElementById('sBand').innerHTML=''}
+
+/* ================= CHANSONS : import ChordPro / grille texte → progression ================= */
+const CHRX=/^\(?([A-G](?:#|b|♯|♭)?)((?:maj|min|mi|m|M|dim|aug|sus|add|ø|°|o|Δ|\+|-|[0-9]|#|b|♯|♭|\(|\))*)(?:\/([A-G](?:#|b|♯|♭)?))?\)?\*?$/;
+const pcOf=t=>{let r={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[t[0]];if(t[1]==='#'||t[1]==='♯')r++;if(t[1]==='b'||t[1]==='♭')r--;return(r+12)%12};
+function chTok(t){const m=CHRX.exec(t);if(!m)return null;const s=m[2].replace(/[()]/g,'');let q;
+if(/^(ø|m7b5|m7♭5|mi7b5|-7b5)/.test(s))q='m7b5';else if(/^(°7|dim7|o7)/.test(s))q='dim7';else if(/^(°|dim|o)/.test(s))q='dim';
+else if(/^(m|mi|min|-)(maj7|M7|Δ)/.test(s))q='mMaj7';else if(/^(m|mi|min|-)6/.test(s))q='m6';else if(/^(m|mi|min|-)(7|9|11|13)/.test(s))q='m7';else if(/^(m(?!aj)|mi|min|-)/.test(s))q='min';
+else if(/^(maj|M7|M9|Δ|7M)/.test(s))q=/^maj$/.test(s)?'maj':'maj7';else if(/^(6|69)/.test(s))q='6';else if(/^((7|9|11|13)sus|sus4?7)/.test(s))q='7sus4';else if(/^(7#5|7\+|\+7|aug7|7♯5)/.test(s))q='7#5';else if(/^(aug|\+)/.test(s))q='aug';
+else if(/^(7|9|11|13)/.test(s))q='7';else if(/^(sus4|sus|4)/.test(s))q='sus4';else q='maj';
+return{cs:t.replace(/[()*]/g,''),r:pcOf(m[1]),q,b:m[3]?pcOf(m[3]):null,fl:/[b♭]/.test(m[1].slice(1)),bfl:!!m[3]&&/[b♭]/.test(m[3].slice(1)),bs:!!m[3]&&/[#♯]/.test(m[3].slice(1))}}
+const isChordLine=l=>{const t=l.trim().split(/\s+/).filter(x=>x&&!/^(\||\|\||%|-+|x\d+|\(x\d+\)|\/|N\.?C\.?)$/i.test(x));return t.length>0&&t.every(x=>chTok(x))};
+const SECRX=/^\s*[\[{(]?\s*(verse|chorus|bridge|intro|outro|pre-?chorus|refrain|couplet|pont|interlude|solo|tag|ending|fin|coda|vamp|instrumental)\b[^\]})]*[\]})]?\s*:?\s*$/i;
+function songParse(txt){const L=txt.replace(/\r/g,'').replace(/\t/g,'    ').split('\n'),S={title:'',key:'',secs:[]};let sec=null;const ns=n=>{sec={name:n,lines:[]};S.secs.push(sec)};const cur=()=>{if(!sec)ns('Début');return sec};
+for(let i=0;i<L.length;i++){const l=L[i];const d=/^\s*\{\s*([\w_]+)\s*(?::\s*(.*?))?\s*\}\s*$/.exec(l);
+if(d){const k=d[1].toLowerCase(),v=d[2]||'';if(k==='title'||k==='t')S.title=v;else if(k==='key')S.key=v;else if(k==='soc'||k==='start_of_chorus')ns(v||'Refrain');else if(k==='sov'||k==='start_of_verse')ns(v||'Couplet');else if(k==='sob'||k==='start_of_bridge')ns(v||'Pont');else if(/^(c|comment|ci|comment_italic|cb|comment_box)$/.test(k)&&v.length<40)ns(v);else if(/^(eoc|eov|eob|end_of_\w+)$/.test(k))sec=null;continue}
+if(!l.trim())continue;if(SECRX.test(l)){ns(l.trim().replace(/^[\[{(]|[\]})]:?$|:$/g,'').trim());continue}
+if(/\[[A-G][^\]]*\]/.test(l)){const ch=[];let lyr='',k=0;l.replace(/\[([^\]]+)\]|([^\[]+)/g,(m0,c,t)=>{if(c!=null){const x=chTok(c.trim());if(x)ch.push({...x,pos:lyr.length})}else lyr+=t;return''});cur().lines.push({lyr,ch});continue}
+if(isChordLine(l)){const ch=[];l.replace(/\S+/g,(t,pos)=>{const x=chTok(t);if(x)ch.push({...x,pos});return t});const nx=L[i+1];
+if(nx!=null&&nx.trim()&&!isChordLine(nx)&&!SECRX.test(nx)&&!/^\s*\{/.test(nx)){cur().lines.push({lyr:nx,ch});i++}else cur().lines.push({lyr:'',ch});continue}
+if(!S.title&&!S.secs.length&&i<3){S.title=l.trim();continue}cur().lines.push({lyr:l,ch:[]})}
+S.secs=S.secs.filter(s=>s.lines.some(x=>x.ch.length));return S}
+function songKey(S,flat){if(S.key){const m=/^([A-G](?:#|b|♯|♭)?)(m(?!aj)|min|-)?/.exec(S.key.trim());if(m)return{k:pcOf(m[1]),minor:!!m[2]}}
+const DQ={0:'M',2:'m',4:'m',5:'M',7:'M',9:'m'};let best=null;for(let k=0;k<12;k++){let sc=0;flat.forEach(c=>{const d=(c.r-k+12)%12,t=TRI3[c.q]||'maj';if(DQ[d]&&((DQ[d]==='M')===(t==='maj')))sc+=1;else if([0,2,4,5,7,9,11].includes(d))sc+=.3});if((flat[0].r-k+12)%12===0)sc+=.5;if(!best||sc>best.sc)best={sc,k}}
+const minor=(flat[0].r-best.k+12)%12===9&&TRI3[flat[0].q]==='min';return{k:minor?(best.k+9)%12:best.k,minor}}
+function songLoad(txt,save){if(/^%PDF/.test(txt)){document.getElementById('nInfo').textContent='Les PDF ne sont pas lisibles ici : exporte la chanson en ChordPro (ou en texte) depuis SongbookPro.';return}
+const S=songParse(txt),flat=[];S.secs.forEach((s,si)=>s.lines.forEach((l,li)=>l.ch.forEach((c,ci)=>flat.push({r:c.r,q:c.q,b:c.b,fl:c.fl,bfl:c.bfl,bs:c.bs,rn:'',si,li,ci}))));
+if(!flat.length){document.getElementById('nInfo').textContent='Aucun accord reconnu dans ce texte.';return}
+const K=songKey(S,flat);P.minor=K.minor;N.key=KEYS.find(x=>PC[x]===K.k)||FLP[K.k];document.getElementById('nKey').value=N.key;
+S.title=S.title||'Sans titre';P.song=S;P.ch=flat;P.i=0;P.rep=-1;P.path=null;P.imp=false;P.paste=false;P.four=true;P.grip='tri';
+if(save!==false){ST.songs=(ST.songs||[]).filter(x=>x.t!==S.title);ST.songs.unshift({t:S.title,txt});ST.songs=ST.songs.slice(0,60);save_()}
+goTab('t-neck');const v=document.getElementById('nView');v.value='prog';v.dispatchEvent(new Event('change'))}
+function save_(){try{save()}catch(e){}}
+window.ffImport=t=>{try{songLoad(String(t))}catch(e){console.log(e)}};
+function capoHint(){const k=PC[N.key],ok=P.minor?[9,4,2]:[0,7,2,9,4];for(let c=0;c<=7;c++){const kk=(k-c+12)%12;if(ok.includes(kk))return c?`Capo ${c} → formes de ${SHP[kk]}${P.minor?'m':''}`:'Formes ouvertes, sans capo'}return''}
+function lyrHTML(si,li,hiCi){const s=P.song.secs[si],l=s&&s.lines[li];if(!l)return'';let h='',p=0;l.ch.forEach((c,ci)=>{const pos=Math.min(c.pos,l.lyr.length);h+=esc(l.lyr.slice(p,pos));p=pos;const cc=P.ch.find(x=>x.si===si&&x.li===li&&x.ci===ci)||c;h+=`<b class="lc ${ci===hiCi?'on':''}">${pName(cc)}</b>`});h+=esc(l.lyr.slice(p));return h}
+const esc=t=>t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
+function transposed(c){const d=P.song.tr||0;return{...c,r:(c.r+d)%12,b:c.b==null?null:(c.b+d)%12}}
+function songRows(){const c=P.ch[P.i],S=P.song;let h=`<div class="row brow"><span class="lbl">🎵</span><b style="font-size:13px">${esc(S.title)}</b><span class="lbl" style="min-width:0">${KDISP(N.key)}${P.minor?'m':''} · ${capoHint()}</span><button class="b" id="pSongX">✕ fermer</button></div>`;
+h+=`<div class="row brow"><span class="lbl">Section</span>${S.secs.map((s,i)=>`<button class="b ${c&&c.si===i?'on':''}" data-psec="${i}">${esc(s.name).slice(0,14)}</button>`).join('')}</div>`;
+if(c){const l2=S.secs[c.si].lines[c.li+1]?[c.si,c.li+1]:S.secs[c.si+1]?[c.si+1,0]:null;h+=`<div class="lyr">${lyrHTML(c.si,c.li,c.ci)}</div>${l2?`<div class="lyr nx">${lyrHTML(l2[0],l2[1],-1)}</div>`:''}`}return h}
+function impRows(){let h=`<div class="row brow"><span class="lbl">Importer</span><button class="b" id="pFileB">📂 Mes fichiers</button><button class="b ${P.paste?'on':''}" id="pPasteB">📋 Coller</button><span class="lbl" style="min-width:0">ChordPro ou grille texte · ou Partager → Fretboard Forge depuis SongbookPro</span></div>`;
+if(P.paste)h+=`<div class="row brow"><textarea id="pPasteT" rows="4" placeholder="Colle ici la chanson (ChordPro [C]paroles… ou accords au-dessus des paroles)" style="flex:1;min-width:0;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:6px;font-size:12px"></textarea><button class="b go" id="pPasteGo">Importer</button></div>`;
+const L=ST.songs||[];if(L.length)h+=`<div class="row brow"><span class="lbl">📚 Mes chansons</span>${L.map((x,i)=>`<button class="b pc" data-psong="${i}">${esc(x.t).slice(0,22)}<i data-psdel="${i}">×</i></button>`).join('')}</div>`;return h}
+function songBind(sub){const g=id=>sub.querySelector(id);
+if(g('#pSongX'))g('#pSongX').onclick=()=>{pStop();P.song=null;P.ch=[];P.i=0;P.path=null;drawNeck()};
+sub.querySelectorAll('[data-psec]').forEach(b=>b.onclick=()=>{const si=+b.dataset.psec,i=P.ch.findIndex(c=>c.si===si);if(i>=0){P.i=i;P.got=[];drawNeck();pPlayCur()}});
+if(g('#pImpB'))g('#pImpB').onclick=()=>{P.imp=!P.imp;drawNeck()};
+if(g('#pFileB'))g('#pFileB').onclick=()=>document.getElementById('pFile').click();
+if(g('#pPasteB'))g('#pPasteB').onclick=()=>{P.paste=!P.paste;drawNeck();if(P.paste)setTimeout(()=>{const t=document.getElementById('pPasteT');if(t)t.focus()},50)};
+if(g('#pPasteGo'))g('#pPasteGo').onclick=()=>{const t=g('#pPasteT').value;if(t.trim())songLoad(t)};
+sub.querySelectorAll('[data-psong]').forEach(b=>b.onclick=e=>{const i=+b.dataset.psong;if(e.target.dataset.psdel!=null){ST.songs.splice(i,1);save_();drawNeck();return}songLoad(ST.songs[i].txt,false)})}
+document.getElementById('pFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{songLoad(String(r.result));e.target.value=''};r.readAsText(f)};
+/* basse des accords slash */
+function bassPos(c,v){if(!c||c.b==null||!v)return null;const lo=Math.min(...v.n.map(x=>x.s));let best=null;for(let s2=0;s2<Math.max(1,lo);s2++)for(let f=0;f<=NF;f++){if((TUNE[s2]+f)%12!==c.b)continue;const d=Math.abs(f-(v.avg||5));if(!best||d<best.d)best={s:s2,f,m:MIDI[s2]+f,d}}return best}
 
 sideReflow();
 let DRM='tri';document.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>drillMode(b.dataset.dm));
@@ -1983,7 +2040,7 @@ document.getElementById('pWeak').textContent=weak.length?'Points faibles : '+wea
 document.getElementById('pReset').onclick=()=>{if(confirm('Effacer toute la progression ?')){localStorage.removeItem('ff_state');location.reload()}};
 
 /* ================= INIT ================= */
-drawNeck();newTarget(true);drawTri();drawSc();drNew();jzReset();
+drawNeck();newTarget(true);drawTri();drawSc();drNew();jzReset();if(window.__ffShared)setTimeout(()=>ffImport(window.__ffShared),300);
 let rz=null,LW=window.innerWidth;window.addEventListener('resize',()=>{const ae=document.activeElement;if(ae&&ae.tagName==='INPUT'&&ae.type!=='range'&&window.innerWidth===LW)return;LW=window.innerWidth;clearTimeout(rz);rz=setTimeout(redrawAll,150)});
 </script>
 </body>

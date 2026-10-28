@@ -358,7 +358,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.6 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.7 — Boss</div>
 </section>
 
 </main>
@@ -561,11 +561,11 @@ if(N.view==='prog'){const r=progDraw(sub);h+=r.h;for(let s2=0;s2<6;s2++)for(let 
 if(N.view==='caged'){
 sub.innerHTML='<span class="lbl">Forme</span>'+[...ORD,'Toutes'].map(s=>`<button class="b ${N.shape===s?'on':''}" data-sh="${s}">${s}</button>`).join('');
 sub.querySelectorAll('[data-sh]').forEach(b=>b.onclick=()=>{N.shape=b.dataset.sh;drawNeck()});
-const list=N.shape==='Toutes'?ORD:[N.shape],all={};ORD.forEach(n=>all[n]=shapeIn(n,N.key));
+const all={};ORD.forEach(n=>all[n]=cagedQ(shapeIn(n,N.key),N.cq||'maj'));const hidden=ORD.filter(n=>!all[n]);const list=(N.shape==='Toutes'?ORD:[N.shape]).filter(n=>all[n]);
 list.forEach(n=>{const fs=all[n].map(x=>x[1]),a=Math.max(0,Math.min(...fs)-1),b=Math.max(...fs);
 h+=`<rect x="34" y="${YL(a)-(a===0?14:0)}" width="296" height="${YL(b)-YL(a)+(a===0?14:0)}" rx="10" fill="#fff" opacity=".04" stroke="#5c6180" stroke-dasharray="4 4"/>`;
 h+=`<text x="352" y="${(YL(a)+YL(b))/2+6}" text-anchor="middle" font-size="18" font-weight="600" fill="#7d83a0">${n}</text>`});
-if(N.mv&&N.shape!=='Toutes'){const i=ORD.indexOf(N.shape),nx=ORD[(i+1)%5],cur=all[N.shape],nxt=all[nx];
+if(N.mv&&N.shape!=='Toutes'&&all[N.shape]&&all[ORD[(ORD.indexOf(N.shape)+1)%5]]){const i=ORD.indexOf(N.shape),nx=ORD[(i+1)%5],cur=all[N.shape],nxt=all[nx];
 const piv=cur.filter(([s,f])=>nxt.some(([s2,f2])=>s2===s&&f2===f));
 const a1=(Math.min(...cur.map(x=>x[1]))+Math.max(...cur.map(x=>x[1])))/2,a2=(Math.min(...nxt.map(x=>x[1]))+Math.max(...nxt.map(x=>x[1])))/2;
 nxt.forEach(([s,f])=>{if(!piv.some(p=>p[0]===s&&p[1]===f))h+=`<circle cx="${X(s)}" cy="${YN(f)}" r="13" fill="none" stroke="#7d83a0" stroke-dasharray="3 3" stroke-width="1.5"/>`});
@@ -575,7 +575,7 @@ piv.forEach(([s,f])=>h+=`<circle cx="${X(s)}" cy="${YN(f)}" r="20" fill="none" s
 info=`Vers ${nx} : ${piv.length} pivot${piv.length>1?'s':''} (anneau cyan) — ${piv.length>1?'ces doigts restent':'ce doigt reste'}, les autres glissent vers les cercles pointillés.`}
 list.forEach(n=>all[n].forEach(([s,f,d])=>{const pc=(TUNE[s]+f)%12,iv=(pc-k+12)%12,col=NC[iv];
 const lab=N.mode==='iv'?IVN[iv]:N.mode==='nt'?nm(pc,N.key):(f===0?'0':d);h+=dot(s,f,col,lab)}));
-if(!info)info=N.shape==='Toutes'?'Les cinq formes s\'emboîtent : chacune partage des notes avec la suivante.':'';
+if(!info)info=N.shape==='Toutes'?'Les cinq formes s\'emboîtent : chacune partage des notes avec la suivante.':'';if(N.cq&&N.cq!=='maj')info=`${KDISP(N.key)}${CQ.find(x=>x[0]===N.cq)[1]} — forme majeure transformée (pastilles « · » = doigt déplacé). `+(hidden.length?`Formes ${hidden.join(', ')} injouables pour ce type ici.`:'')+info;
 }else if(N.view==='scale'){
 sub.innerHTML='<span class="lbl">Gamme</span><select id="nScSel" style="max-width:170px">'+SCALES.map((s,i)=>`<option value="${i}" ${N.sc===i?'selected':''}>${s[0]}</option>`).join('')+'</select>';
 sub.querySelector('#nScSel').onchange=e=>{N.sc=+e.target.value;drawNeck()};
@@ -1715,6 +1715,16 @@ const t=CSC[c.q]||CSC.maj;return{r:c.r,set:t.slice(0,-1),name:JN[c.r]+' '+t[t.le
 function progNote(m,fromMic){const v=(progPath()||[])[P.i];if(!v)return;const ms=v.n.map(x=>x.m);
 if(ms.includes(m)){if(!P.got.includes(m))P.got.push(m);if(fromMic||ms.every(x=>P.got.includes(x))){flash('ok','nFrame');if(fromMic)MIC.mute=performance.now()+300;P.got=[];P.i=(P.i+1)%P.ch.length;drawNeck();pPlayCur();return}drawNeck();return}
 if(ms.some(x=>x%12===m%12)){flash('warn','nFrame');return}flash('ko','nFrame')}
+/* CAGED : les cinq formes pour chaque type d'accord (dérivées de la forme majeure) */
+const CQ=[['maj',''],['min','m'],['7','7'],['maj7','maj7'],['m7','m7'],['m7b5','ø7'],['dim7','°7'],['6','6'],['m6','m6'],['sus4','sus4'],['add9','add9'],['aug','+'],['dim','°']];
+function cagedQ(sh,q){if(q==='maj')return sh;const k=PC[N.key];let n=sh.map(([s,f,d])=>[s,f,d,(TUNE[s]+f-k+24)%12]);
+const lowS=Math.min(...n.map(x=>x[0]));const mv=(iv,d,which)=>{const L=n.filter(x=>x[3]===iv&&!(which==='nb'&&x[0]===lowS));if(!L.length)return false;const t=which==='all'?L:[L[L.length-1]];t.forEach(x=>{x[1]+=d;x[3]=(x[3]+d+12)%12;x[2]='·'});return true};
+const minor=['min','m7','m7b5','dim7','m6','dim'].includes(q);if(minor)mv(4,-1,'all');if(q==='m7b5'||q==='dim7'||q==='dim')mv(7,-1,'all');if(q==='aug')mv(7,1,'all');if(q==='sus4')mv(4,1,'all');
+if(q==='7'||q==='m7'||q==='m7b5'){if(!mv(0,-2,'nb'))return null}if(q==='maj7'){if(!mv(0,-1,'nb'))return null}if(q==='dim7'){if(!mv(0,-3,'nb'))return null}
+if(q==='6'||q==='m6'){if(!mv(7,2,'nb')&&!mv(0,-3,'nb'))return null}if(q==='add9'){if(!mv(0,2,'nb'))return null}
+if(n.some(x=>x[1]<0))n.forEach(x=>x[1]+=12);if(n.some(x=>x[1]>NF))return null;const fz=n.map(x=>x[1]).filter(f=>f>0);if(fz.length&&Math.max(...fz)-Math.min(...fz)>5)return null;return n.map(([s,f,d])=>[s,f,d])}
+function cagedRail(){const R=document.getElementById('nRailR');R.classList.add('wide');R.innerHTML='<div class="rlab">TYPE D\'ACCORD</div><div class="rgrid g2c">'+CQ.map(([q,l])=>`<button class="rc ${(N.cq||'maj')===q?'on':''}" data-cq="${q}">${KDISP(N.key)}${l}</button>`).join('')+'</div>';
+R.querySelectorAll('[data-cq]').forEach(b=>b.onclick=()=>{N.cq=b.dataset.cq;drawNeck();const sh=N.shape==='Toutes'?'C':N.shape,v=cagedQ(shapeIn(sh,N.key),N.cq);if(v)chord(v.map(([s,f])=>MIDI[s]+f))})}
 /* rail droit du dictionnaire */
 const DFAM=[['Majeurs',['maj','sus4','6','69','maj7','maj9','m11+','maj13']],['Mineurs',['min','m6','m7','m9','m11','m13','mM7']],['Dim / aug',['m7b5','dim7','dim','aug']],['Dominantes',['7','7sus4','7b5','7#5','9','9b5','9#5','7b9','7#9','11','13','13sus4','5']]];
 function dictRail(){const R=document.getElementById('nRailR');R.classList.add('wide');let fi=DFAM.findIndex(f=>f[1].includes(N.dt));if(N.dfam==null)N.dfam=fi<0?0:fi;
@@ -1726,7 +1736,7 @@ keyRail('nRailL',PC[N.key],k=>{const d=(PC[k]-PC[N.key]+12)%12;N.key=k;document.
 N.view==='prog'?`<button class="rt" id="pMin">${P.minor?'Mineur ⇄ Maj':'Maj ⇄ mineur'}</button>`:'');
 bindExtra=()=>{const b=document.getElementById('pMin');if(b)b.onclick=()=>{P.minor=!P.minor;drawNeck()}};bindExtra();
 document.querySelectorAll('#nVw [data-nv]').forEach(b=>b.classList.toggle('on',b.dataset.nv===N.view));
-if(N.view==='prog'||N.view==='dict'){R.style.display=''}else{R.style.display='none';R.innerHTML='';R.classList.remove('wide')}}
+if(N.view==='caged'){R.style.display='';cagedRail()}else if(N.view==='prog'||N.view==='dict'){R.style.display=''}else{R.style.display='none';R.innerHTML='';R.classList.remove('wide')}}
 
 /* ================= GAMMES · accès direct ================= */
 const G={work:'gamme',fam:null,par:false,afam:0,sig:null,mi:0,gi:0};S.tempo=S.tempo||76;

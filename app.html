@@ -358,7 +358,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v4.0 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v4.1 — Boss</div>
 </section>
 
 </main>
@@ -634,7 +634,7 @@ const ivs=T[2].map(x=>x%12),labs={};T[2].forEach((x,i)=>labs[x%12]=T[3]?T[3][i]:
 for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const iv=(TUNE[s2]+f-k+24)%12;if(!ivs.includes(iv))continue;
 const lab=N.mode==='nt'?nm((TUNE[s2]+f)%12,N.key):labs[iv];h+=dot(s2,f,NC[iv],lab,{r:iv===0?15:13})}
 info=`${KDISP(N.key)} ${T[1]} — ${T[4]}. `+(N.np?`Chemin « ${NPATHS.find(x=>x[0]===N.np)[1]} » : ${NPATHS.find(x=>x[0]===N.np)[3]} — ▶ Écouter le joue du grave à l'aigu.`:'Choisis un chemin pour l\'écouter du grave à l\'aigu.')}
-if(N.view==='triad'||N.view==='scale'){N.np=N.np===undefined?'court':N.np;const old=document.getElementById('npRowX');if(old)old.remove();npRow(sub);sub.nextSibling.id='npRowX';if(N.np){const L=notePath(curIvs(),k,N.np);h+=pathSvg(L,NPATHS.find(x=>x[0]===N.np)[2])}}else{const old=document.getElementById('npRowX');if(old)old.remove()}
+if(N.view==='triad'||N.view==='scale'){N.np=N.np===undefined?'court':N.np;const old=document.getElementById('npRowX');if(old)old.remove();const RR=document.getElementById('nRailR');if(N.view==='scale'){RR.style.display='';RR.classList.add('wide');RR.innerHTML=''}npRail(RR);if(N.np){const L=notePath(curIvs(),k,N.np);h+=pathSvg(L,NPATHS.find(x=>x[0]===N.np)[2])}}else{const old=document.getElementById('npRowX');if(old)old.remove()}
 document.getElementById('nLayRow').style.display=(N.view==='layers'||N.view==='taylor')?'flex':'none';document.getElementById('nGo').style.display=N.view==='layers'?'':'none';document.getElementById('nReset').style.display=N.view==='taylor'?'':'none';
 document.getElementById('nGo').textContent=N.play?'■ Stop':'🎯 Joue la couche';
 setSvg('nSvg',h);document.getElementById('nInfo').textContent=info}
@@ -1743,6 +1743,9 @@ let j=D.reduce((bi,d,x)=>d.c<D[bi].c?x:bi,0);const out=[];for(let i=n-1;i>=0;i--
 function pathSvg(L,col){if(!L.length)return'';let h=`<polyline points="${L.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="${col}" stroke-width="2.5" stroke-opacity=".55" stroke-dasharray="6 4"/>`;
 for(let i=1;i<L.length;i+=Math.max(1,Math.round(L.length/12))){const a=L[i-1],b=L[i];h+=`<line x1="${X(a.s)}" y1="${YN(a.f)}" x2="${(X(a.s)+X(b.s))/2}" y2="${(YN(a.f)+YN(b.f))/2}" stroke="${col}" stroke-width="2.5" stroke-opacity=".8" marker-end="url(#arY)"/>`}
 h+=`<g pointer-events="none"><circle cx="${X(L[0].s)+14}" cy="${YN(L[0].f)-13}" r="8" fill="${col}"/><text x="${X(L[0].s)+14}" y="${YN(L[0].f)-9.5}" text-anchor="middle" font-size="10" font-weight="700" fill="#05060b">1</text></g>`;return h}
+function npRail(R){const box=document.createElement('div');box.style.cssText='display:flex;flex-direction:column;gap:5px;width:100%;margin-top:8px';
+box.innerHTML='<div class="rlab">CHEMIN</div>'+NPATHS.map(([id,lb,col,d])=>`<button class="rc ${N.np===id?'on':''}" data-np="${id}" style="white-space:normal;border-color:${col}${N.np===id?'':'66'};${N.np===id?`color:${col};box-shadow:0 0 8px ${col}`:''}">${lb}<small>${d}</small></button>`).join('')+`<button class="rc ${N.np?'':'on'}" data-np="">Aucun</button><button class="rc" id="npPlay" style="border-color:#39ff88;color:#39ff88">▶ Écouter</button>`;
+R.appendChild(box);box.querySelectorAll('[data-np]').forEach(b=>b.onclick=()=>{N.np=b.dataset.np;drawNeck();if(N.np)document.getElementById('nPlay').click()});box.querySelector('#npPlay').onclick=()=>document.getElementById('nPlay').click()}
 function npRow(sub){const row=document.createElement('div');row.className='row brow';row.innerHTML='<span class="lbl">Chemin</span>'+NPATHS.map(([id,lb,col,d])=>`<button class="b ${N.np===id?'on':''}" data-np="${id}" title="${d}" style="${N.np===id?`border-color:${col};color:${col}`:''}">${lb}</button>`).join('')+`<button class="b ${N.np?'':'on'}" data-np="">Aucun</button>`;
 sub.after(row);row.querySelectorAll('[data-np]').forEach(b=>b.onclick=()=>{N.np=b.dataset.np;drawNeck();if(N.np)document.getElementById('nPlay').click()})}
 function curIvs(){if(N.view==='scale')return SCALES[N.sc][2];const F=STRF.find(x=>x[0]===(N.sf||'tri')),T=F[2].find(x=>x[0]===N.st)||F[2][0];return T[2].map(x=>x%12)}

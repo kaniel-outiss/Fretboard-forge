@@ -358,7 +358,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.4 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.5 — Boss</div>
 </section>
 
 </main>
@@ -1806,7 +1806,7 @@ const S=songParse(txt),flat=[];S.secs.forEach((s,si)=>s.lines.forEach((l,li)=>l.
 if(!flat.length){document.getElementById('nInfo').textContent='Aucun accord reconnu dans ce texte.';return}
 const K=songKey(S,flat);P.minor=K.minor;N.key=KEYS.find(x=>PC[x]===K.k)||FLP[K.k];document.getElementById('nKey').value=N.key;
 S.title=S.title||'Sans titre';P.song=S;P.ch=flat;P.i=0;P.rep=-1;P.path=null;P.imp=false;P.paste=false;P.four=true;P.grip='tri';
-if(save!==false){ST.songs=(ST.songs||[]).filter(x=>x.t!==S.title);ST.songs.unshift({t:S.title,txt});ST.songs=ST.songs.slice(0,60);save_()}
+if(save!==false){ST.songs=(ST.songs||[]).filter(x=>x.t!==S.title);ST.songs.unshift({t:S.title,txt});try{localStorage.setItem('ff_state',JSON.stringify(ST))}catch(e){ST.songs.pop();save_();document.getElementById('nInfo').textContent='Mémoire du téléphone pleine pour l\'app : supprime quelques chansons (×).'}}
 goTab('t-neck');const v=document.getElementById('nView');v.value='prog';v.dispatchEvent(new Event('change'))}
 function save_(){try{save()}catch(e){}}
 window.ffImport=t=>{try{songLoad(String(t))}catch(e){console.log(e)}};

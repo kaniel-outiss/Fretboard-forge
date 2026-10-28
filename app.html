@@ -358,7 +358,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.7 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.8 — Boss</div>
 </section>
 
 </main>
@@ -1622,10 +1622,12 @@ const PPRE={maj:[['ii‑V‑I',[[2,'m7','min','ii'],[7,'7','maj','V'],[0,'maj7',
 ['iii‑vi‑ii‑V‑I',[[4,'m7','min','iii'],[9,'m7','min','vi'],[2,'m7','min','ii'],[7,'7','maj','V'],[0,'maj7','maj','I']]],['Blues 12',[0,5,0,0,5,5,0,0,7,5,0,7].map((o,i)=>[o,'7','7',['I7','IV7','I7','I7','IV7','IV7','I7','I7','V7','IV7','I7','V7'][i]])],['Gospel I‑VI7‑ii‑V',[[0,'maj7','maj','I'],[9,'7','7','VI7'],[2,'m7','min','ii'],[7,'7','7','V']]]],
 min:[['ii°‑V‑i',[[2,'m7b5','dim','ii°'],[7,'7','maj','V'],[0,'m7','min','i']]],['i‑iv‑V',[[0,'m7','min','i'],[5,'m7','min','iv'],[7,'7','maj','V'],[0,'m7','min','i']]],['i‑♭VII‑♭VI‑V',[[0,'m7','min','i'],[10,'7','maj','♭VII',1],[8,'maj7','maj','♭VI',1],[7,'7','maj','V']]],['i‑♭VI‑♭III‑♭VII',[[0,'m7','min','i'],[8,'maj7','maj','♭VI',1],[3,'maj7','maj','♭III',1],[10,'7','maj','♭VII',1]]],['Blues mineur',[0,5,0,0,5,5,0,0,8,7,0,7].map((o,i)=>[o,o===8?'7':o===7?'7':'m7',o===8||o===7?'maj':'min',['i','iv','i','i','iv','iv','i','i','♭VI7','V7','i','V7'][i],o===8?1:0])]]};
 const P={za:5,zw:5,tr:'0',scl:true,ch:[],i:0,grip:'d2',four:true,minor:false,lock:false,zc:6,rep:-1,timer:null,tempo:96,got:[],path:null,sig:'',stdQ:false};
-const GRIPS=[['tri','Triades'],['d2','Drop 2'],['d3','Drop 3'],['sh','Shells'],['q4','Quartes'],['full','Complets']];
+const GRIPS=[['caged','CAGED'],['tri','Triades'],['d2','Drop 2'],['d3','Drop 3'],['sh','Shells'],['q4','Quartes'],['full','Complets']];
 const keyFlat=()=>P.minor?['D','G','C','F','Bb','Eb','Ab'].includes(N.key):FLATK.includes(N.key);
 const pName=c=>{const T=(c.fl||keyFlat()?FLP:SHP);return T[c.r]+(QS[c.q]??c.q)+(c.b!=null&&c.b!==c.r?'/'+(c.bs?SHP:c.bfl?FLP:T)[c.b]:'')};
-function pvCands(c){const out=[],push=(strs,fr)=>{if(fr.some(f=>f<0||f>NF))return;const n=strs.map((s,i)=>({s,f:fr[i],m:MIDI[s]+fr[i]})).sort((a,b)=>a.s-b.s);const fz=n.map(x=>x.f).filter(f=>f>0);out.push({n,avg:fz.length?avg(fz):0})};
+const Q2CQ={maj:'maj',min:'min','7':'7',maj7:'maj7',m7:'m7',m7b5:'m7b5',dim7:'dim7','6':'6',m6:'m6',sus4:'sus4','7sus4':'sus4',aug:'aug','7#5':'aug',dim:'dim',mMaj7:'min'};
+function pvCands(c){const out=[],push=(strs,fr,cg)=>{if(fr.some(f=>f<0||f>NF))return;const n=strs.map((s,i)=>({s,f:fr[i],m:MIDI[s]+fr[i]})).sort((a,b)=>a.s-b.s);const fz=n.map(x=>x.f).filter(f=>f>0);out.push({n,avg:fz.length?avg(fz):0,cg})};
+if(P.grip==='caged'){ORD.forEach(nm2=>{const v=cagedQ(shapeIn(nm2,FLP[c.r]),Q2CQ[c.q]||'maj',c.r);if(!v)return;[0,12,-12].forEach(o=>{const fr=v.map(x=>x[1]+o);if(o&&fr.some(f=>f===o))return;push(v.map(x=>x[0]),fr,nm2)})})}else 
 if(P.grip==='tri'){for(let ss=0;ss<4;ss++)triadVoicings(FLP[c.r],TRI3[c.q]||'maj',ss).forEach(v=>push(v.strs,v.frets))}
 else if(P.grip==='full'){const id=DICT.find(d=>d[0]===c.q)?c.q:(TRI3[c.q]==='min'?'min':'maj');dictVoicings(c.r,id).forEach(v=>{const st=[],fr=[];v.fr.forEach((f,s)=>{if(f>=0){st.push(s);fr.push(f)}});push(st,fr)})}
 else{const q=sevQ(c.q),gt=shellIv(q);DSETS[P.grip].forEach(st=>voicings(c.r,q,P.grip,st).forEach(v=>{if(P.grip==='q4'&&!v.ivs.some(iv=>gt.includes(iv)))return;push(v.strs,v.fr)}))}
@@ -1638,11 +1640,11 @@ const out=[];const rec=(s2,cur)=>{if(s2===6){const pl=cur.map((f,i)=>f>=0?i:-1).
 const got=new Set(pl.map(i=>(TUNE[i]+cur[i])%12));if(!need.every(x=>got.has(x)))return;if(got.size<Math.min(want,pcs.length)-(pcs.length>3?1:0))return;const fz=pl.map(i=>cur[i]).filter(f=>f>0);if(fz.length&&Math.max(...fz)-Math.min(...fz)>3)return;if(fz.length>4)return;
 const n=pl.map(i=>({s:i,f:cur[i],m:MIDI[i]+cur[i]}));out.push({n,avg:fz.length?avg(fz):0,sc:(((TUNE[pl[0]]+cur[pl[0]])%12===c.r)?2:0)+got.size});return}for(const f of opts[s2])rec(s2+1,cur.concat([f]))};rec(0,[]);
 out.sort((a,b)=>b.sc-a.sc);return ZVC[k]=out.slice(0,24)}
-function pvCost(a,b){let c=0;const mb={};b.n.forEach(x=>mb[x.s]=x.f);const ma={};a.n.forEach(x=>ma[x.s]=x.f);
+function pvCost(a,b){let c=0;if(P.slide){const fz=[...a.n,...b.n].map(x=>x.f).filter(f=>f>0);if(fz.length&&Math.max(...fz)-Math.min(...fz)>P.zw-1)c+=8}const mb={};b.n.forEach(x=>mb[x.s]=x.f);const ma={};a.n.forEach(x=>ma[x.s]=x.f);
 a.n.forEach(x=>{if(mb[x.s]!=null)c+=Math.abs(mb[x.s]-x.f);else c+=1.5});b.n.forEach(x=>{if(ma[x.s]==null)c+=1.5});return c+Math.abs(a.avg-b.avg)*.5}
 function zonePen(v){return 0}
-function progPath(){const sig=P.grip+'|'+P.lock+P.za+'/'+P.zw+'|'+P.ch.map(c=>c.r+c.q).join(',');if(P.path&&P.sig===sig)return P.path;P.sig=sig;
-const C=P.ch.map(c=>{const all=pvCands(c);if(!P.lock)return all;const z=all.filter(inZone);if(z.length){z.forEach(v=>v.zf=0);return z}const g=zoneVoicings(c);g.forEach(v=>v.zf=1);return g});if(!C.length||C.some(x=>!x.length)){P.path=C.map(x=>x[0]||null);return P.path}
+function progPath(){const sig=P.grip+'|'+P.lock+P.slide+P.za+'/'+P.zw+'|'+JSON.stringify(P.cgF||{})+'|'+P.ch.map(c=>c.r+c.q).join(',');if(P.path&&P.sig===sig)return P.path;P.sig=sig;
+const C=P.ch.map((c,ci)=>{let all=pvCands(c);const F=(P.cgF||{})[ci];if(P.grip==='caged'&&F){const f2=all.filter(v=>v.cg===F);if(f2.length)all=f2}if(!P.lock)return all;const z=all.filter(inZone);if(z.length){z.forEach(v=>v.zf=0);return z}const g=zoneVoicings(c);g.forEach(v=>v.zf=1);return g});if(!C.length||C.some(x=>!x.length)){P.path=C.map(x=>x[0]||null);return P.path}
 let D=C[0].map(v=>({c:Math.abs(v.avg-(P.lock?P.za+P.zw/2:6))*.3,p:-1}));const BK=[D];
 for(let i=1;i<C.length;i++){const ND=C[i].map(v=>{let best=1e9,bp=0;D.forEach((d,j)=>{const x=d.c+pvCost(C[i-1][j],v);if(x<best){best=x;bp=j}});return{c:best+zonePen(v),p:bp}});BK.push(ND);D=ND}
 let j=D.reduce((bi,d,k)=>d.c<D[bi].c?k:bi,0);const path=[];for(let i=C.length-1;i>=0;i--){path[i]=C[i][j];j=BK[i][j].p}P.path=path;return path}
@@ -1664,8 +1666,8 @@ let first=1;P.ch.forEach((c,i)=>{if(P.song&&c.si!==P.ch[P.i].si)return;h+=`${fir
 if(P.ch.length)h+='<button class="b" id="pClr">✕ effacer</button>';h+='</div>';
 if(!P.song)h+='<div class="row brow"><span class="lbl">Raccourcis</span>'+PPRE[P.minor?'min':'maj'].map((p,i)=>`<button class="b" data-pp="${i}">${p[0]}</button>`).join('')+`<button class="b ${P.stdQ?'on':''}" id="pStdB">📚 Standard</button>${P.stdQ?'<input id="pStdQ" enterkeyhint="go" placeholder="titre… (vide = hasard)" style="width:120px;background:#11131d;color:#e6e8f2;border:1px solid #2a2f45;border-radius:8px;padding:3px 6px;font-size:11.5px"><button class="b go" id="pStdGo">Charger</button>':''}</div>`;
 if(P.imp)h+=impRows();h+='<div class="row brow"><button class="b go" id="pGo">'+(P.timer?'■ Stop':'▶ Jouer')+'</button><button class="b '+(P.imp?'on':'')+'" id="pImpB">📥 Chansons</button><button class="b" id="pPrev">◀</button><button class="b" id="pNext">▶</button><span class="lbl" style="min-width:0">Tempo</span><button class="b" id="pTm">−</button><span style="font-size:12px">'+P.tempo+'</span><button class="b" id="pTp">+</button>'+
-`<button class="b ${P.scl?'on':''}" id="pScl">🎼 Gamme</button></div>`+`<div class="row brow"><span class="lbl">Zone</span><button class="b ${P.lock?'':'on'}" id="pFree">Libre</button><button class="b ${P.lock?'on':''}" id="pLock">🔒 Cases ${P.za}‑${P.za+P.zw-1}</button><button class="b" id="pZl">◀</button><button class="b" id="pZr">▶</button>${[4,5,6].map(w=>`<button class="b ${P.zw===w?'on':''}" data-zw="${w}">${w} c.</button>`).join('')}</div>`+`<div class="row brow"><span class="lbl">Transpo</span>${[['0','Fixe'],['4','↻ 4tes'],['5','↻ 5tes'],['1','↻ ½ ton']].map(([v,t])=>`<button class="b ${P.tr===v?'on':''}" data-tr="${v}">${t}</button>`).join('')}<button class="b" id="pTrN">⏭ tonalité suivante</button></div>`;
-h+=chipRow('Grips',GRIPS,P.grip,'pg');
+`<button class="b ${P.scl?'on':''}" id="pScl">🎼 Gamme</button></div>`+`<div class="row brow"><span class="lbl">Zone</span><button class="b ${!P.lock&&!P.slide?'on':''}" id="pFree">Libre</button><button class="b ${P.slide?'on':''}" id="pSlide">↔ Glissante</button><button class="b ${P.lock?'on':''}" id="pLock">🔒 Cases ${P.za}‑${P.za+P.zw-1}</button><button class="b" id="pZl">◀</button><button class="b" id="pZr">▶</button>${[4,5,6].map(w=>`<button class="b ${P.zw===w?'on':''}" data-zw="${w}">${w} c.</button>`).join('')}</div>`+`<div class="row brow"><span class="lbl">Transpo</span>${[['0','Fixe'],['4','↻ 4tes'],['5','↻ 5tes'],['1','↻ ½ ton']].map(([v,t])=>`<button class="b ${P.tr===v?'on':''}" data-tr="${v}">${t}</button>`).join('')}<button class="b" id="pTrN">⏭ tonalité suivante</button></div>`;
+h+=chipRow('Grips',GRIPS,P.grip,'pg');if(P.grip==='caged'){const cv=(progPath()||[])[P.i],F=(P.cgF||{})[P.i];h+=`<div class="row brow"><span class="lbl">Forme</span>${ORD.map(x=>`<button class="b ${cv&&cv.cg===x?'on':''}" data-pcg="${x}" style="min-width:40px;${F===x?'border-style:double;border-width:3px':''}">${x}</button>`).join('')}<span class="lbl" style="min-width:0">${F?'forme imposée · retouche pour libérer':'touche une forme pour l\'imposer à cet accord'}</span></div>`}
 sub.innerHTML=h;
 sub.querySelectorAll('[data-pi]').forEach(b=>{let t=null,long=false;b.onpointerdown=()=>{long=false;t=setTimeout(()=>{long=true;P.rep=+b.dataset.pi;drawNeck()},500)};b.onpointerup=b.onpointerleave=()=>clearTimeout(t);b.onclick=e=>{if(e.target.dataset.px!=null){P.ch.splice(+e.target.dataset.px,1);P.i=Math.min(P.i,P.ch.length-1);P.i=Math.max(0,P.i);P.rep=-1;P.path=null;drawNeck();return}if(long)return;P.i=+b.dataset.pi;P.got=[];drawNeck();pPlayCur()}});
 const g=id=>sub.querySelector(id);if(g('#pClr'))g('#pClr').onclick=()=>{pStop();P.ch=[];P.i=0;P.rep=-1;P.path=null;drawNeck()};
@@ -1674,11 +1676,11 @@ if(g('#pStdQ')){const i=g('#pStdQ');i.value=P.qv||'';i.oninput=()=>P.qv=i.value;
 songBind(sub);if(g('#pStdB'))g('#pStdB').onclick=()=>{P.stdQ=!P.stdQ;drawNeck();if(P.stdQ)setTimeout(()=>{const i=document.getElementById('pStdQ');if(i)i.focus()},50)};if(g('#pStdGo'))g('#pStdGo').onclick=pStd;
 g('#pGo').onclick=pToggle;g('#pPrev').onclick=()=>pStep(-1);g('#pNext').onclick=()=>pStep(1);
 g('#pTm').onclick=()=>{P.tempo=Math.max(40,P.tempo-8);if(P.timer){pStop();pToggle()}else drawNeck()};g('#pTp').onclick=()=>{P.tempo=Math.min(200,P.tempo+8);if(P.timer){pStop();pToggle()}else drawNeck()};
-g('#pFree').onclick=()=>{P.lock=false;P.path=null;drawNeck()};g('#pLock').onclick=()=>{if(!P.lock&&!P.zset){const v=(progPath()||[])[P.i];if(v&&v.avg)P.za=Math.max(0,Math.round(v.avg-P.zw/2+.5))}P.zset=1;P.lock=true;P.path=null;drawNeck()};
-const zmv=d=>{P.za=Math.max(0,Math.min(NF-P.zw+1,P.za+d));P.lock=true;P.zset=1;P.path=null;drawNeck()};g('#pZl').onclick=()=>zmv(-1);g('#pZr').onclick=()=>zmv(1);
-sub.querySelectorAll('[data-zw]').forEach(b=>b.onclick=()=>{P.zw=+b.dataset.zw;P.lock=true;P.zset=1;P.path=null;drawNeck()});
+g('#pFree').onclick=()=>{P.lock=false;P.slide=false;P.path=null;drawNeck()};g('#pSlide').onclick=()=>{P.lock=false;P.slide=true;P.path=null;drawNeck()};g('#pLock').onclick=()=>{P.slide=false;if(!P.lock&&!P.zset){const v=(progPath()||[])[P.i];if(v&&v.avg)P.za=Math.max(0,Math.round(v.avg-P.zw/2+.5))}P.zset=1;P.lock=true;P.path=null;drawNeck()};
+const zmv=d=>{P.slide=false;P.za=Math.max(0,Math.min(NF-P.zw+1,P.za+d));P.lock=true;P.zset=1;P.path=null;drawNeck()};g('#pZl').onclick=()=>zmv(-1);g('#pZr').onclick=()=>zmv(1);
+sub.querySelectorAll('[data-zw]').forEach(b=>b.onclick=()=>{P.zw=+b.dataset.zw;if(!P.slide)P.lock=true;P.zset=1;P.path=null;drawNeck()});
 sub.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{P.tr=b.dataset.tr;drawNeck()});g('#pTrN').onclick=()=>{pTranspose(TRD[P.tr==='0'?'4':P.tr]);drawNeck();pPlayCur()};g('#pScl').onclick=()=>{P.scl=!P.scl;drawNeck()};
-sub.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{P.grip=b.dataset.pg;P.path=null;drawNeck();pPlayCur()});
+sub.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{P.grip=b.dataset.pg;P.path=null;drawNeck();pPlayCur()});sub.querySelectorAll('[data-pcg]').forEach(b=>b.onclick=()=>{P.cgF=P.cgF||{};if(P.cgF[P.i]===b.dataset.pcg)delete P.cgF[P.i];else P.cgF[P.i]=b.dataset.pcg;P.path=null;drawNeck();pPlayCur()});
 // rail droit
 const R=document.getElementById('nRailR');R.classList.add('wide');const dia=P.minor?PMIN:PMAJ,bor=P.minor?PMINB:PMAJB;
 const tile=(t,i,b)=>{const q=P.four?t[2]:t[1],qq=TRI3[q]||'maj';return`<button class="rc ${qq==='min'?'m':qq==='dim'?'d':'M'} ${b?'out':''}" data-pa="${b?'b':'d'}${i}">${((t[4]?FLP:(keyFlat()?FLP:SHP))[(k+t[0])%12])+(QS[q]??q)}<small>${t[3]}</small></button>`};
@@ -1690,6 +1692,7 @@ let s='',info='';const path=progPath();const cur=path[P.i];
 if(!P.ch.length){info='Choisis une tonalité à gauche, touche des accords à droite (ou un raccourci) : l\'appli calcule l\'enchaînement le plus court sur tout le manche. Appui long sur un accord de la progression = le remplacer.';return{h:s,info}}
 if(!cur){info=`Aucun grip « ${GRIPS.find(x=>x[0]===P.grip)[1]} » trouvé pour ${pName(P.ch[P.i])} — essaie un autre grip.`;return{h:s,info}}
 const za=P.lock?P.za:0,zb=P.lock?P.za+P.zw-1:NF;if(P.lock)s+=`<rect x="34" y="${YL(Math.max(0,za-1))-(za<=1?14:0)}" width="296" height="${YL(zb)-YL(Math.max(0,za-1))+(za<=1?14:0)}" rx="10" fill="#2ee6ff" opacity=".06" stroke="#2ee6ff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="5 4"/>`;
+if(P.slide){const fz=cur.n.map(x=>x.f).filter(f=>f>0);if(fz.length){const lo=Math.min(...fz),hi=Math.max(...fz),a0=Math.max(1,Math.min(lo,hi-P.zw+1)),b0=Math.min(NF,a0+P.zw-1);s+=`<rect x="34" y="${YL(a0-1)}" width="296" height="${YL(b0)-YL(a0-1)}" rx="10" fill="#ffb020" opacity=".06" stroke="#ffb020" stroke-opacity=".6" stroke-width="2" stroke-dasharray="5 4"/>`}}
 const csc=chordScale(P.ch[P.i]);if(P.scl&&csc){const ca=P.lock?za:Math.max(0,Math.round(cur.avg)-2),cb=P.lock?zb:Math.min(NF,Math.round(cur.avg)+3);for(let s2=0;s2<6;s2++)for(let f=ca;f<=cb;f++){const pc=(TUNE[s2]+f)%12,iv=(pc-P.ch[P.i].r+12)%12;if(!csc.set.includes((pc-csc.r+12)%12)||cur.n.some(x=>x.s===s2&&x.f===f))continue;s+=`<circle cx="${X(s2)}" cy="${YN(f)}" r="9" fill="${NC[iv]}" opacity=".35"/><text x="${X(s2)}" y="${YN(f)+3}" text-anchor="middle" font-size="8" fill="#05060b">${IVN[iv]}</text>`}}
 const n=P.ch.length,nxt=n>1?path[(P.i+1)%n]:null,c=P.ch[P.i],cn=n>1?P.ch[(P.i+1)%n]:null;
 const gt=(v,ch)=>v?v.n.filter(x=>{const iv=(x.m-ch.r+120)%12;return[3,4,10,11,9].includes(iv)&&!(iv===9&&!/6|dim7|°/.test(QS[ch.q]))}):[];
@@ -1705,7 +1708,8 @@ cur.n.forEach(x=>{const iv=(x.m-c.r+120)%12,isP=piv.some(y=>y.s===x.s&&y.f===x.f
 let tot=0,jumps=0;for(let i=0;i+1<n;i++){if(!path[i]||!path[i+1])continue;const m=pvMove(path[i],path[i+1]);tot+=m.cases;if(m.jump)jumps++}
 const zs=path.filter(Boolean).map(v=>v.avg).filter(x=>x>0),z1=zs.length?Math.round(Math.min(...zs)):0,z2=zs.length?Math.round(Math.max(...zs)):0;
 info=`${pName(c)}${csc&&P.scl?' ('+csc.name+')':''}${cn?' → '+pName(cn):''}`;if(cur.zf)info+=' · forme trouvée dans la zone';if(nxt){const m=pvMove(cur,nxt);info+=` · ◎ ${m.piv} doigt${m.piv>1?'s':''} reste${m.piv>1?'nt':''} · ↕ ${m.mv} bouge${m.mv>1?'nt':''} (${m.cases} case${m.cases>1?'s':''})${m.neu?' · +'+m.neu+' nouvelle(s) corde(s)':''}${m.jump?' · ⚠ saut de position':''}`}
-info+=`  ‖  Grille : ${tot} cases · zone ${z1}‑${z2} · ${jumps} saut${jumps>1?'s':''}${P.stdName&&P.ch.length>8?' · '+P.stdName:''}. Pointillé jaune = accord suivant · anneau cyan = doigt qui reste · flèche verte 1 case / jaune 2 / rouge saut · violet = notes guides 3‑7.`;
+let zmoves=0;if(P.slide)for(let i=0;i+1<n;i++){if(!path[i]||!path[i+1])continue;const fz=[...path[i].n,...path[i+1].n].map(x=>x.f).filter(f=>f>0);if(fz.length&&Math.max(...fz)-Math.min(...fz)>P.zw-1)zmoves++}
+info+=`  ‖  Grille : ${tot} cases · zone ${z1}‑${z2} · ${jumps} saut${jumps>1?'s':''}${P.slide?' · '+zmoves+' déplacement'+(zmoves>1?'s':'')+' de zone':''}${P.stdName&&P.ch.length>8?' · '+P.stdName:''}. Pointillé jaune = accord suivant · anneau cyan = doigt qui reste · flèche verte 1 case / jaune 2 / rouge saut · violet = notes guides 3‑7.`;
 return{h:s,info}}
 const CSC={maj:[0,2,4,5,7,9,11,'ionien'],maj7:[0,2,4,5,7,9,11,'ionien'],'6':[0,2,4,5,7,9,11,'ionien'],'7':[0,2,4,5,7,9,10,'mixolydien'],sus4:[0,2,4,5,7,9,10,'mixolydien'],'7sus4':[0,2,4,5,7,9,10,'mixolydien'],min:[0,2,3,5,7,9,10,'dorien'],m7:[0,2,3,5,7,9,10,'dorien'],m6:[0,2,3,5,7,9,10,'dorien'],mMaj7:[0,2,3,5,7,9,11,'mineur mélodique'],m7b5:[0,1,3,5,6,8,10,'locrien'],dim:[0,2,3,5,6,8,9,11,'diminuée'],dim7:[0,2,3,5,6,8,9,11,'diminuée'],aug:[0,2,4,6,8,10,'par tons'],'7#5':[0,2,4,6,8,10,'par tons']};
 const MODN7=['ionien','dorien','phrygien','lydien','mixolydien','éolien','locrien'];
@@ -1717,7 +1721,7 @@ if(ms.includes(m)){if(!P.got.includes(m))P.got.push(m);if(fromMic||ms.every(x=>P
 if(ms.some(x=>x%12===m%12)){flash('warn','nFrame');return}flash('ko','nFrame')}
 /* CAGED : les cinq formes pour chaque type d'accord (dérivées de la forme majeure) */
 const CQ=[['maj',''],['min','m'],['7','7'],['maj7','maj7'],['m7','m7'],['m7b5','ø7'],['dim7','°7'],['6','6'],['m6','m6'],['sus4','sus4'],['add9','add9'],['aug','+'],['dim','°']];
-function cagedQ(sh,q){if(q==='maj')return sh;const k=PC[N.key];let n=sh.map(([s,f,d])=>[s,f,d,(TUNE[s]+f-k+24)%12]);
+function cagedQ(sh,q,root){if(q==='maj')return sh;const k=root!=null?root:PC[N.key];let n=sh.map(([s,f,d])=>[s,f,d,(TUNE[s]+f-k+24)%12]);
 const lowS=Math.min(...n.map(x=>x[0]));const mv=(iv,d,which)=>{const L=n.filter(x=>x[3]===iv&&!(which==='nb'&&x[0]===lowS));if(!L.length)return false;const t=which==='all'?L:[L[L.length-1]];t.forEach(x=>{x[1]+=d;x[3]=(x[3]+d+12)%12;x[2]='·'});return true};
 const minor=['min','m7','m7b5','dim7','m6','dim'].includes(q);if(minor)mv(4,-1,'all');if(q==='m7b5'||q==='dim7'||q==='dim')mv(7,-1,'all');if(q==='aug')mv(7,1,'all');if(q==='sus4')mv(4,1,'all');
 if(q==='7'||q==='m7'||q==='m7b5'){if(!mv(0,-2,'nb'))return null}if(q==='maj7'){if(!mv(0,-1,'nb'))return null}if(q==='dim7'){if(!mv(0,-3,'nb'))return null}

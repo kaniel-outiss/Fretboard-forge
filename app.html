@@ -366,7 +366,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v5.2 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v5.3 — Boss</div>
 </section>
 
 </main>
@@ -1753,8 +1753,8 @@ for(let i=1;i<L.length;i+=Math.max(1,Math.round(L.length/12))){const a=L[i-1],b=
 h+=`<g pointer-events="none"><circle cx="${X(L[0].s)+14}" cy="${YN(L[0].f)-13}" r="8" fill="${col}"/><text x="${X(L[0].s)+14}" y="${YN(L[0].f)-9.5}" text-anchor="middle" font-size="10" font-weight="700" fill="#05060b">1</text></g>`;return h}
 function pathCtx(){const t=document.querySelector('.tab.on');if(t&&t.id==='t-sc')return{ivs:SCALES[S.s][2],k:S.k,svg:'sSvg',info:'sMood',name:SCALES[S.s][0],key:KEYS.find(x=>PC[x]===S.k)||SHP[S.k]};return{ivs:curIvs(),k:PC[N.key],svg:'nSvg',info:'nInfo',name:N.view==='scale'?SCALES[N.sc][0]:'',key:N.key}}
 const npRedraw=()=>{const t=document.querySelector('.tab.on');if(t&&t.id==='t-sc')drawSc();else drawNeck()};
-function npRail(R){R.innerHTML='<div class="rlab">CHEMIN</div><div class="rgrid g2c">'+NPATHS.map(([id,lb,col,d])=>`<button class="rc ${N.np===id?'on':''}" data-np="${id}" title="${d}" style="border-color:${col}${N.np===id?'':'66'};${N.np===id?`color:${col};box-shadow:0 0 8px ${col}`:''}">${lb.replace('Bas du manche','Bas').replace('Horizontal','Horiz.').replace('Diagonale','Diag.')}</button>`).join('')+`<button class="rc ${N.np?'':'on'}" data-np="">Aucun</button></div>`+'<button class="rc" id="npPlay" style="border-color:#39ff88;color:#39ff88;width:100%">▶ Écouter ↑↓</button>';
-R.querySelectorAll('[data-np]').forEach(b=>b.onclick=()=>{N.np=b.dataset.np;npRedraw();if(N.np)npPlay()});R.querySelector('#npPlay').onclick=npPlay}
+function npRail(R){R.innerHTML='<div class="rlab">CHEMIN</div><div class="rgrid g2c">'+NPATHS.map(([id,lb,col,d])=>`<button class="rc ${N.np===id?'on':''}" data-np="${id}" title="${d}" style="border-color:${col}${N.np===id?'':'66'};${N.np===id?`color:${col};box-shadow:0 0 8px ${col}`:''}">${lb.replace('Bas du manche','Bas').replace('Horizontal','Horiz.').replace('Diagonale','Diag.')}</button>`).join('')+`<button class="rc ${N.np?'':'on'}" data-np="">Aucun</button></div>`+'<div style="display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:3px;width:100%"><button class="rc" data-npc="prev" style="width:auto;font-size:16px">◀</button><button class="rc" data-npc="play" style="border-color:#39ff88;color:#39ff88;width:auto">▶ ↑↓</button><button class="rc" data-npc="next" style="width:auto;font-size:16px">▶</button></div>'+(N.gi!=null?`<div class="rlab np-stepl">étape ${N.gi+1}</div>`:'');
+R.querySelectorAll('[data-np]').forEach(b=>b.onclick=()=>{N.gi=null;N.np=b.dataset.np;npRedraw();if(N.np)npPlay()});R.querySelector('[data-npc=play]').onclick=()=>{N.gi=null;npPlay()};R.querySelector('[data-npc=prev]').onclick=()=>npStep(-1);R.querySelector('[data-npc=next]').onclick=()=>npStep(1)}
 const HMS=[['1','Seule'],['3','3ces'],['4','4tes'],['6','6tes'],['10','10es'],['tri','Triades'],['7','7es']];
 function grip(ms,anc){let best=null;const P2=ms.map(m=>posOf(m));const rec=(k,cur)=>{if(k===ms.length){const fz=cur.map(x=>x.f).filter(f=>f>0);const sp=fz.length?Math.max(...fz)-Math.min(...fz):0;if(sp>(ms.length>3?5:4))return;const c=Math.abs((fz.length?avg(fz):0)-anc)+sp*.3;if(!best||c<best.c)best={c,v:cur.slice()};return}
 for(const [s2,f] of P2[k]){if(cur.length&&s2<=cur[cur.length-1].s)continue;cur.push({s:s2,f,m:ms[k]});rec(k+1,cur);cur.pop()}};rec(0,[]);return best?best.v:null}
@@ -1762,8 +1762,15 @@ function hmOff(){const n=pathCtx().ivs.length,h=N.hm||'1';return h==='3'?[0,2]:h
 function hmLab(grp){const ms=grp.map(p=>p.m),names=ms.map(m=>JN[m%12]).join('‑');if(ms.length===2){const d=(ms[1]-ms[0])%12,big=ms[1]-ms[0]>12;if(big)return names+' · '+({3:'10e m',4:'10e M'}[d]||'');return names+' · '+({1:'2de m',2:'2de M',3:'3ce m',4:'3ce M',5:'4te J',6:'triton',7:'5te J',8:'6te m',9:'6te M',10:'7e m',11:'7e M',0:'octave'}[d]||'')}
 const q=daQual({notes:ms.map(m=>({m}))});return names+' · '+(q[2]!=null?JN[q[2]]+({majeur:'',mineur:'m',diminué:'°',augmenté:'+'}[q[0]]??q[0]):'')}
 function hmHTML(){return'<div class="rlab" style="margin-top:6px">HARMONIE</div><div class="rgrid hmg" style="width:100%">'+HMS.map(([v,t])=>`<button class="rt ${(N.hm||'1')===v?'on':''}" data-hm="${v}">${t}</button>`).join('')+'</div>'}
-function npPlay(){if(!N.np){N.np='court';npRedraw()}const C=pathCtx(),L=notePath(C.ivs,C.k,N.np);if(!L.length)return;ac();const R=[...L].reverse(),G=[];
-const off=hmOff(),g=off.length;if(g===1){[...L,...R.slice(1)].forEach(p=>G.push([p]))}else{const sp=off[off.length-1],up=[];let anc=L[0].f;for(let i=0;i+sp<L.length;i++){const v=grip(off.map(o=>L[i+o].m),anc);if(v){up.push(v);anc=avg(v.map(x=>x.f))}}G.push(...up,...up.slice(0,-1).reverse())}
+function npGroups(){const C=pathCtx(),L=notePath(C.ivs,C.k,N.np||'court'),R=[...L].reverse(),G=[];if(!L.length)return{C,G,g:1};
+const off=hmOff(),g=off.length;if(g===1){[...L,...R.slice(1)].forEach(p=>G.push([p]))}else{const sp=off[off.length-1],up=[];let anc=L[0].f;for(let i=0;i+sp<L.length;i++){const v=grip(off.map(o=>L[i+o].m),anc);if(v){up.push(v);anc=avg(v.map(x=>x.f))}}G.push(...up,...up.slice(0,-1).reverse())}return{C,G,g}}
+function npStep(d){if(!N.np)N.np='court';DEMO++;const {C,G,g}=npGroups();if(!G.length)return;N.gi=((N.gi==null?-1:N.gi)+d+G.length)%G.length;npRedraw();const grp=G[N.gi],lay=svgLayer(C.svg),gg=document.createElementNS('http://www.w3.org/2000/svg','g');gg.setAttribute('pointer-events','none');
+let h=grp.length>1?`<polyline points="${grp.map(p=>X(p.s)+','+YN(p.f)).join(' ')}" fill="none" stroke="#ffd23f" stroke-width="3" stroke-opacity=".7"/>`:'';grp.forEach(p=>h+=`<circle cx="${X(p.s)}" cy="${YN(p.f)}" r="20" fill="none" stroke="#ffd23f" stroke-width="4" filter="url(#glow)"/>`);gg.innerHTML=h;lay.appendChild(gg);
+ac();grp.forEach((p,i)=>tone(p.m,g>1?0:0,1.1,g>1?.16:.22));const half=Math.ceil(G.length/2);
+document.getElementById(C.info).textContent=`${KDISP(C.key)} ${C.name} · ${HMS.find(x=>x[0]===(N.hm||'1'))[1]} · étape ${N.gi+1}/${G.length} ${N.gi<half?'↑':'↓'} : `+(grp.length>1?hmLab(grp):JN[grp[0].m%12]+' ('+(6-grp[0].s)+'e corde, case '+grp[0].f+')');
+document.querySelectorAll('.np-stepl').forEach(l=>l.textContent=`étape ${N.gi+1}/${G.length}`)}
+function npPlay(){if(!N.np){N.np='court';npRedraw()}const {C,G,g}=npGroups();if(!G.length)return;ac();if(false){
+}
 const tk=++DEMO,dt=g===1?.2:.38;G.forEach((grp,i)=>setTimeout(()=>{if(tk!==DEMO)return;if(g>1)document.getElementById(C.info).textContent=`${KDISP(C.key)} ${C.name} · ${HMS.find(x=>x[0]===(N.hm||'1'))[1]} : `+hmLab(grp)+`  (${i+1}/${G.length})`;grp.forEach(p=>{pulseAt(C.svg,p.s,p.f,'#ffd23f',true,dt*.9);tone(p.m,0,dt*.95,g>1?.16:.22)})},i*dt*1000))}
 const SCF={F:'Base',P:'Penta',M:'Modes',S:'Mineures',Y:'Sym.',X:'Exot.'};
 function scList(R){const f=N.scf||SCALES[N.sc][1];N.scf=f;R.innerHTML='<div class="rlab">FAMILLE</div><div class="rtabs">'+Object.keys(SCF).map(x=>`<button class="${f===x?'on':''}" data-scf="${x}">${SCF[x]}</button>`).join('')+'</div><div class="rlab">GAMME</div><div class="rgrid">'+SCALES.map((z,i)=>z[1]!==f?'':`<button class="rc sm ${N.sc===i?'on':''}" data-nsc="${i}" style="width:100%">${z[0].replace('Majeure (ionien)','Ionien').replace(/ \(.*\)/,'')}</button>`).join('')+'</div>';
@@ -1790,7 +1797,7 @@ R.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>{N.dt=b.dataset.dt;N.dv
 function neckRails(){const R=document.getElementById('nRailR');R.classList.remove('split');
 keyRail('nRailL',PC[N.key],k=>{const d=(PC[k]-PC[N.key]+12)%12;N.key=k;document.getElementById('nKey').value=k;if(typeof jgStop==='function')jgStop();N.si=0;N.tc=null;if(d&&P.ch.length){P.ch=P.ch.map(c=>({...c,r:(c.r+d)%12,b:c.b==null?null:(c.b+d)%12}));P.path=null}drawNeck()},
 N.view==='prog'?`<button class="rt" id="pMin">${P.minor?'Mineur ⇄ Maj':'Maj ⇄ mineur'}</button>`:(N.view==='scale'||N.view==='triad')?hmHTML():'');
-bindExtra=()=>{const b=document.getElementById('pMin');if(b)b.onclick=()=>{P.minor=!P.minor;drawNeck()};document.querySelectorAll('#nRailL [data-hm],#sRailL [data-hm]').forEach(x=>x.onclick=()=>{N.hm=x.dataset.hm;npRedraw();npPlay()})};bindExtra();
+bindExtra=()=>{const b=document.getElementById('pMin');if(b)b.onclick=()=>{P.minor=!P.minor;drawNeck()};document.querySelectorAll('#nRailL [data-hm],#sRailL [data-hm]').forEach(x=>x.onclick=()=>{N.gi=null;N.hm=x.dataset.hm;npRedraw();npPlay()})};bindExtra();
 document.querySelectorAll('#nVw [data-nv]').forEach(b=>b.classList.toggle('on',b.dataset.nv===N.view));
 if(N.view==='caged'){R.style.display='';cagedRail()}else if(N.view==='triad'){R.style.display='';N.sf=N.sf||'tri';if(!N.st)N.st=STRF.find(x=>x[0]===N.sf)[2][0][0];strRail()}else if(N.view==='prog'||N.view==='dict'){R.style.display=''}else{R.style.display='none';R.innerHTML='';R.classList.remove('wide')}}
 
@@ -1831,7 +1838,7 @@ if(x==='mic'){document.getElementById('btnMic').click();setTimeout(scUI,300)}
 if(x==='re'){scStop();S.mi=0;DA.i=0;DA.got=[];drawSc()}});
 const f2=document.getElementById('sFrm2');if(f2)f2.innerHTML=document.getElementById('sFrm').innerHTML;
 // rails
-keyRail('sRailL',S.k,k=>{scStop();S.k=PC[k];document.getElementById('sKey').value=S.k;S.tgt=null;motBuild();drawSc()},G.work==='chem'?hmHTML():'');bindExtra=null;document.querySelectorAll('#sRailL [data-hm]').forEach(x=>x.onclick=()=>{N.hm=x.dataset.hm;scUI();npPlay()});
+keyRail('sRailL',S.k,k=>{scStop();S.k=PC[k];document.getElementById('sKey').value=S.k;S.tgt=null;motBuild();drawSc()},G.work==='chem'?hmHTML():'');bindExtra=null;document.querySelectorAll('#sRailL [data-hm]').forEach(x=>x.onclick=()=>{N.gi=null;N.hm=x.dataset.hm;scUI();npPlay()});
 const R=document.getElementById('sRailR');R.classList.add('wide');
 if(G.work==='arp'){R.classList.remove('split');R.innerHTML='<div class="rlab">FAMILLE</div><div class="rtabs">'+ARPF.map((g,i)=>`<button class="${G.afam===i?'on':''}" data-af="${i}">${g[0].slice(0,4)}</button>`).join('')+'</div><div class="rlab">ARPÈGE</div><div class="rgrid">'+ARPF[G.afam][1].map((f,i)=>`<button class="rc sm ${DA.af===G.afam+':'+i?'on':''}" data-arf="${G.afam}:${i}">${f[0]}</button>`).join('')+'</div>';
 R.querySelectorAll('[data-af]').forEach(b=>b.onclick=()=>{G.afam=+b.dataset.af;scUI()});R.querySelectorAll('[data-arf]').forEach(b=>b.onclick=()=>{DA.af=b.dataset.arf;drawSc()});return}

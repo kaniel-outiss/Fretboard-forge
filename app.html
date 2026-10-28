@@ -358,7 +358,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.9 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v4.0 — Boss</div>
 </section>
 
 </main>
@@ -633,7 +633,8 @@ sub.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{N.sf=b.dataset.sf;N.
 const ivs=T[2].map(x=>x%12),labs={};T[2].forEach((x,i)=>labs[x%12]=T[3]?T[3][i]:IVN[x%12]);
 for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const iv=(TUNE[s2]+f-k+24)%12;if(!ivs.includes(iv))continue;
 const lab=N.mode==='nt'?nm((TUNE[s2]+f)%12,N.key):labs[iv];h+=dot(s2,f,NC[iv],lab,{r:iv===0?15:13})}
-info=`${KDISP(N.key)} ${T[1]} — ${T[4]}. Toutes les notes sur le manche : cherche les formes serrées sur chaque groupe de cordes.`}
+info=`${KDISP(N.key)} ${T[1]} — ${T[4]}. `+(N.np?`Chemin « ${NPATHS.find(x=>x[0]===N.np)[1]} » : ${NPATHS.find(x=>x[0]===N.np)[3]} — ▶ Écouter le joue du grave à l'aigu.`:'Choisis un chemin pour l\'écouter du grave à l\'aigu.')}
+if(N.view==='triad'||N.view==='scale'){N.np=N.np===undefined?'court':N.np;const old=document.getElementById('npRowX');if(old)old.remove();npRow(sub);sub.nextSibling.id='npRowX';if(N.np){const L=notePath(curIvs(),k,N.np);h+=pathSvg(L,NPATHS.find(x=>x[0]===N.np)[2])}}else{const old=document.getElementById('npRowX');if(old)old.remove()}
 document.getElementById('nLayRow').style.display=(N.view==='layers'||N.view==='taylor')?'flex':'none';document.getElementById('nGo').style.display=N.view==='layers'?'':'none';document.getElementById('nReset').style.display=N.view==='taylor'?'':'none';
 document.getElementById('nGo').textContent=N.play?'■ Stop':'🎯 Joue la couche';
 setSvg('nSvg',h);document.getElementById('nInfo').textContent=info}
@@ -694,7 +695,8 @@ let nTm=null;document.getElementById('nPlay').onclick=()=>{if(nTm){clearInterval
 if(N.view==='layers'){const L=layNotes();demoRun('nSvg',laySeq().map(m=>L.find(x=>MIDI[x[0]]+x[1]===m)).filter(Boolean).map(x=>({s:x[0],f:x[1]})),.2);return}
 if(N.view==='taylor'){const k=PC[N.key],go=()=>chord(Q7[N.tq].map(iv=>48+k+iv),0,2.2);go();nTm=setInterval(go,2400);return}
 if(N.view==='caged'){let i=0;const go=()=>{N.shape=ORD[i%5];drawNeck();shapeIn(N.shape,N.key).sort((a,b)=>a[0]-b[0]).forEach((x,j)=>setTimeout(()=>tone(MIDI[x[0]]+x[1]),j*110));i++;if(i>5){clearInterval(nTm);nTm=null}};go();nTm=setInterval(go,2200)}
-else{const k=PC[N.key],set=N.view==='scale'?SCALES[N.sc][2]:QUAL[N.q||'maj'];const ms=[];for(let m=48+k;m<=48+k+12;m++)if(set.includes((m-48-k)%12)||m===48+k+12)ms.push(m);ms.forEach((m,i)=>tone(m,i*.18))}};
+else if((N.view==='triad'||N.view==='scale')&&N.np){const L=notePath(curIvs(),PC[N.key],N.np);demoRun('nSvg',L,.2)}
+else{const k=PC[N.key],set=N.view==='scale'?SCALES[N.sc][2]:curIvs();const ms=[];for(let m=48+k;m<=48+k+12;m++)if(set.includes((m-48-k)%12)||m===48+k+12)ms.push(m);ms.forEach((m,i)=>tone(m,i*.18))}};
 
 /* ================= TRIADES ================= */
 const T={ss:0,q:'maj',mode:'explore',run:false,idx:0,key:'C',target:null,played:[],streak:0,tempo:70,prevFrets:null,timer:null,ringT:0};
@@ -1730,6 +1732,20 @@ if(q==='6'||q==='m6'){if(!mv(7,2,'nb')&&!mv(0,-3,'nb'))return null}if(q==='add9'
 if(n.some(x=>x[1]<0))n.forEach(x=>x[1]+=12);if(n.some(x=>x[1]>NF))return null;const fz=n.map(x=>x[1]).filter(f=>f>0);if(fz.length&&Math.max(...fz)-Math.min(...fz)>5)return null;return n.map(([s,f,d])=>[s,f,d])}
 function cagedRail(){const R=document.getElementById('nRailR');R.classList.add('wide');R.innerHTML='<div class="rlab">TYPE D\'ACCORD</div><div class="rgrid g2c">'+CQ.map(([q,l])=>`<button class="rc ${(N.cq||'maj')===q?'on':''}" data-cq="${q}">${KDISP(N.key)}${l}</button>`).join('')+'</div>';
 R.querySelectorAll('[data-cq]').forEach(b=>b.onclick=()=>{N.cq=b.dataset.cq;drawNeck();const sh=N.shape==='Toutes'?'C':N.shape,v=cagedQ(shapeIn(sh,N.key),N.cq);if(v)chord(v.map(([s,f])=>MIDI[s]+f))})}
+/* Chemins d'écoute grave → aigu : plusieurs parcours possibles */
+const NPATHS=[['court','Court','#2ee6ff','reste groupé, petits gestes'],['diag','Diagonale','#ffd23f','monte le long du manche'],['bas','Bas du manche','#39ff88','positions basses, cordes à vide'],['horiz','Horizontal','#ff7a1a','le long des cordes, peu de changements de corde']];
+function notePath(ivs,k,type){const ms=[];for(let m=MIDI[0];m<=MIDI[5]+NF;m++)if(ivs.includes((m-k+120)%12))ms.push(m);if(!ms.length)return[];
+const P2=ms.map(m=>posOf(m).map(([s2,f])=>({s:s2,f,m})));const n=ms.length;
+const node=(i,p)=>type==='bas'?p.f*.8:type==='diag'?Math.abs(p.f-(1+(15)*i/Math.max(1,n-1)))*1.2:0;
+const edge=(a,b)=>{const df=Math.abs(b.f-a.f),ds=Math.abs(b.s-a.s);if(type==='horiz')return(ds?5*ds:0)+df*.15;const back=b.s<a.s?4:0;if(type==='diag')return df*.4+(ds>1?1.5:0)+back;if(type==='bas')return df*.4+(ds>1?1:0)+back;return df*df*.35+(ds>1?2:0)+back};
+let D=P2[0].map(p=>({c:node(0,p),b:-1}));const BK=[D];for(let i=1;i<n;i++){const ND=P2[i].map(p=>{let best=1e9,bj=0;D.forEach((d,j)=>{const x=d.c+edge(P2[i-1][j],p);if(x<best){best=x;bj=j}});return{c:best+node(i,p),b:bj}});BK.push(ND);D=ND}
+let j=D.reduce((bi,d,x)=>d.c<D[bi].c?x:bi,0);const out=[];for(let i=n-1;i>=0;i--){out[i]=P2[i][j];j=BK[i][j].b}return out}
+function pathSvg(L,col){if(!L.length)return'';let h=`<polyline points="${L.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="${col}" stroke-width="2.5" stroke-opacity=".55" stroke-dasharray="6 4"/>`;
+for(let i=1;i<L.length;i+=Math.max(1,Math.round(L.length/12))){const a=L[i-1],b=L[i];h+=`<line x1="${X(a.s)}" y1="${YN(a.f)}" x2="${(X(a.s)+X(b.s))/2}" y2="${(YN(a.f)+YN(b.f))/2}" stroke="${col}" stroke-width="2.5" stroke-opacity=".8" marker-end="url(#arY)"/>`}
+h+=`<g pointer-events="none"><circle cx="${X(L[0].s)+14}" cy="${YN(L[0].f)-13}" r="8" fill="${col}"/><text x="${X(L[0].s)+14}" y="${YN(L[0].f)-9.5}" text-anchor="middle" font-size="10" font-weight="700" fill="#05060b">1</text></g>`;return h}
+function npRow(sub){const row=document.createElement('div');row.className='row brow';row.innerHTML='<span class="lbl">Chemin</span>'+NPATHS.map(([id,lb,col,d])=>`<button class="b ${N.np===id?'on':''}" data-np="${id}" title="${d}" style="${N.np===id?`border-color:${col};color:${col}`:''}">${lb}</button>`).join('')+`<button class="b ${N.np?'':'on'}" data-np="">Aucun</button>`;
+sub.after(row);row.querySelectorAll('[data-np]').forEach(b=>b.onclick=()=>{N.np=b.dataset.np;drawNeck();if(N.np)document.getElementById('nPlay').click()})}
+function curIvs(){if(N.view==='scale')return SCALES[N.sc][2];const F=STRF.find(x=>x[0]===(N.sf||'tri')),T=F[2].find(x=>x[0]===N.st)||F[2][0];return T[2].map(x=>x%12)}
 /* Structures : familles et types */
 const STRF=[['tri','Triades',[['maj','majeure',[0,4,7],null,'3ce M + 3ce m'],['min','mineure',[0,3,7],null,'3ce m + 3ce M'],['dim','diminuée',[0,3,6],null,'deux 3ces m'],['aug','augmentée',[0,4,8],['R','3','#5'],'deux 3ces M'],['sus2','sus2',[0,2,7],null,'2de + 5te'],['sus4','sus4',[0,5,7],null,'4te + 5te'],['b5','majeure ♭5',[0,4,6],null,'3ce M + 3ce dim. (Lydien)']]],
 ['q4','Quartes',[['q44','4te J + 4te J',[0,5,10],['R','4','b7'],'empilement « So What »'],['q4a','4te J + 4te aug',[0,5,11],['R','4','7'],'quartal lydien'],['qa4','4te aug + 4te J',[0,6,11],['R','#4','7'],'son lydien'],['q444','4 × 4te J',[0,5,10,15],['R','4','b7','b3'],'quatre sons quartaux (McCoy)'],['qmaj','4tes du majeur (3‑6‑2)',[4,9,14],['3','6','9'],'quartal sur la 3ce (couleur 6/9)']]],

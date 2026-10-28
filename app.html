@@ -358,7 +358,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.5 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.6 — Boss</div>
 </section>
 
 </main>
@@ -514,9 +514,9 @@ let LASTP=null,LASTV=null,FING=false,DEMO=0;
 const vColor=()=>LASTV&&performance.now()-LASTV.t<120?({ok:'#39ff88',ko:'#ff3b5c',warn:'#ffb020'})[LASTV.cls]:'#2ee6ff';
 function svgLayer(id){const el=document.getElementById(id);if(!el)return null;return el.querySelector(':scope > g[transform]')||el}
 function pulseAt(id,s,f,col,noTrail,hold){col=col||'#2ee6ff';const pk=id+'/'+s+'/'+f;if(PSEEN[pk]&&performance.now()-PSEEN[pk]<150)return;PSEEN[pk]=performance.now();const L=svgLayer(id);if(!L)return;const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('pointer-events','none');const x=X(s),y=YN(f);let h='';
-if(!noTrail&&LASTP&&LASTP.id===id&&performance.now()-LASTP.t<2500&&(LASTP.s!==s||LASTP.f!==f))h+=`<line class="pzT" x1="${X(LASTP.s)}" y1="${YN(LASTP.f)}" x2="${x}" y2="${y}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>`;
-const hd=hold?Math.max(.25,Math.min(2.5,hold)):0;if(hd)h+=`<circle class="pzH" style="--hd:${hd+.25}s" cx="${x}" cy="${y}" r="20" fill="${col}" fill-opacity=".4" stroke="${col}" stroke-width="3.5" filter="url(#glow)"/>`;
-h+=`<circle class="pzA" cx="${x}" cy="${y}" r="16" fill="${col}" fill-opacity=".55" filter="url(#glow)"/><circle class="pzB" cx="${x}" cy="${y}" r="16" fill="none" stroke="${col}" stroke-width="3"/>`;
+if(!noTrail&&LASTP&&LASTP.id===id&&performance.now()-LASTP.t<2500&&(LASTP.s!==s||LASTP.f!==f))h+=`<line class="pzT" x1="${X(LASTP.s)}" y1="${YN(LASTP.f)}" x2="${x}" y2="${y}" stroke="${col}" stroke-width="2" stroke-opacity=".35" stroke-linecap="round"/>`;
+const hd=hold?Math.max(.25,Math.min(2.5,hold)):0;if(hd)h+=`<circle class="pzH" style="--hd:${hd+.25}s" cx="${x}" cy="${y}" r="20" fill="none" stroke="${col}" stroke-width="4" filter="url(#glow)"/>`;
+h+=`<circle class="pzA" cx="${x}" cy="${y}" r="18" fill="none" stroke="${col}" stroke-width="2.5" filter="url(#glow)"/><circle class="pzB" cx="${x}" cy="${y}" r="16" fill="none" stroke="${col}" stroke-width="3"/>`;
 g.innerHTML=h;L.appendChild(g);setTimeout(()=>g.remove(),Math.max(1300,(hd+.5)*1000));LASTP={id,s,f,t:performance.now()}}
 function pathAhead(st,i,n){n=n||3;let h='';for(let k=1;k<=n;k++){const a=st[i+k-1],b=st[i+k];if(!a||!b)break;const op=(1-k*.22).toFixed(2);
 if(a.s!==b.s||a.f!==b.f)h+=`<line x1="${X(a.s)}" y1="${YN(a.f)}" x2="${X(b.s)}" y2="${YN(b.f)}" stroke="#ffd23f" stroke-width="2.5" stroke-dasharray="6 5" opacity="${op}" marker-end="url(#arY)"/>`;

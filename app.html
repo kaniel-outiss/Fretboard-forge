@@ -13,6 +13,12 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden}
 body{display:flex;flex-direction:column;height:100dvh}
+.hubnav{display:flex;border-top:1px solid var(--line);flex:0 0 auto;background:var(--bg2);padding-bottom:env(safe-area-inset-bottom)}
+.hubnav button{flex:1;background:none;border:0;color:var(--mut);font-size:11.5px;padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.hubnav button i{font-style:normal;font-size:22px;line-height:1}.hubnav button.on{color:var(--acc);text-shadow:0 0 8px var(--acc)}
+.subbar{display:flex;gap:6px;padding:4px 10px 0;flex:0 0 auto}.subbar:empty{display:none}
+.subbar button{flex:1;background:var(--bg2);color:var(--mut);border:1px solid var(--line);border-radius:12px;font-size:12.5px;padding:6px 4px}.subbar button.on{color:var(--acc);border-color:var(--acc);box-shadow:0 0 8px var(--acc)}
+@media (orientation:landscape){body{padding-left:62px;box-sizing:border-box}.hubnav{position:fixed;left:0;top:0;bottom:0;width:62px;flex-direction:column;border-top:0;border-right:1px solid var(--line);padding:0}.hubnav button{font-size:9.5px;padding:4px 1px}.hubnav button i{font-size:19px}.subbar{padding-top:2px}.subbar button{padding:3px 4px;font-size:11.5px}}
 header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line);flex:0 0 auto}
 header h1{font-size:17px;margin:0;font-weight:600;letter-spacing:1px}
 header h1 span{color:var(--acc);text-shadow:0 0 10px var(--acc)}
@@ -133,6 +139,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <h1>FRETBOARD <span>FORGE</span></h1>
   <div class="hdr-r"><span id="sessBar" class="sessb"></span><span id="micNote" class="micn">—</span><span id="hdrKey"></span><button class="b" id="btnFing" title="Numéros de doigts">✋</button><button class="b" id="btnMic" title="Micro">🎤</button><button class="b" id="btnSnd" title="Son">🔊</button></div>
 </header>
+<div id="subBar" class="subbar"></div>
 <main>
 
 <!-- ===== MANCHE ===== -->
@@ -358,11 +365,11 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v4.2 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v5.0 — Boss</div>
 </section>
 
 </main>
-<nav>
+<nav style="display:none">
   <button class="on" data-t="t-neck"><i>🎸</i>Manche</button>
   <button data-t="t-dr"><i>✏️</i>Dessine</button>
   <button data-t="t-tri"><i>⚡</i>Drills</button>
@@ -372,6 +379,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <button data-t="t-sg"><i>🎤</i>Scène</button>
   <button data-t="t-pro"><i>🗺️</i>Parcours</button>
 </nav>
+<div class="hubnav" id="hubNav"><button data-hub="manche"><i>🎸</i>Manche</button><button data-hub="gammes"><i>🐉</i>Gammes</button><button data-hub="prog"><i>🧭</i>Progression</button><button data-hub="train"><i>⚡</i>Entraîner</button><button data-hub="styles"><i>🎷</i>Styles</button><button data-hub="pro"><i>🗺️</i>Parcours</button></div>
 
 <script>const GOSP_PROGS={
   cad:{lb:'Cadence d\u2019église · I–IV–V7–I',st:[[0,'maj','I'],[5,'maj','IV'],[7,'7','V7'],[0,'maj','I']]},
@@ -552,7 +560,7 @@ document.querySelectorAll('#t-neck [data-m]').forEach(b=>b.onclick=()=>{N.mode=b
 document.getElementById('nMv').onclick=()=>{N.mv=!N.mv;drawNeck()};
 document.getElementById('nChips').innerHTML=[['R','Fondamentale'],['3','Tierce'],['5','Quinte'],['b3','Tierce m.'],['7','7e maj'],['b7','7e'],['2','9e'],['6','6te'],['4','11e']].map(([k,t])=>{const iv=Object.keys(IVN).find(i=>IVN[i]===k);return`<span class="chip"><b style="background:${NC[iv]}">${k}</b>${t}</span>`}).join('');
 function shapeIn(name,key){const k=PC[key];let n=CAGED[name].map(([s,f,d])=>[s,f+k,d]);if(Math.max(...n.map(x=>x[1]))>NF)n=n.map(([s,f,d])=>[s,f-12,d]);if(Math.min(...n.map(x=>x[1]))<0)n=n.map(([s,f,d])=>[s,f+12,d]);return n}
-function drawNeck(){
+function drawNeck(){if(!['prog','scale'].includes(N.view))ST.manV=N.view;if(typeof hubSync==='function'&&document.getElementById('t-neck').classList.contains('on'))setTimeout(hubSync,0);
 document.getElementById('hdrKey').textContent=N.key;
 document.querySelectorAll('#t-neck [data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m===N.mode));
 document.getElementById('nMv').classList.toggle('on',N.mv);
@@ -1656,7 +1664,7 @@ function pPreset(t){P.ch=t.map(x=>({r:(PC[N.key]+x[0])%12,q:P.four?x[1]:x[2],rn:
 function pTranspose(d){if(P.song)P.ch.forEach(c=>{c.fl=false;c.bfl=false;c.bs=false});const k2=KEYS.find(x=>PC[x]===(PC[N.key]+d)%12);N.key=k2;document.getElementById('nKey').value=k2;P.ch=P.ch.map(c=>({...c,r:(c.r+d)%12,b:c.b==null?null:(c.b+d)%12}));P.path=null}
 const TRD={'4':5,'5':7,'1':1};
 function pStop(){if(P.timer){clearInterval(P.timer);P.timer=null}}
-function pPlayCur(){const v=progPath()[P.i];if(v){chord(v.n.map(x=>x.m),0,60/P.tempo*3.6);const bp=bassPos(P.ch[P.i],v);if(bp)tone(bp.m,0,60/P.tempo*3.6,.25)}}
+function pPlayCur(){const v=progPath()[P.i];if(v){chord(v.n.map(x=>x.m),0,60/P.tempo*3.6);const bp=slashBass(P.ch[P.i],v);if(bp)tone(bp.m,0,60/P.tempo*3.6,.25)}}
 function pStep(d){if(!P.ch.length)return;P.i=(P.i+d+P.ch.length)%P.ch.length;P.got=[];drawNeck();pPlayCur()}
 function pToggle(){if(P.timer){pStop();drawNeck();return}if(!P.ch.length)return;ac();pPlayCur();drawNeck();P.timer=setInterval(()=>{if(N.view!=='prog'||!document.getElementById('t-neck').classList.contains('on')){pStop();return}P.i=(P.i+1)%P.ch.length;if(P.i===0&&P.tr!=='0')pTranspose(TRD[P.tr]);P.got=[];drawNeck();pPlayCur()},60/P.tempo*4*1000)}
 async function pStd(){if(!STD){document.getElementById('nInfo').textContent='Chargement des standards…';await stdLoad()}const q=(document.getElementById('pStdQ')||{}).value||'';let idx=-1;if(q.trim()){const ql=q.trim().toLowerCase();idx=STD.findIndex(r=>r[1].toLowerCase().includes(ql))}if(idx<0)idx=Math.floor(Math.random()*STD.length);
@@ -1706,7 +1714,7 @@ s+=`<line x1="${X(x.s)}" y1="${y1}" x2="${X(x.s)}" y2="${y2}" stroke="${col}" st
 const g1=gt(cur,c),g2=gt(nxt,cn);g1.forEach(a=>{if(!g2.length)return;const b=g2.reduce((p,q)=>Math.abs(q.m-a.m)<Math.abs(p.m-a.m)?q:p);if(b.s===a.s&&b.f===a.f)return;s+=`<path d="M${X(a.s)} ${YN(a.f)} Q ${(X(a.s)+X(b.s))/2-26} ${(YN(a.f)+YN(b.f))/2} ${X(b.s)} ${YN(b.f)}" fill="none" stroke="#a06bff" stroke-width="2" stroke-dasharray="3 3"/>`})}
 const piv=nxt?cur.n.filter(x=>nxt.n.some(y=>y.s===x.s&&y.f===x.f)):[];
 cur.n.forEach(x=>{const iv=(x.m-c.r+120)%12,isP=piv.some(y=>y.s===x.s&&y.f===x.f);if(isP)s+=`<circle cx="${X(x.s)}" cy="${YN(x.f)}" r="21" fill="none" stroke="#2ee6ff" stroke-width="3" filter="url(#glow)"/>`;s+=dot(x.s,x.f,NC[iv],P.got.includes(x.m)?'✓':(N.mode==='nt'?JN[x.m%12]:lab7(iv,sevQ(c.q))),{r:15,target:P.got.length&&!P.got.includes(x.m)})});
-{const bp=bassPos(c,cur);if(bp){const nb=nxt?bassPos(cn,nxt):null;if(nb&&(nb.s!==bp.s||nb.f!==bp.f))s+=`<line x1="${X(bp.s)}" y1="${YN(bp.f)}" x2="${X(nb.s)}" y2="${YN(nb.f)}" stroke="#a06bff" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#arY)"/>`;s+=`<rect x="${X(bp.s)-14}" y="${YN(bp.f)-14}" width="28" height="28" rx="7" fill="#a06bff"/><text x="${X(bp.s)}" y="${YN(bp.f)+4}" text-anchor="middle" font-size="11" font-weight="700" fill="#05060b">${JN[c.b]}</text>`}}
+{const bp=slashBass(c,cur);if(bp){const nb=nxt?slashBass(cn,nxt):null;if(nb&&(nb.s!==bp.s||nb.f!==bp.f))s+=`<line x1="${X(bp.s)}" y1="${YN(bp.f)}" x2="${X(nb.s)}" y2="${YN(nb.f)}" stroke="#a06bff" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#arY)"/>`;s+=`<rect x="${X(bp.s)-14}" y="${YN(bp.f)-14}" width="28" height="28" rx="7" fill="#a06bff"/><text x="${X(bp.s)}" y="${YN(bp.f)+4}" text-anchor="middle" font-size="11" font-weight="700" fill="#05060b">${JN[c.b]}</text>`}}
 let tot=0,jumps=0;for(let i=0;i+1<n;i++){if(!path[i]||!path[i+1])continue;const m=pvMove(path[i],path[i+1]);tot+=m.cases;if(m.jump)jumps++}
 const zs=path.filter(Boolean).map(v=>v.avg).filter(x=>x>0),z1=zs.length?Math.round(Math.min(...zs)):0,z2=zs.length?Math.round(Math.max(...zs)):0;
 info=`${pName(c)}${csc&&P.scl?' ('+csc.name+')':''}${cn?' → '+pName(cn):''}`;if(cur.zf)info+=' · forme trouvée dans la zone';if(nxt){const m=pvMove(cur,nxt);info+=` · ◎ ${m.piv} doigt${m.piv>1?'s':''} reste${m.piv>1?'nt':''} · ↕ ${m.mv} bouge${m.mv>1?'nt':''} (${m.cases} case${m.cases>1?'s':''})${m.neu?' · +'+m.neu+' nouvelle(s) corde(s)':''}${m.jump?' · ⚠ saut de position':''}`}
@@ -1885,7 +1893,7 @@ if(g('#pPasteGo'))g('#pPasteGo').onclick=()=>{const t=g('#pPasteT').value;if(t.t
 sub.querySelectorAll('[data-psong]').forEach(b=>b.onclick=e=>{const i=+b.dataset.psong;if(e.target.dataset.psdel!=null){ST.songs.splice(i,1);save_();drawNeck();return}songLoad(ST.songs[i].txt,false)})}
 document.getElementById('pFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{songLoad(String(r.result));e.target.value=''};r.readAsText(f)};
 /* basse des accords slash */
-function bassPos(c,v){if(!c||c.b==null||!v)return null;const lo=Math.min(...v.n.map(x=>x.s));let best=null;for(let s2=0;s2<Math.max(1,lo);s2++)for(let f=0;f<=NF;f++){if((TUNE[s2]+f)%12!==c.b)continue;const d=Math.abs(f-(v.avg||5));if(!best||d<best.d)best={s:s2,f,m:MIDI[s2]+f,d}}return best}
+function slashBass(c,v){if(!c||c.b==null||!v)return null;const lo=Math.min(...v.n.map(x=>x.s));let best=null;for(let s2=0;s2<Math.max(1,lo);s2++)for(let f=0;f<=NF;f++){if((TUNE[s2]+f)%12!==c.b)continue;const d=Math.abs(f-(v.avg||5));if(!best||d<best.d)best={s:s2,f,m:MIDI[s2]+f,d}}return best}
 
 sideReflow();
 let DRM='tri';document.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>drillMode(b.dataset.dm));
@@ -2040,7 +2048,21 @@ document.getElementById('btnMic').onclick=()=>{MIC.on?micStop():micStart()};
 /* ================= PARCOURS : séance du jour + villages ================= */
 ST.days=ST.days||{};
 const today=()=>new Date().toISOString().slice(0,10);
-const goTab=id=>document.querySelector(`nav button[data-t="${id}"]`).click();
+const goTab=id=>{document.querySelector(`nav button[data-t="${id}"]`).click();if(typeof hubSync==='function')hubSync()};
+/* ================= NAVIGATION PAR INTENTION (6 hubs + sous-onglets) ================= */
+const HUBS={manche:[['Explorer le manche','t-neck','man']],gammes:[['🐉 Gammes','t-sc'],['🎼 Harmonie & chemins','t-neck','scale']],prog:[['🧭 Grilles & chansons','t-neck','prog'],['🎤 Standards (Scène)','t-sg']],
+train:[['✏️ Dessine','t-dr'],['⚡ Drills','t-tri']],styles:[['🔥 Blues','t-bl'],['🎷 Jazz','t-jz']],pro:[['Parcours','t-pro']]};
+ST.hub=ST.hub||{cur:'manche',sub:{}};let HUBCUR=ST.hub.cur||'manche';
+function hubOf(t){if(t==='t-neck')return N.view==='prog'?'prog':N.view==='scale'?'gammes':'manche';return{'t-sc':'gammes','t-sg':'prog','t-dr':'train','t-tri':'train','t-bl':'styles','t-jz':'styles','t-pro':'pro'}[t]||'manche'}
+function hubSync(){const tab=document.querySelector('.tab.on');if(!tab)return;const h=hubOf(tab.id);HUBCUR=h;const L=HUBS[h];let si=L.findIndex(x=>x[1]===tab.id&&(tab.id!=='t-neck'||x[2]===(N.view==='prog'||N.view==='scale'?N.view:'man')));if(si<0)si=0;
+ST.hub.cur=h;ST.hub.sub[h]=si;document.querySelectorAll('#hubNav [data-hub]').forEach(b=>b.classList.toggle('on',b.dataset.hub===h));
+const sb=document.getElementById('subBar');sb.innerHTML=L.length>1?L.map((x,i)=>`<button class="${i===si?'on':''}" data-si="${i}">${x[0]}</button>`).join(''):'';sb.querySelectorAll('[data-si]').forEach(b=>b.onclick=()=>hubGo(h,+b.dataset.si));
+const vw=document.getElementById('nVw');if(vw){vw.style.display=tab.id==='t-neck'&&h!=='manche'?'none':'';vw.querySelectorAll('[data-nv=prog],[data-nv=scale]').forEach(b=>b.style.display='none')}}
+function hubGo(h,si){const L=HUBS[h];if(si==null)si=Math.min(L.length-1,(ST.hub.sub||{})[h]||0);const [,t,v]=L[si];
+if(t==='t-neck'){const want=v==='man'?(['prog','scale'].includes(N.view)?(ST.manV||'caged'):N.view):v;if(N.view!==want){const sel=document.getElementById('nView');sel.value=want;goTab('t-neck');sel.dispatchEvent(new Event('change'))}else goTab('t-neck')}else goTab(t);
+ST.hub.cur=h;ST.hub.sub[h]=si;save();hubSync()}
+document.querySelectorAll('#hubNav [data-hub]').forEach(b=>b.onclick=()=>hubGo(b.dataset.hub));
+
 const clickSel=q=>{const el=document.querySelector(q);if(el)el.click()};
 const ratio=d=>d&&(d.ok+d.ko)?d.ok/(d.ok+d.ko):-1;
 function weakest(obj,keys){let best=keys[0],bv=9;keys.forEach(k=>{const d=obj[k],n=d?d.ok+d.ko:0,v=n<3?-1+n/10:d.ok/n;if(v<bv){bv=v;best=k}});return best}
@@ -2095,7 +2117,7 @@ document.getElementById('pWeak').textContent=weak.length?'Points faibles : '+wea
 document.getElementById('pReset').onclick=()=>{if(confirm('Effacer toute la progression ?')){localStorage.removeItem('ff_state');location.reload()}};
 
 /* ================= INIT ================= */
-drawNeck();newTarget(true);drawTri();drawSc();drNew();jzReset();if(window.__ffShared)setTimeout(()=>ffImport(window.__ffShared),300);
+drawNeck();newTarget(true);drawTri();drawSc();drNew();jzReset();setTimeout(()=>{try{hubGo(HUBCUR)}catch(e){hubGo('manche',0)}},30);if(window.__ffShared)setTimeout(()=>ffImport(window.__ffShared),300);
 let rz=null,LW=window.innerWidth;window.addEventListener('resize',()=>{const ae=document.activeElement;if(ae&&ae.tagName==='INPUT'&&ae.type!=='range'&&window.innerWidth===LW)return;LW=window.innerWidth;clearTimeout(rz);rz=setTimeout(redrawAll,150)});
 </script>
 </body>

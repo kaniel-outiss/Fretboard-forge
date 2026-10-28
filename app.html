@@ -138,7 +138,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 <!-- ===== MANCHE ===== -->
 <section class="tab on land" id="t-neck">
   <div class="side">
-    <div class="row brow" id="nVw"><span class="lbl">Vue</span><button class="b" data-nv="prog">🧭 Progression</button><button class="b" data-nv="dict">📖 Dico</button><button class="b" data-nv="caged">CAGED</button><button class="b" data-nv="scale">Gamme</button><button class="b" data-nv="triad">Triades</button><button class="b" data-nv="layers">Couches</button><button class="b" data-nv="taylor">Hiérarchie</button><button class="b" data-nv="jig">Tonalité</button><button class="b" data-nv="mark">Repères</button></div>
+    <div class="row brow" id="nVw"><span class="lbl">Vue</span><button class="b" data-nv="prog">🧭 Progression</button><button class="b" data-nv="dict">📖 Dico</button><button class="b" data-nv="caged">CAGED</button><button class="b" data-nv="scale">Gamme</button><button class="b" data-nv="triad">Structures</button><button class="b" data-nv="layers">Couches</button><button class="b" data-nv="taylor">Hiérarchie</button><button class="b" data-nv="jig">Tonalité</button><button class="b" data-nv="mark">Repères</button></div>
     <div style="display:none"><select id="nKey"></select><select id="nView"><option value="caged">CAGED</option><option value="scale">Gamme</option><option value="triad">Triades</option><option value="layers">Couches (Ellis)</option><option value="taylor">Hiérarchie (Taylor)</option><option value="jig">Tonalité (accords)</option><option value="mark">Repères C‑D‑E‑G‑A</option><option value="dict">📖 Dictionnaire d'accords</option><option value="prog">Progression</option></select></div>
     <div class="row" id="nSub"></div>
     <div class="row"><span class="lbl">Pastilles</span><button class="b" data-m="iv">Intervalles</button><button class="b" data-m="nt">Notes</button><button class="b" data-m="dg">Doigts</button>
@@ -358,7 +358,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.8 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v3.9 — Boss</div>
 </section>
 
 </main>
@@ -626,13 +626,14 @@ else info='Aucun voicing jouable trouvé pour cet accord.';
 for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const pc=(TUNE[s2]+f)%12;if(M.includes(pc))h+=dot(s2,f,['#ff3b5c',0,'#ff9f1a',0,'#ffd23f',0,0,'#39ff88',0,'#2ee6ff'][pc],SHP[pc],{r:14});
 else h+=`<g class="dot" data-s="${s2}" data-f="${f}" style="cursor:pointer"><circle cx="${X(s2)}" cy="${YN(f)}" r="5" fill="#2a2f45"/></g>`}
 info='Fretboard Toolbox : apprends d\'abord ces 5 notes (C‑D‑E‑G‑A, la penta de C / A mineur) partout. Toute autre note est à une case à gauche (♭) ou à droite (♯) d\'une note que tu connais déjà — sauf E‑F et B‑C, collées.';
-}else{ // triades
-sub.innerHTML='<span class="lbl">Qualité</span>'+Object.keys(QUAL).map(q=>`<button class="b ${(N.q||'maj')===q?'on':''}" data-q="${q}">${q}</button>`).join('');
-sub.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{N.q=b.dataset.q;drawNeck()});
-const set=QUAL[N.q||'maj'];
-for(let s=0;s<6;s++)for(let f=0;f<=NF;f++){const iv=(TUNE[s]+f-k+24)%12;if(!set.includes(iv))continue;
-const lab=N.mode==='nt'?nm((TUNE[s]+f)%12,N.key):IVN[iv];h+=dot(s,f,NC[iv],lab,{r:iv===0?15:13})}
-info='Toutes les notes de l\'accord : vois les triades serrées se dessiner sur chaque groupe de 3 cordes.'}
+}else{ // structures : triades, quartes, quintes, sixtes, septièmes
+N.sf=N.sf||'tri';const F=STRF.find(x=>x[0]===N.sf),T=F[2].find(x=>x[0]===N.st)||F[2][0];N.st=T[0];
+sub.innerHTML='<span class="lbl">Famille</span>'+STRF.map(x=>`<button class="b ${N.sf===x[0]?'on':''}" data-sf="${x[0]}">${x[1]}</button>`).join('');
+sub.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{N.sf=b.dataset.sf;N.st=null;drawNeck();strPlay()});
+const ivs=T[2].map(x=>x%12),labs={};T[2].forEach((x,i)=>labs[x%12]=T[3]?T[3][i]:IVN[x%12]);
+for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const iv=(TUNE[s2]+f-k+24)%12;if(!ivs.includes(iv))continue;
+const lab=N.mode==='nt'?nm((TUNE[s2]+f)%12,N.key):labs[iv];h+=dot(s2,f,NC[iv],lab,{r:iv===0?15:13})}
+info=`${KDISP(N.key)} ${T[1]} — ${T[4]}. Toutes les notes sur le manche : cherche les formes serrées sur chaque groupe de cordes.`}
 document.getElementById('nLayRow').style.display=(N.view==='layers'||N.view==='taylor')?'flex':'none';document.getElementById('nGo').style.display=N.view==='layers'?'':'none';document.getElementById('nReset').style.display=N.view==='taylor'?'':'none';
 document.getElementById('nGo').textContent=N.play?'■ Stop':'🎯 Joue la couche';
 setSvg('nSvg',h);document.getElementById('nInfo').textContent=info}
@@ -1729,6 +1730,16 @@ if(q==='6'||q==='m6'){if(!mv(7,2,'nb')&&!mv(0,-3,'nb'))return null}if(q==='add9'
 if(n.some(x=>x[1]<0))n.forEach(x=>x[1]+=12);if(n.some(x=>x[1]>NF))return null;const fz=n.map(x=>x[1]).filter(f=>f>0);if(fz.length&&Math.max(...fz)-Math.min(...fz)>5)return null;return n.map(([s,f,d])=>[s,f,d])}
 function cagedRail(){const R=document.getElementById('nRailR');R.classList.add('wide');R.innerHTML='<div class="rlab">TYPE D\'ACCORD</div><div class="rgrid g2c">'+CQ.map(([q,l])=>`<button class="rc ${(N.cq||'maj')===q?'on':''}" data-cq="${q}">${KDISP(N.key)}${l}</button>`).join('')+'</div>';
 R.querySelectorAll('[data-cq]').forEach(b=>b.onclick=()=>{N.cq=b.dataset.cq;drawNeck();const sh=N.shape==='Toutes'?'C':N.shape,v=cagedQ(shapeIn(sh,N.key),N.cq);if(v)chord(v.map(([s,f])=>MIDI[s]+f))})}
+/* Structures : familles et types */
+const STRF=[['tri','Triades',[['maj','majeure',[0,4,7],null,'3ce M + 3ce m'],['min','mineure',[0,3,7],null,'3ce m + 3ce M'],['dim','diminuée',[0,3,6],null,'deux 3ces m'],['aug','augmentée',[0,4,8],['R','3','#5'],'deux 3ces M'],['sus2','sus2',[0,2,7],null,'2de + 5te'],['sus4','sus4',[0,5,7],null,'4te + 5te'],['b5','majeure ♭5',[0,4,6],null,'3ce M + 3ce dim. (Lydien)']]],
+['q4','Quartes',[['q44','4te J + 4te J',[0,5,10],['R','4','b7'],'empilement « So What »'],['q4a','4te J + 4te aug',[0,5,11],['R','4','7'],'quartal lydien'],['qa4','4te aug + 4te J',[0,6,11],['R','#4','7'],'son lydien'],['q444','4 × 4te J',[0,5,10,15],['R','4','b7','b3'],'quatre sons quartaux (McCoy)'],['qmaj','4tes du majeur (3‑6‑2)',[4,9,14],['3','6','9'],'quartal sur la 3ce (couleur 6/9)']]],
+['q5','Quintes',[['p5','power (R‑5)',[0,7],null,'quinte juste'],['55','5te + 5te',[0,7,14],['R','5','9'],'empilement de quintes (add9 sans 3ce)'],['555','3 quintes',[0,7,14,21],['R','5','9','6'],'R‑5‑9‑13 : couleur 6/9'],['5555','4 quintes',[0,7,14,21,28],['R','5','9','6','3'],'= penta majeure'],['5a','5te + 5te aug.',[0,7,13],['R','5','b9'],'tension phrygienne']]],
+['six','Sixtes',[['6','majeur 6',[0,4,7,9],null,'R‑3‑5‑6'],['m6','mineur 6',[0,3,7,9],null,'R‑b3‑5‑6 (dorien / m. mél.)'],['69','6/9',[0,4,7,9,14],['R','3','5','6','9'],'couleur gospel/jazz'],['m69','m6/9',[0,3,7,9,14],['R','b3','5','6','9'],'mineur 6/9'],['b6','mineur ♭6',[0,3,7,8],null,'éolien'],['6sus','6sus4',[0,5,7,9],null,'sans 3ce']]],
+['sev','Septièmes',[['maj7','maj7',[0,4,7,11],null,'majeur 7'],['7','7',[0,4,7,10],null,'dominante'],['m7','m7',[0,3,7,10],null,'mineur 7'],['m7b5','ø7 (m7♭5)',[0,3,6,10],null,'demi-diminué'],['dim7','°7',[0,3,6,9],['R','b3','b5','°7'],'diminué'],['mMaj7','m(maj7)',[0,3,7,11],null,'mineur majeur 7'],['7b5','7♭5',[0,4,6,10],null,'dominante quinte bémol'],['7#5','7♯5',[0,4,8,10],['R','3','#5','b7'],'dominante augmentée'],['maj7#5','maj7♯5',[0,4,8,11],['R','3','#5','7'],'majeur 7 augmenté'],['maj7b5','maj7♭5',[0,4,6,11],null,'lydien'],['7sus4','7sus4',[0,5,7,10],null,'dominante suspendue']]]];
+function strPlay(){const F=STRF.find(x=>x[0]===N.sf),T=F[2].find(x=>x[0]===N.st)||F[2][0];const r=48+PC[N.key];chord(T[2].map(x=>r+x))}
+function strRail(){const R=document.getElementById('nRailR');R.classList.add('wide');const F=STRF.find(x=>x[0]===(N.sf||'tri'));
+R.innerHTML=`<div class="rlab">${F[1].toUpperCase()}</div><div class="rgrid">`+F[2].map(t=>`<button class="rc ${N.st===t[0]?'on':''}" data-sq="${t[0]}" style="white-space:normal">${KDISP(N.key)} ${t[1]}<small>${t[4]}</small></button>`).join('')+'</div>';
+R.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{N.st=b.dataset.sq;drawNeck();strPlay()})}
 /* rail droit du dictionnaire */
 const DFAM=[['Majeurs',['maj','sus4','6','69','maj7','maj9','m11+','maj13']],['Mineurs',['min','m6','m7','m9','m11','m13','mM7']],['Dim / aug',['m7b5','dim7','dim','aug']],['Dominantes',['7','7sus4','7b5','7#5','9','9b5','9#5','7b9','7#9','11','13','13sus4','5']]];
 function dictRail(){const R=document.getElementById('nRailR');R.classList.add('wide');let fi=DFAM.findIndex(f=>f[1].includes(N.dt));if(N.dfam==null)N.dfam=fi<0?0:fi;
@@ -1740,7 +1751,7 @@ keyRail('nRailL',PC[N.key],k=>{const d=(PC[k]-PC[N.key]+12)%12;N.key=k;document.
 N.view==='prog'?`<button class="rt" id="pMin">${P.minor?'Mineur ⇄ Maj':'Maj ⇄ mineur'}</button>`:'');
 bindExtra=()=>{const b=document.getElementById('pMin');if(b)b.onclick=()=>{P.minor=!P.minor;drawNeck()}};bindExtra();
 document.querySelectorAll('#nVw [data-nv]').forEach(b=>b.classList.toggle('on',b.dataset.nv===N.view));
-if(N.view==='caged'){R.style.display='';cagedRail()}else if(N.view==='prog'||N.view==='dict'){R.style.display=''}else{R.style.display='none';R.innerHTML='';R.classList.remove('wide')}}
+if(N.view==='caged'){R.style.display='';cagedRail()}else if(N.view==='triad'){R.style.display='';N.sf=N.sf||'tri';if(!N.st)N.st=STRF.find(x=>x[0]===N.sf)[2][0][0];strRail()}else if(N.view==='prog'||N.view==='dict'){R.style.display=''}else{R.style.display='none';R.innerHTML='';R.classList.remove('wide')}}
 
 /* ================= GAMMES · accès direct ================= */
 const G={work:'gamme',fam:null,par:false,afam:0,sig:null,mi:0,gi:0};S.tempo=S.tempo||76;

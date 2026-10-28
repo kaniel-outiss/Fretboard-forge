@@ -86,7 +86,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
 .cof{display:flex;justify-content:center;flex:0 0 auto}
 .fill.rails{align-items:stretch;gap:4px}.fill.rails svg.neck{flex:1 1 auto;min-width:0}
 .rail{flex:0 0 auto;width:66px;display:flex;flex-direction:column;align-items:center;gap:4px;overflow-y:auto;scrollbar-width:none;padding:2px 0}.rail::-webkit-scrollbar{display:none}
-.rail:empty{display:none}.rail.wide{width:132px}.rail.wide .rc{width:100%}.rail.wide .rc:not(.sm){font-size:13.5px;padding:6px 1px}.rail.wide .rc small{font-size:10.5px}.rail.wide .rt{width:100%;font-size:11.5px;padding:6px 2px}.rlab{font-size:10.5px}
+.rail:empty{display:none}.rail.split{display:flex!important;flex-direction:column;overflow:hidden;gap:6px}.rail.split .rtop,.rail.split .rbot{display:flex;flex-direction:column;gap:4px;width:100%;min-height:0;overflow-y:auto;scrollbar-width:none}.rail.split .rtop{flex:2 1 0}.rail.split .rbot{flex:1 1 0;border-top:1px solid var(--line);padding-top:4px}.rail.split .rbot .rc{padding:5px 1px;font-size:12px}.rail.split .rtop .rgrid:not(.g2c){display:flex!important;flex-direction:column}.rail.split .rtop .rc{width:100%!important;white-space:normal}.rail.split .rtop .rc small{white-space:normal}.rail.wide{width:132px}.rail.wide .rc{width:100%}.rail.wide .rc:not(.sm){font-size:13.5px;padding:6px 1px}.rail.wide .rc small{font-size:10.5px}.rail.wide .rt{width:100%;font-size:11.5px;padding:6px 2px}.rlab{font-size:10.5px}
 .rgrid{display:flex;flex-direction:column;gap:4px;align-items:center;width:100%}
 .rlab{font-size:9px;color:var(--mut);text-align:center;letter-spacing:.5px;line-height:1.15}
 .rk{width:38px;height:38px;flex:0 0 auto;border-radius:50%;border:1px solid var(--line);background:var(--bg2);color:var(--txt);font-size:13px;padding:0}
@@ -358,7 +358,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v4.1 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v4.2 — Boss</div>
 </section>
 
 </main>
@@ -577,8 +577,7 @@ list.forEach(n=>all[n].forEach(([s,f,d])=>{const pc=(TUNE[s]+f)%12,iv=(pc-k+12)%
 const lab=N.mode==='iv'?IVN[iv]:N.mode==='nt'?nm(pc,N.key):(f===0?'0':d);h+=dot(s,f,col,lab)}));
 if(!info)info=N.shape==='Toutes'?'Les cinq formes s\'emboîtent : chacune partage des notes avec la suivante.':'';if(N.cq&&N.cq!=='maj')info=`${KDISP(N.key)}${CQ.find(x=>x[0]===N.cq)[1]} — forme majeure transformée (pastilles « · » = doigt déplacé). `+(hidden.length?`Formes ${hidden.join(', ')} injouables pour ce type ici.`:'')+info;
 }else if(N.view==='scale'){
-sub.innerHTML='<span class="lbl">Gamme</span><select id="nScSel" style="max-width:170px">'+SCALES.map((s,i)=>`<option value="${i}" ${N.sc===i?'selected':''}>${s[0]}</option>`).join('')+'</select>';
-sub.querySelector('#nScSel').onchange=e=>{N.sc=+e.target.value;drawNeck()};
+sub.innerHTML=`<span class="lbl">Gamme</span><b style="font-size:13px">${KDISP(N.key)} ${SCALES[N.sc][0]}</b>`;
 const [name,fam,set,ch]=SCALES[N.sc];
 for(let s=0;s<6;s++)for(let f=0;f<=NF;f++){const iv=(TUNE[s]+f-k+24)%12;if(!set.includes(iv))continue;
 const lab=N.mode==='nt'?nm((TUNE[s]+f)%12,N.key):IVN[iv];h+=dot(s,f,NC[iv],lab,{pulse:!MAJ.includes(iv)?'#fff':null,ring:iv===ch?NC[iv]:null,r:iv===0?15:13})}
@@ -634,7 +633,7 @@ const ivs=T[2].map(x=>x%12),labs={};T[2].forEach((x,i)=>labs[x%12]=T[3]?T[3][i]:
 for(let s2=0;s2<6;s2++)for(let f=0;f<=NF;f++){const iv=(TUNE[s2]+f-k+24)%12;if(!ivs.includes(iv))continue;
 const lab=N.mode==='nt'?nm((TUNE[s2]+f)%12,N.key):labs[iv];h+=dot(s2,f,NC[iv],lab,{r:iv===0?15:13})}
 info=`${KDISP(N.key)} ${T[1]} — ${T[4]}. `+(N.np?`Chemin « ${NPATHS.find(x=>x[0]===N.np)[1]} » : ${NPATHS.find(x=>x[0]===N.np)[3]} — ▶ Écouter le joue du grave à l'aigu.`:'Choisis un chemin pour l\'écouter du grave à l\'aigu.')}
-if(N.view==='triad'||N.view==='scale'){N.np=N.np===undefined?'court':N.np;const old=document.getElementById('npRowX');if(old)old.remove();const RR=document.getElementById('nRailR');if(N.view==='scale'){RR.style.display='';RR.classList.add('wide');RR.innerHTML=''}npRail(RR);if(N.np){const L=notePath(curIvs(),k,N.np);h+=pathSvg(L,NPATHS.find(x=>x[0]===N.np)[2])}}else{const old=document.getElementById('npRowX');if(old)old.remove()}
+if(N.view==='triad'||N.view==='scale'){N.np=N.np===undefined?'court':N.np;const old=document.getElementById('npRowX');if(old)old.remove();const RR=document.getElementById('nRailR');RR.style.display='';RR.classList.add('wide','split');const top=document.createElement('div'),bot=document.createElement('div');top.className='rtop';bot.className='rbot';if(N.view==='scale'){RR.innerHTML='';scList(top)}else{while(RR.firstChild)top.appendChild(RR.firstChild)}RR.appendChild(top);RR.appendChild(bot);npRail(bot);if(N.np){const L=notePath(curIvs(),k,N.np);h+=pathSvg(L,NPATHS.find(x=>x[0]===N.np)[2])}}else{const old=document.getElementById('npRowX');if(old)old.remove()}
 document.getElementById('nLayRow').style.display=(N.view==='layers'||N.view==='taylor')?'flex':'none';document.getElementById('nGo').style.display=N.view==='layers'?'':'none';document.getElementById('nReset').style.display=N.view==='taylor'?'':'none';
 document.getElementById('nGo').textContent=N.play?'■ Stop':'🎯 Joue la couche';
 setSvg('nSvg',h);document.getElementById('nInfo').textContent=info}
@@ -695,7 +694,7 @@ let nTm=null;document.getElementById('nPlay').onclick=()=>{if(nTm){clearInterval
 if(N.view==='layers'){const L=layNotes();demoRun('nSvg',laySeq().map(m=>L.find(x=>MIDI[x[0]]+x[1]===m)).filter(Boolean).map(x=>({s:x[0],f:x[1]})),.2);return}
 if(N.view==='taylor'){const k=PC[N.key],go=()=>chord(Q7[N.tq].map(iv=>48+k+iv),0,2.2);go();nTm=setInterval(go,2400);return}
 if(N.view==='caged'){let i=0;const go=()=>{N.shape=ORD[i%5];drawNeck();shapeIn(N.shape,N.key).sort((a,b)=>a[0]-b[0]).forEach((x,j)=>setTimeout(()=>tone(MIDI[x[0]]+x[1]),j*110));i++;if(i>5){clearInterval(nTm);nTm=null}};go();nTm=setInterval(go,2200)}
-else if((N.view==='triad'||N.view==='scale')&&N.np){const L=notePath(curIvs(),PC[N.key],N.np);demoRun('nSvg',L,.2)}
+else if((N.view==='triad'||N.view==='scale')&&N.np){npPlay()}
 else{const k=PC[N.key],set=N.view==='scale'?SCALES[N.sc][2]:curIvs();const ms=[];for(let m=48+k;m<=48+k+12;m++)if(set.includes((m-48-k)%12)||m===48+k+12)ms.push(m);ms.forEach((m,i)=>tone(m,i*.18))}};
 
 /* ================= TRIADES ================= */
@@ -1743,9 +1742,15 @@ let j=D.reduce((bi,d,x)=>d.c<D[bi].c?x:bi,0);const out=[];for(let i=n-1;i>=0;i--
 function pathSvg(L,col){if(!L.length)return'';let h=`<polyline points="${L.map(x=>X(x.s)+','+YN(x.f)).join(' ')}" fill="none" stroke="${col}" stroke-width="2.5" stroke-opacity=".55" stroke-dasharray="6 4"/>`;
 for(let i=1;i<L.length;i+=Math.max(1,Math.round(L.length/12))){const a=L[i-1],b=L[i];h+=`<line x1="${X(a.s)}" y1="${YN(a.f)}" x2="${(X(a.s)+X(b.s))/2}" y2="${(YN(a.f)+YN(b.f))/2}" stroke="${col}" stroke-width="2.5" stroke-opacity=".8" marker-end="url(#arY)"/>`}
 h+=`<g pointer-events="none"><circle cx="${X(L[0].s)+14}" cy="${YN(L[0].f)-13}" r="8" fill="${col}"/><text x="${X(L[0].s)+14}" y="${YN(L[0].f)-9.5}" text-anchor="middle" font-size="10" font-weight="700" fill="#05060b">1</text></g>`;return h}
-function npRail(R){const box=document.createElement('div');box.style.cssText='display:flex;flex-direction:column;gap:5px;width:100%;margin-top:8px';
-box.innerHTML='<div class="rlab">CHEMIN</div>'+NPATHS.map(([id,lb,col,d])=>`<button class="rc ${N.np===id?'on':''}" data-np="${id}" style="white-space:normal;border-color:${col}${N.np===id?'':'66'};${N.np===id?`color:${col};box-shadow:0 0 8px ${col}`:''}">${lb}<small>${d}</small></button>`).join('')+`<button class="rc ${N.np?'':'on'}" data-np="">Aucun</button><button class="rc" id="npPlay" style="border-color:#39ff88;color:#39ff88">▶ Écouter</button>`;
-R.appendChild(box);box.querySelectorAll('[data-np]').forEach(b=>b.onclick=()=>{N.np=b.dataset.np;drawNeck();if(N.np)document.getElementById('nPlay').click()});box.querySelector('#npPlay').onclick=()=>document.getElementById('nPlay').click()}
+function npRail(R){R.innerHTML='<div class="rlab">CHEMIN</div><div class="rgrid g2c">'+NPATHS.map(([id,lb,col,d])=>`<button class="rc ${N.np===id?'on':''}" data-np="${id}" title="${d}" style="border-color:${col}${N.np===id?'':'66'};${N.np===id?`color:${col};box-shadow:0 0 8px ${col}`:''}">${lb.replace('Bas du manche','Bas').replace('Horizontal','Horiz.').replace('Diagonale','Diag.')}</button>`).join('')+`<button class="rc ${N.np?'':'on'}" data-np="">Aucun</button></div>`+
+'<div class="rlab">NOTES ENSEMBLE</div><div class="rgrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px">'+[1,2,3,4].map(g=>`<button class="rc ${(N.ng||1)===g?'on':''}" data-ng="${g}" style="width:auto">${g}</button>`).join('')+'</div><button class="rc" id="npPlay" style="border-color:#39ff88;color:#39ff88;width:100%">▶ Écouter ↑↓</button>';
+R.querySelectorAll('[data-np]').forEach(b=>b.onclick=()=>{N.np=b.dataset.np;drawNeck();if(N.np)npPlay()});R.querySelectorAll('[data-ng]').forEach(b=>b.onclick=()=>{N.ng=+b.dataset.ng;drawNeck();if(N.np)npPlay()});R.querySelector('#npPlay').onclick=npPlay}
+function npPlay(){if(!N.np){N.np='court';drawNeck()}const L=notePath(curIvs(),PC[N.key],N.np);if(!L.length)return;ac();const g=N.ng||1,R=[...L].reverse(),G=[];
+if(g===1){[...L,...R.slice(1)].forEach(p=>G.push([p]))}else{for(let i=0;i+g<=L.length;i++)G.push(L.slice(i,i+g));for(let i=1;i+g<=R.length;i++)G.push(R.slice(i,i+g))}
+const tk=++DEMO,dt=g===1?.2:.34;G.forEach((grp,i)=>setTimeout(()=>{if(tk!==DEMO)return;grp.forEach(p=>{pulseAt('nSvg',p.s,p.f,'#ffd23f',true,dt*.9);tone(p.m,0,dt*.95,g>1?.16:.22)})},i*dt*1000))}
+const SCF={F:'Base',P:'Penta',M:'Modes',S:'Mineures',Y:'Sym.',X:'Exot.'};
+function scList(R){const f=N.scf||SCALES[N.sc][1];N.scf=f;R.innerHTML='<div class="rlab">FAMILLE</div><div class="rtabs">'+Object.keys(SCF).map(x=>`<button class="${f===x?'on':''}" data-scf="${x}">${SCF[x]}</button>`).join('')+'</div><div class="rlab">GAMME</div><div class="rgrid">'+SCALES.map((z,i)=>z[1]!==f?'':`<button class="rc sm ${N.sc===i?'on':''}" data-nsc="${i}" style="width:100%">${z[0].replace('Majeure (ionien)','Ionien').replace(/ \(.*\)/,'')}</button>`).join('')+'</div>';
+R.querySelectorAll('[data-scf]').forEach(b=>b.onclick=()=>{N.scf=b.dataset.scf;scList(R)});R.querySelectorAll('[data-nsc]').forEach(b=>b.onclick=()=>{N.sc=+b.dataset.nsc;drawNeck();if(N.np)npPlay()})}
 function npRow(sub){const row=document.createElement('div');row.className='row brow';row.innerHTML='<span class="lbl">Chemin</span>'+NPATHS.map(([id,lb,col,d])=>`<button class="b ${N.np===id?'on':''}" data-np="${id}" title="${d}" style="${N.np===id?`border-color:${col};color:${col}`:''}">${lb}</button>`).join('')+`<button class="b ${N.np?'':'on'}" data-np="">Aucun</button>`;
 sub.after(row);row.querySelectorAll('[data-np]').forEach(b=>b.onclick=()=>{N.np=b.dataset.np;drawNeck();if(N.np)document.getElementById('nPlay').click()})}
 function curIvs(){if(N.view==='scale')return SCALES[N.sc][2];const F=STRF.find(x=>x[0]===(N.sf||'tri')),T=F[2].find(x=>x[0]===N.st)||F[2][0];return T[2].map(x=>x%12)}
@@ -1765,7 +1770,7 @@ function dictRail(){const R=document.getElementById('nRailR');R.classList.add('w
 R.innerHTML='<div class="rlab">FAMILLE</div><div class="rtabs">'+DFAM.map((f,i)=>`<button class="${N.dfam===i?'on':''}" data-dfm="${i}">${f[0]}</button>`).join('')+'</div><div class="rlab">ACCORD</div><div class="rgrid g2c">'+DFAM[N.dfam][1].map(id=>{const d=DICT.find(x=>x[0]===id);return`<button class="rc ${N.dt===id?'on':''}" data-dt="${id}">${KDISP(N.key)}${d[1].replace(' (power)','')}</button>`}).join('')+'</div>';
 R.querySelectorAll('[data-dfm]').forEach(b=>b.onclick=()=>{N.dfam=+b.dataset.dfm;dictRail()});
 R.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>{N.dt=b.dataset.dt;N.dv=0;drawNeck();const v=(N.dvs||[])[0];if(v)chord(v.ms)})}
-function neckRails(){const R=document.getElementById('nRailR');
+function neckRails(){const R=document.getElementById('nRailR');R.classList.remove('split');
 keyRail('nRailL',PC[N.key],k=>{const d=(PC[k]-PC[N.key]+12)%12;N.key=k;document.getElementById('nKey').value=k;if(typeof jgStop==='function')jgStop();N.si=0;N.tc=null;if(d&&P.ch.length){P.ch=P.ch.map(c=>({...c,r:(c.r+d)%12,b:c.b==null?null:(c.b+d)%12}));P.path=null}drawNeck()},
 N.view==='prog'?`<button class="rt" id="pMin">${P.minor?'Mineur ⇄ Maj':'Maj ⇄ mineur'}</button>`:'');
 bindExtra=()=>{const b=document.getElementById('pMin');if(b)b.onclick=()=>{P.minor=!P.minor;drawNeck()}};bindExtra();

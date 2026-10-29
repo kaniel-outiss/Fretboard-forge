@@ -377,7 +377,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v5.6 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v5.7 — Boss</div>
 </section>
 
 </main>
@@ -714,6 +714,8 @@ document.getElementById('nReset').onclick=()=>{N.tc=null;N.tLast=null;drawNeck()
 let nTm=null;document.getElementById('nPlay').onclick=()=>{if(nTm){clearInterval(nTm);nTm=null;return}
 if(N.view==='layers'){const L=layNotes();demoRun('nSvg',laySeq().map(m=>L.find(x=>MIDI[x[0]]+x[1]===m)).filter(Boolean).map(x=>({s:x[0],f:x[1]})),.2);return}
 if(N.view==='taylor'){const k=PC[N.key],go=()=>chord(Q7[N.tq].map(iv=>48+k+iv),0,2.2);go();nTm=setInterval(go,2400);return}
+if(N.view==='caged'&&N.shape!=='Toutes'){const v=cagedQ(shapeIn(N.shape,N.key),N.cq||'maj')||[];const L=v.map(([s2,f])=>({s:s2,f})).sort((a,b)=>MIDI[a.s]+a.f-MIDI[b.s]-b.f);demoRun('nSvg',[...L,...L.slice(0,-1).reverse()],.22);return}
+if(N.view==='dict'){const v=(N.dvs||[])[N.dv||0];if(v){const L=v.fr.map((f,s2)=>f<0?null:{s:s2,f}).filter(Boolean);demoRun('nSvg',[...L,...L.slice(0,-1).reverse()],.2);setTimeout(()=>chord(v.ms),(L.length*2-1)*200+150)}return}
 if(N.view==='caged'){let i=0;const go=()=>{N.shape=ORD[i%5];drawNeck();shapeIn(N.shape,N.key).sort((a,b)=>a[0]-b[0]).forEach((x,j)=>setTimeout(()=>tone(MIDI[x[0]]+x[1]),j*110));i++;if(i>5){clearInterval(nTm);nTm=null}};go();nTm=setInterval(go,2200)}
 else if((N.view==='triad'||N.view==='scale')&&N.np){npPlay()}
 else{const k=PC[N.key],set=N.view==='scale'?SCALES[N.sc][2]:curIvs();const ms=[];for(let m=48+k;m<=48+k+12;m++)if(set.includes((m-48-k)%12)||m===48+k+12)ms.push(m);ms.forEach((m,i)=>tone(m,i*.18))}};
@@ -1751,6 +1753,7 @@ if(q==='7'||q==='m7'||q==='m7b5'){if(!mv(0,-2,'nb'))return null}if(q==='maj7'){i
 if(q==='6'||q==='m6'){if(!mv(7,2,'nb')&&!mv(0,-3,'nb'))return null}if(q==='add9'){if(!mv(0,2,'nb'))return null}
 if(n.some(x=>x[1]<0))n.forEach(x=>x[1]+=12);if(n.some(x=>x[1]>NF))return null;const fz=n.map(x=>x[1]).filter(f=>f>0);if(fz.length&&Math.max(...fz)-Math.min(...fz)>5)return null;return n.map(([s,f,d])=>[s,f,d])}
 function cagedRail(){const R=document.getElementById('nRailR');R.classList.add('wide');R.innerHTML='<div class="rlab">TYPE D\'ACCORD</div><div class="rgrid g2c">'+CQ.map(([q,l])=>`<button class="rc ${(N.cq||'maj')===q?'on':''}" data-cq="${q}">${KDISP(N.key)}${l}</button>`).join('')+'</div>';
+R.insertAdjacentHTML('beforeend','<div class="rlab" style="margin-top:6px">FORME</div><div class="rgrid g2c">'+[...ORD,'Toutes'].map(x=>`<button class="rc ${N.shape===x?'on':''}" data-rsh="${x}">${x}</button>`).join('')+'</div>');R.querySelectorAll('[data-rsh]').forEach(b=>b.onclick=()=>{N.shape=b.dataset.rsh;STP.i=-1;drawNeck();if(N.shape!=='Toutes'){const v=cagedQ(shapeIn(N.shape,N.key),N.cq||'maj');if(v)chord(v.map(([s2,f])=>MIDI[s2]+f))}});
 R.querySelectorAll('[data-cq]').forEach(b=>b.onclick=()=>{N.cq=b.dataset.cq;drawNeck();const sh=N.shape==='Toutes'?'C':N.shape,v=cagedQ(shapeIn(sh,N.key),N.cq);if(v)chord(v.map(([s,f])=>MIDI[s]+f))})}
 /* Chemins d'écoute grave → aigu : plusieurs parcours possibles */
 const NPATHS=[['court','Court','#2ee6ff','reste groupé, petits gestes'],['diag','Diagonale','#ffd23f','monte le long du manche'],['bas','Bas du manche','#39ff88','positions basses, cordes à vide'],['horiz','Horizontal','#ff7a1a','le long des cordes, peu de changements de corde']];
@@ -1804,7 +1807,7 @@ R.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{N.st=b.dataset.sq;draw
 const DFAM=[['Majeurs',['maj','sus4','6','69','maj7','maj9','m11+','maj13']],['Mineurs',['min','m6','m7','m9','m11','m13','mM7']],['Dim / aug',['m7b5','dim7','dim','aug']],['Dominantes',['7','7sus4','7b5','7#5','9','9b5','9#5','7b9','7#9','11','13','13sus4','5']]];
 function dictRail(){const R=document.getElementById('nRailR');R.classList.add('wide');let fi=DFAM.findIndex(f=>f[1].includes(N.dt));if(N.dfam==null)N.dfam=fi<0?0:fi;
 R.innerHTML='<div class="rlab">FAMILLE</div><div class="rtabs">'+DFAM.map((f,i)=>`<button class="${N.dfam===i?'on':''}" data-dfm="${i}">${f[0]}</button>`).join('')+'</div><div class="rlab">ACCORD</div><div class="rgrid g2c">'+DFAM[N.dfam][1].map(id=>{const d=DICT.find(x=>x[0]===id);return`<button class="rc ${N.dt===id?'on':''}" data-dt="${id}">${KDISP(N.key)}${d[1].replace(' (power)','')}</button>`}).join('')+'</div>';
-R.querySelectorAll('[data-dfm]').forEach(b=>b.onclick=()=>{N.dfam=+b.dataset.dfm;dictRail()});
+R.querySelectorAll('[data-dfm]').forEach(b=>b.onclick=()=>{N.dfam=+b.dataset.dfm;dictRail()});const dv=N.dvs||dictVoicings(PC[N.key],N.dt||'maj');if(dv.length){R.insertAdjacentHTML('beforeend','<div class="rlab" style="margin-top:6px">POSITION</div><div class="rgrid g2c">'+dv.map((v,i)=>`<button class="rc ${(N.dv||0)===i?'on':''}" data-rdv="${i}">${v.pos===0?'Ouv.':'Pos '+v.pos}</button>`).join('')+'</div>');R.querySelectorAll('[data-rdv]').forEach(b=>b.onclick=()=>{N.dv=+b.dataset.rdv;STP.i=-1;drawNeck();const v=N.dvs[N.dv];if(v)chord(v.ms)})}
 R.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>{N.dt=b.dataset.dt;N.dv=0;drawNeck();const v=(N.dvs||[])[0];if(v)chord(v.ms)})}
 function neckRails(){const R=document.getElementById('nRailR');R.classList.remove('split');
 keyRail('nRailL',PC[N.key],k=>{const d=(PC[k]-PC[N.key]+12)%12;N.key=k;document.getElementById('nKey').value=k;if(typeof jgStop==='function')jgStop();N.si=0;N.tc=null;if(d&&P.ch.length){P.ch=P.ch.map(c=>({...c,r:(c.r+d)%12,b:c.b==null?null:(c.b+d)%12}));P.path=null}drawNeck()},
@@ -1928,7 +1931,7 @@ function blSteps(){if(BL.mode==='dbl')return turnSeq().map(st=>({n:vN(st)}));if(
 if(BL.mode==='boogie'){const bp=boogiePos(),L=pentaMaj(bp.root,bp.str,bp.f);const u=[...new Set(L.map(n=>MIDI[n.s]+n.f))].sort((a,b)=>a-b);return u.map(m=>{const n=L.find(x=>MIDI[x.s]+x.f===m);return{n:[P3(n.s,n.f)]}})}
 const bi=BL.mode==='box'?BL.box:0,L=boxNotes(bi);return boxSeq(bi).map(m=>L.find(n=>MIDI[n.s]+n.f===m)).filter(Boolean).map(n=>({n:[P3(n.s,n.f)]}))}
 function sgSteps(){const o=[];(SG.bars||[]).forEach((b,bi)=>b.ch.forEach((c,ci)=>{const v=SG.path[bi]&&SG.path[bi][ci];if(v&&!c.cont)o.push({n:vN(v),lab:`mesure ${bi+1} · ${c.cs}`,bi,beat:c.beat})}));return o}
-const STEPSRC={tk:{svg:'tSvg',info:'tkInfo',get:()=>TK.ex==='find'||TK.ex==='bend'?[]:TK.seq.map(n=>({n:[P3(n.s,n.f)],lab:n.fg!=null?'doigt '+n.fg:''})),redraw:()=>tkDraw()},
+const STEPSRC={nk:{svg:'nSvg',info:'nInfo',get:()=>{if(N.view==='caged'&&N.shape!=='Toutes'){const v=cagedQ(shapeIn(N.shape,N.key),N.cq||'maj')||[];return v.map(([s2,f])=>P3(s2,f)).sort((a,b)=>a.m-b.m).map(p=>({n:[p],lab:`forme ${N.shape}`}))}if(N.view==='dict'){const v=(N.dvs||[])[N.dv||0];if(!v)return[];const L=v.fr.map((f,s2)=>f<0?null:P3(s2,f)).filter(Boolean);return[...L.map(p=>({n:[p],lab:v.pos===0?'position ouverte':'position '+v.pos})),{n:L,lab:'accord complet'}]}return[]},redraw:()=>drawNeck()},tk:{svg:'tSvg',info:'tkInfo',get:()=>TK.ex==='find'||TK.ex==='bend'?[]:TK.seq.map(n=>({n:[P3(n.s,n.f)],lab:n.fg!=null?'doigt '+n.fg:''})),redraw:()=>tkDraw()},
 jz:{svg:'jSvg',info:()=>J.mode==='cm'?'cmInfo':J.mode==='im'?'imInfo':'jInfo',get:jzSteps,redraw:()=>jzDraw()},
 bl:{svg:'bSvg',info:'blInfo',get:blSteps,redraw:()=>blDraw()},
 sg:{svg:'gSvg',info:'sgInfo',get:sgSteps,redraw:(st)=>{if(st&&st.bi!=null){SG.bar=st.bi;SG.beat=st.beat||0}sgDraw()}}};
@@ -1941,8 +1944,8 @@ ac();st.n.forEach(p=>tone(p.m,0,1.1,st.n.length>1?.16:.22));
 const nm2=st.n.length>1?hmLab([...st.n].sort((a,b)=>a.m-b.m)):JN[st.n[0].m%12]+` (corde ${6-st.n[0].s}, case ${st.n[0].f})`;
 const el=document.getElementById(typeof src.info==='function'?src.info():src.info);if(el)el.textContent=`Étape ${STP.i+1}/${L.length} : ${st.lab?st.lab+' — ':''}${nm2}`}
 function daStep(d){if(!DA.ev.length)return;daStop();DA.i=(DA.i+d+DA.ev.length)%DA.ev.length;DA.got=[];daDraw();const e=DA.ev[DA.i];ac();e.notes.forEach(x=>tone(x.m,0,1.1,e.notes.length>1?.16:.22))}
-[['tkPlay','tk'],['jPlay','jz'],['cmPlay','jz'],['imPlay','jz'],['blPlay','bl'],['daPlay','da'],['sgGo','sg']].forEach(([id,k])=>{const b=document.getElementById(id);if(!b)return;
-const mk=(d,t)=>{const x=document.createElement('button');x.className='b';x.textContent=t;x.title=d<0?'étape précédente':'étape suivante';x.style.minWidth='38px';x.onclick=()=>k==='da'?daStep(d):stepGo(k,d);return x};
+[['nPlay','nk'],['tkPlay','tk'],['jPlay','jz'],['cmPlay','jz'],['imPlay','jz'],['blPlay','bl'],['daPlay','da'],['sgGo','sg']].forEach(([id,k])=>{const b=document.getElementById(id);if(!b)return;
+const mk=(d,t)=>{const x=document.createElement('button');x.className='b';x.textContent=t;x.title=d<0?'étape précédente':'étape suivante';x.style.minWidth='38px';x.onclick=()=>k==='da'?daStep(d):(k==='nk'&&(N.view==='triad'||N.view==='scale'))?npStep(d):stepGo(k,d);return x};
 b.before(mk(-1,'◀'));b.after(mk(1,'▶'))});
 
 /* ================= MODE FOCUS ================= */
@@ -1951,7 +1954,7 @@ const clk=sel=>{const b=typeof sel==='string'?document.querySelector(sel):sel;if
 function fcCtx(){const t=(document.querySelector('.tab.on')||{}).id;const sx=x=>()=>clk(`#scBand [data-sx=${x}]`);
 if(t==='t-neck'){if(N.view==='prog')return{prev:()=>pStep(-1),next:()=>pStep(1),play:pToggle,info:()=>P.song&&P.ch[P.i]?document.querySelector('#nSub .lyr')?.innerHTML+' &nbsp;·&nbsp; '+document.getElementById('nInfo').textContent.split('‖')[0]:document.getElementById('nInfo').textContent.split('‖')[0],tempo:d=>{P.tempo=Math.max(40,Math.min(200,P.tempo+d*8));if(P.timer){pStop();pToggle()}},playing:()=>!!P.timer};
 if(N.view==='triad'||N.view==='scale')return{prev:()=>npStep(-1),next:()=>npStep(1),play:()=>{N.gi=null;npPlay()},info:()=>document.getElementById('nInfo').textContent};
-return{play:()=>clk('#nPlay'),info:()=>document.getElementById('nInfo').textContent}}
+const stp=(N.view==='caged'&&N.shape!=='Toutes')||N.view==='dict';return{prev:stp?()=>stepGo('nk',-1):null,next:stp?()=>stepGo('nk',1):null,play:()=>clk('#nPlay'),info:()=>document.getElementById('nInfo').textContent}}
 if(t==='t-sc'){if(G.work==='chem')return{prev:()=>npStep(-1),next:()=>npStep(1),play:()=>{N.gi=null;npPlay()},info:()=>document.getElementById('sMood').textContent,tempo:d=>{S.tempo=Math.max(40,Math.min(200,S.tempo+d*8));DA.tempo=S.tempo}};
 return{prev:sx('prev'),next:sx('next'),play:sx('play'),info:()=>(document.getElementById('sBig').textContent+' · '+document.getElementById('sBand').textContent).replace(/ · $/,''),tempo:d=>clk(`#scBand [data-sx=${d>0?'tp':'tm'}]`)}}
 const slide=(id,d)=>{const r=document.getElementById(id);if(!r)return;r.value=+r.value+d*(+r.step||5);r.dispatchEvent(new Event('input'))};

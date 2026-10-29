@@ -20,7 +20,9 @@ body{display:flex;flex-direction:column;height:100dvh}
 .subbar button{flex:1;background:var(--bg2);color:var(--mut);border:1px solid var(--line);border-radius:12px;font-size:12.5px;padding:6px 4px}.subbar button.on{color:var(--acc);border-color:var(--acc);box-shadow:0 0 8px var(--acc)}
 @media (orientation:landscape){body{padding-left:62px;box-sizing:border-box}.hubnav{position:fixed;left:0;top:0;bottom:0;width:62px;flex-direction:column;border-top:0;border-right:1px solid var(--line);padding:0}.hubnav button{font-size:9.5px;padding:4px 1px}.hubnav button i{font-size:19px}.subbar{padding-top:2px}.subbar button{padding:3px 4px;font-size:11.5px}}
 #fcTop,#fcBar{display:none}
-body.focus header,body.focus #hubNav,body.focus #subBar,body.focus .tab .side,body.focus .rail,body.focus .modbar{display:none!important}
+.fill{position:relative}.ntag{position:absolute;top:2px;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none;font-size:20px;font-weight:700;color:#fff;text-shadow:0 0 10px var(--acc),0 0 2px #000;white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}.ntag small{font-size:13px;font-weight:500;color:#ffd23f;margin-left:6px}.ntag:empty{display:none}body.focus .ntag{font-size:26px;top:0}
+.fill.withtag{padding-top:28px}body.focus .fill.withtag{padding-top:34px}
+body.focus header,body.focus #hubNav,body.focus #subBar,body.focus .tab .side,body.focus .modbar{display:none!important}
 body.focus #t-neck .side,body.focus #t-sc .side,body.focus #t-tri .side,body.focus #t-jz .side,body.focus #t-bl .side,body.focus #t-sg .side,body.focus #t-dr .side{display:none!important}body.focus #t-neck.on,body.focus #t-sc.on{flex-direction:column}body.focus{padding-left:0!important}body.focus .tab{padding:30px 4px 64px}body.focus .fill{flex:1 1 auto}
 body.focus #fcTop{display:block;position:fixed;top:0;left:0;right:0;z-index:20;padding:6px 12px;font-size:14px;line-height:1.35;text-align:center;background:linear-gradient(#05060bee,#05060b99);color:var(--txt);max-height:3.4em;overflow:hidden}
 body.focus #fcTop .lyr{display:inline;background:none;border:0;padding:0;font-size:15px}
@@ -375,7 +377,7 @@ svg.neck.h text{transform-box:fill-box;transform-origin:center;transform:rotate(
   <div class="info" id="pWeak"></div>
   <div class="row" style="justify-content:center;margin-top:auto"><button class="b" id="pReset">Réinitialiser</button></div>
   </div>
-  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v5.5 — Boss</div>
+  <div class="info" style="text-align:center;font-size:10px">Fretboard Forge v5.6 — Boss</div>
 </section>
 
 </main>
@@ -1975,6 +1977,21 @@ let fcT0=null;document.addEventListener('touchstart',e=>{if(!FC.on||e.touches.le
 document.addEventListener('touchend',e=>{if(!FC.on||!fcT0)return;const t=e.changedTouches[0],dx=t.clientX-fcT0.x,dy=t.clientY-fcT0.y,dt=Date.now()-fcT0.t;fcT0=null;if(dt>600)return;
 if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){const C=fcCtx();(dx<0?C.next:C.prev)&&(dx<0?C.next:C.prev)();setTimeout(fcUpd,50)}else if(dy>120&&Math.abs(dy)>Math.abs(dx)*2&&fcT0===null&&t.clientY>innerHeight*.35)fcSet(false)},{passive:true});
 document.addEventListener('keydown',e=>{if(!FC.on)return;const C=fcCtx();if(e.key==='Escape')fcSet(false);else if(e.key==='ArrowRight'&&C.next)C.next();else if(e.key==='ArrowLeft'&&C.prev)C.prev();else if(e.key===' '&&C.play){e.preventDefault();C.play()}});
+
+/* ================= NOM ÉVIDENT (accord / gamme) au-dessus du manche ================= */
+function curName(){const t=(document.querySelector('.tab.on')||{}).id,K=k=>KDISP(k||'C');const nx=x=>x?`<small>→ ${x}</small>`:'';
+try{if(t==='t-neck'){if(N.view==='prog'){const c=P.ch[P.i];if(!c)return K(N.key)+(P.minor?'m':'');const n=P.ch.length>1?P.ch[(P.i+1)%P.ch.length]:null;return pName(c)+nx(n&&pName(n))}
+if(N.view==='triad'){const F=STRF.find(x=>x[0]===(N.sf||'tri')),T=F[2].find(x=>x[0]===N.st)||F[2][0];return K(N.key)+' '+T[1]}
+if(N.view==='scale')return K(N.key)+' '+SCALES[N.sc][0];if(N.view==='dict'){const d=DICT.find(x=>x[0]===N.dt);return K(N.key)+(d?d[1]:'')}
+if(N.view==='caged')return K(N.key)+(CQ.find(x=>x[0]===(N.cq||'maj'))||['',''])[1]+(N.shape&&N.shape!=='Toutes'?`<small>forme ${N.shape}</small>`:'');
+if(N.view==='taylor')return K(N.key)+Q7N[N.tq||'7'];if(N.view==='jig'){const c=N.jcx;return c?jName(c.r,c.q,N.key,c.fl):K(N.key)+' majeur'}return K(N.key)}
+if(t==='t-sc')return K(KEYS.find(x=>PC[x]===S.k)||SHP[S.k])+' '+SCALES[S.s][0];
+const txt=id=>{const e=document.getElementById(id);return e?e.textContent.split(/ — | · /)[0]:''};
+if(t==='t-tri')return DRM==='tk'?(TK.ex==='find'||TK.ex==='spider'?txt('tkBig'):K(TK.key)+' '+TKX[TK.ex].lb):DRM==='da'?txt('daBig'):DRM==='ear'?'':DRM==='nm'?'':txt('tBig');
+if(t==='t-jz')return J.mode==='cm'?txt('cmBig'):J.mode==='im'?txt('imBig'):J.mode==='h'?'':(J.tgt&&J.tgt.c?J.tgt.c.name+Q7N[J.tgt.c.q]:K(J.key)+Q7N[J.q]);
+if(t==='t-bl'){const e=document.getElementById('blBig').textContent;return K(BL.key)+' blues'+`<small>${e.split(/ — /).slice(1).join(' — ')}</small>`}if(t==='t-dr')return document.getElementById('dTitle').textContent;if(t==='t-sg'){const c=sgCur();return c.c?c.c.cs+(c.n?`<small>→ ${c.n.cs}</small>`:''):''}}catch(e){}return''}
+document.querySelectorAll('.tab .fill').forEach(f=>{if(f.closest('#t-pro'))return;const d=document.createElement('div');d.className='ntag';f.prepend(d);f.classList.add('withtag')});
+setInterval(()=>{const t=document.querySelector('.tab.on');if(!t)return;const g=t.querySelector('.ntag');if(!g)return;const h=curName();if(g.dataset.h!==h){g.dataset.h=h;g.innerHTML=h}},250);
 
 sideReflow();
 let DRM='tri';document.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>drillMode(b.dataset.dm));
